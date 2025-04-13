@@ -378,21 +378,21 @@ export const stapiService = {
       
       const $ = cheerio.load(html);
       
-      // Try to find the main image - first look for infobox image
+      // Try to find the og:image meta tag first (usually the best quality)
+      const ogImage = $('meta[property="og:image"]').attr('content');
+      if (ogImage) {
+        // Return the raw URL directly without proxying
+        return this.cleanWikiaImageUrl(ogImage);
+      }
+      
+      // Try to find the main image - look for infobox image
       const infoboxImage = $('.pi-image img').first();
       if (infoboxImage.length) {
         let src = infoboxImage.attr('src');
         if (src) {
-          // Make sure we have the correct parameters
-          src = this.cleanWikiaImageUrl(src);
-          return this.proxyImageUrl(src);
+          // Return the raw URL directly without proxying
+          return this.cleanWikiaImageUrl(src);
         }
-      }
-      
-      // Try to find the og:image meta tag
-      const ogImage = $('meta[property="og:image"]').attr('content');
-      if (ogImage) {
-        return this.proxyImageUrl(this.cleanWikiaImageUrl(ogImage));
       }
       
       // Look for any image in the article content
@@ -400,7 +400,8 @@ export const stapiService = {
       if (contentImage.length) {
         let src = contentImage.attr('src');
         if (src) {
-          return this.proxyImageUrl(this.cleanWikiaImageUrl(src));
+          // Return the raw URL directly without proxying
+          return this.cleanWikiaImageUrl(src);
         }
       }
       
