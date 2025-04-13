@@ -19,7 +19,11 @@ try {
     try {
       const html = await stapiService.getMemoryAlphaPageHTML("James_T._Kirk");
       const $ = await import('cheerio').then(module => module.load(html));
-      rawImageUrl = $('meta[property="og:image"]').attr('content');
+      const rawUrl = $('meta[property="og:image"]').attr('content');
+      if (rawUrl) {
+        // Use the proxy for the raw image URL
+        rawImageUrl = stapiService.proxyImageUrl(stapiService.cleanWikiaImageUrl(rawUrl));
+      }
       console.log("Raw Kirk image URL:", rawImageUrl);
     } catch (error) {
       console.error("Error getting raw image URL:", error);

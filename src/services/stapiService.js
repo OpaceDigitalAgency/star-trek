@@ -381,8 +381,9 @@ export const stapiService = {
       // Try to find the og:image meta tag first (usually the best quality)
       const ogImage = $('meta[property="og:image"]').attr('content');
       if (ogImage) {
-        // Return the raw URL directly without proxying
-        return this.cleanWikiaImageUrl(ogImage);
+        // Use the proxy for the image
+        const cleanedUrl = this.cleanWikiaImageUrl(ogImage);
+        return this.proxyImageUrl(cleanedUrl);
       }
       
       // Try to find the main image - look for infobox image
@@ -390,8 +391,9 @@ export const stapiService = {
       if (infoboxImage.length) {
         let src = infoboxImage.attr('src');
         if (src) {
-          // Return the raw URL directly without proxying
-          return this.cleanWikiaImageUrl(src);
+          // Use the proxy for the image
+          const cleanedUrl = this.cleanWikiaImageUrl(src);
+          return this.proxyImageUrl(cleanedUrl);
         }
       }
       
@@ -400,8 +402,9 @@ export const stapiService = {
       if (contentImage.length) {
         let src = contentImage.attr('src');
         if (src) {
-          // Return the raw URL directly without proxying
-          return this.cleanWikiaImageUrl(src);
+          // Use the proxy for the image
+          const cleanedUrl = this.cleanWikiaImageUrl(src);
+          return this.proxyImageUrl(cleanedUrl);
         }
       }
       
