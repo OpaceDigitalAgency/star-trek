@@ -38,7 +38,7 @@ characters.forEach(character => {
 const speciesNames = Object.keys(charactersBySpecies).sort();
 
 // Enhance character data with Memory Alpha information for the first few characters of each species
-const MAX_CHARACTERS_PER_SPECIES = 5;
+const MAX_CHARACTERS_PER_SPECIES = 20; // Increased from 5 to show more characters with images
 for (const species of speciesNames) {
   const speciesCharacters = charactersBySpecies[species];
   if (speciesCharacters && speciesCharacters.length > 0) {
