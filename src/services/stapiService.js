@@ -438,10 +438,10 @@ export const stapiService = {
   proxyImageUrl(url) {
     if (!url) return null;
     
-    // Use the direct Netlify function path for local development
-    // and the API path for production
-    const isLocalDev = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-    const proxyPath = isLocalDev ? '/.netlify/functions/proxy-image' : '/api/proxy-image';
+    // IMPORTANT: Always use the direct Netlify function path
+    // The redirect from /api/proxy-image to /.netlify/functions/proxy-image
+    // might not be working correctly on Netlify
+    const proxyPath = '/.netlify/functions/proxy-image';
     
     // Return the proxied URL
     return `${proxyPath}?url=${encodeURIComponent(url)}`;

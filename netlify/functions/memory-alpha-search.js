@@ -70,7 +70,7 @@ exports.handler = async function(event, context) {
         snippet: result.snippet,
         summary: firstParagraph,
         url: pageUrl,
-        imageUrl: ogImage ? `/api/proxy-image?url=${encodeURIComponent(ogImage)}` : null
+        imageUrl: ogImage ? `/.netlify/functions/proxy-image?url=${encodeURIComponent(ogImage)}` : null
       };
     }));
     
