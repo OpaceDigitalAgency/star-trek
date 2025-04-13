@@ -1,0 +1,236 @@
+---
+// Featured characters component with Memory Alpha integration
+import { stapiService } from '../services/stapiService';
+
+// Fetch top characters from STAPI and Memory Alpha
+let featuredCharacters = [];
+try {
+  // Kirk
+  const response = await stapiService.searchCharacters("Kirk");
+  if (response.length > 0) {
+    // Also fetch Memory Alpha data for Kirk
+    const kirkData = await stapiService.getMemoryAlphaContent("James T. Kirk");
+    
+    // Debug: Log the image URL
+    console.log("Kirk image URL:", kirkData.image);
+    
+    // Try to get the raw image URL from Memory Alpha
+    let rawImageUrl = null;
+    try {
+      const html = await stapiService.getMemoryAlphaPageHTML("James_T._Kirk");
+      const $ = await import('cheerio').then(module => module.load(html));
+      rawImageUrl = $('meta[property="og:image"]').attr('content');
+      console.log("Raw Kirk image URL:", rawImageUrl);
+    } catch (error) {
+      console.error("Error getting raw image URL:", error);
+    }
+    
+    featuredCharacters.push({
+      name: response[0].name,
+      series: "The Original Series",
+      // Try the raw image URL first, then the proxy, then the fallback
+      image: rawImageUrl || kirkData.image || `/images/kirk-placeholder.jpg`,
+      slug: response[0].uid,
+      wikiUrl: kirkData.wikiUrl
+    });
+  }
+  
+  // Picard
+  const picardResponse = await stapiService.searchCharacters("Picard");
+  if (picardResponse.length > 0) {
+    // Also fetch Memory Alpha data for Picard
+    const picardData = await stapiService.getMemoryAlphaContent("Jean-Luc Picard");
+    featuredCharacters.push({
+      name: picardResponse[0].name,
+      series: "The Next Generation",
+      image: picardData.image || `/images/picard-placeholder.jpg`,
+      slug: picardResponse[0].uid,
+      wikiUrl: picardData.wikiUrl
+    });
+  }
+  
+  // Sisko
+  const siskoResponse = await stapiService.searchCharacters("Sisko");
+  if (siskoResponse.length > 0) {
+    // Also fetch Memory Alpha data for Sisko
+    const siskoData = await stapiService.getMemoryAlphaContent("Benjamin Sisko");
+    featuredCharacters.push({
+      name: siskoResponse[0].name,
+      series: "Deep Space Nine",
+      image: siskoData.image || `/images/sisko-placeholder.jpg`,
+      slug: siskoResponse[0].uid,
+      wikiUrl: siskoData.wikiUrl
+    });
+  }
+  
+  // Janeway
+  const janewayResponse = await stapiService.searchCharacters("Janeway");
+  if (janewayResponse.length > 0) {
+    // Also fetch Memory Alpha data for Janeway
+    const janewayData = await stapiService.getMemoryAlphaContent("Kathryn Janeway");
+    featuredCharacters.push({
+      name: janewayResponse[0].name,
+      series: "Voyager",
+      image: janewayData.image || `/images/janeway-placeholder.jpg`,
+      slug: janewayResponse[0].uid,
+      wikiUrl: janewayData.wikiUrl
+    });
+  }
+} catch (error) {
+  console.error("Error fetching character data:", error);
+}
+
+// Fallback if API fails
+if (featuredCharacters.length === 0) {
+  featuredCharacters = [
+    {
+      name: "Captain James T. Kirk",
+      series: "The Original Series",
+      image: `/images/kirk-placeholder.jpg`,
+      slug: "james-kirk",
+      wikiUrl: "https://memory-alpha.fandom.com/wiki/James_T._Kirk"
+    },
+    {
+      name: "Captain Jean-Luc Picard",
+      series: "The Next Generation",
+      image: `/images/picard-placeholder.jpg`,
+      slug: "jean-luc-picard",
+      wikiUrl: "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard"
+    },
+    {
+      name: "Captain Benjamin Sisko",
+      series: "Deep Space Nine",
+      image: `/images/sisko-placeholder.jpg`,
+      slug: "benjamin-sisko",
+      wikiUrl: "https://memory-alpha.fandom.com/wiki/Benjamin_Sisko"
+    },
+    {
+      name: "Captain Kathryn Janeway",
+      series: "Voyager",
+      image: `/images/janeway-placeholder.jpg`,
+      slug: "kathryn-janeway",
+      wikiUrl: "https://memory-alpha.fandom.com/wiki/Kathryn_Janeway"
+    }
+  ];
+}
+---
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-10">
+  {featuredCharacters.map((character, index) => (
+    <a href={`/characters/${character.slug}/`} class="character-profile" data-index={index}>
+      <div class="character-container lcars-interface">
+        <div class="lcars-header bg-starfleet-gold h-4 rounded-tl-lg w-full"></div>
+        <div class="character-image aspect-square overflow-hidden border-2 border-console-blue mb-2 relative">
+          <img
+            src={character.image}
+            alt={character.name}
+            class="w-full h-full object-cover"
+            loading="lazy"
+            onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg'; console.error('Image failed to load:', this.src);"
+          />
+          <!-- Debug: Show the image URL -->
+          <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 overflow-hidden">
+            {character.image ? character.image.substring(0, 30) + '...' : 'No image URL'}
+          </div>
+          <div class="scanner-line absolute inset-x-0 h-[2px] bg-starfleet-blue opacity-60 top-0"></div>
+          <div class="targeting-reticle absolute inset-0 opacity-0 transition-opacity duration-300"></div>
+        </div>
+        <div class="lcars-footer flex">
+          <div class="bg-starfleet-blue w-10 h-4"></div>
+          <div class="bg-starfleet-red flex-grow h-4"></div>
+        </div>
+      </div>
+      
+      <div class="character-info text-center mt-3">
+        <h3 class="text-white text-lg font-semibold mb-1">{character.name}</h3>
+        <p class="text-console-blue text-sm">{character.series}</p>
+        
+        {character.wikiUrl && (
+          <a href={character.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center mt-1" onclick={(e) => { e.stopPropagation(); e.preventDefault(); window.open(character.wikiUrl, '_blank'); }}>
+            Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+          </a>
+        )}
+      </div>
+    </a>
+  ))}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Scanner line animation
+    const scannerLines = document.querySelectorAll('.scanner-line');
+    
+    scannerLines.forEach(line => {
+      const duration = 2000 + Math.random() * 1000;
+      
+      line.animate(
+        [
+          { top: '0%' },
+          { top: '100%' }
+        ],
+        {
+          duration: duration,
+          iterations: Infinity,
+          easing: 'cubic-bezier(0.37, 0, 0.63, 1)'
+        }
+      );
+    });
+    
+    // Targeting reticle on hover
+    const characterProfiles = document.querySelectorAll('.character-profile');
+    characterProfiles.forEach(profile => {
+      const reticle = profile.querySelector('.targeting-reticle');
+      
+      if (reticle) {
+        profile.addEventListener('mouseenter', () => {
+          reticle.style.opacity = '1';
+        });
+        
+        profile.addEventListener('mouseleave', () => {
+          reticle.style.opacity = '0';
+        });
+      }
+    });
+  });
+</script>
+
+<style>
+  .character-container {
+    transition: all 0.3s ease;
+    background-color: rgba(3, 10, 23, 0.7);
+    padding: 0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .character-profile:hover .character-container {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 178, 255, 0.4);
+  }
+  
+  .character-profile:hover .character-image {
+    border-color: var(--starfleet-gold);
+  }
+  
+  .character-image {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .targeting-reticle {
+    background: 
+      radial-gradient(circle, transparent 20px, rgba(0, 178, 255, 0.2) 21px, transparent 22px),
+      radial-gradient(circle, rgba(0, 178, 255, 0.3) 25px, transparent 26px),
+      linear-gradient(to bottom, transparent 49%, rgba(0, 178, 255, 0.3) 50%, transparent 51%),
+      linear-gradient(to right, transparent 49%, rgba(0, 178, 255, 0.3) 50%, transparent 51%);
+    mix-blend-mode: screen;
+  }
+  
+  .character-info {
+    transition: all 0.3s ease;
+  }
+  
+  .character-profile:hover .character-info h3 {
+    color: var(--starfleet-gold);
+  }
+</style>

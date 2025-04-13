@@ -1,0 +1,227 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import LatestSeries from '../components/LatestSeries.astro';
+import TimelinePreview from '../components/TimelinePreview.astro';
+import FeaturedCharacters from '../components/FeaturedCharacters.astro';
+import { stapiService, extractYears, extractStardateYears } from '../services/stapiService';
+
+// Fetch data from STAPI
+const allSeries = await stapiService.getSeries();
+
+// Map STAPI data to our format
+const featuredSeries = allSeries
+  .filter(series => ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Discovery"].includes(series.title))
+  .map(series => ({
+    title: series.title,
+    slug: series.uid,
+    years: extractYears(series),
+    image: `/images/placeholder-${series.title.toLowerCase().replace('star trek: ', '').replace(/\s+/g, '-')}.jpg`,
+    description: series.abbreviation 
+      ? `${series.abbreviation}: ${series.productionEndYear ? 'Completed' : 'Ongoing'} series spanning ${extractStardateYears(series)} in the Star Trek universe.` 
+      : "A Star Trek series in the larger franchise."
+  }));
+
+// Get additional data from Memory Alpha for featured series
+for (let i = 0; i < Math.min(featuredSeries.length, 3); i++) {
+  try {
+    const wikiData = await stapiService.getMemoryAlphaContent(featuredSeries[i].title.replace('Star Trek: ', ''));
+    if (wikiData.summary) {
+      featuredSeries[i].wikiSummary = wikiData.summary;
+    }
+    if (wikiData.image) {
+      featuredSeries[i].wikiImage = wikiData.image;
+    }
+    featuredSeries[i].wikiUrl = wikiData.wikiUrl;
+  } catch (error) {
+    console.error(`Error fetching Memory Alpha data for ${featuredSeries[i].title}:`, error);
+  }
+}
+
+// If STAPI fails to fetch data, use our fallback data
+if (featuredSeries.length === 0) {
+  const fallbackSeries = [
+    {
+      title: "Star Trek: The Original Series",
+      slug: "tos",
+      years: "1966-1969",
+      image: `/images/placeholder-original-series.jpg`,
+      description: "The adventures of the USS Enterprise under the command of Captain James T. Kirk."
+    },
+    {
+      title: "Star Trek: The Next Generation",
+      slug: "tng",
+      years: "1987-1994",
+      image: `/images/placeholder-next-generation.jpg`,
+      description: "Set almost 100 years after the original series, it follows a new crew aboard the Enterprise-D."
+    },
+    {
+      title: "Star Trek: Discovery",
+      slug: "discovery",
+      years: "2017-2024",
+      image: `/images/placeholder-discovery.jpg`,
+      description: "Following the adventures of the USS Discovery and later 32nd century exploration."
+    }
+  ];
+  featuredSeries.push(...fallbackSeries);
+}
+
+// Create JSON-LD schema for the home page
+const homePageSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Star Trek Timelines | Interactive Chronology of the Star Trek Universe",
+  "description": "Explore the vast Star Trek universe chronologically, with detailed timelines of all shows, movies, and key events from the Original Series to Discovery and beyond.",
+  "url": "https://star-trek-timelines.netlify.app/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Star Trek Timelines",
+    "url": "https://star-trek-timelines.netlify.app/"
+  },
+  "about": {
+    "@type": "CreativeWorkSeries",
+    "name": "Star Trek",
+    "description": "Science fiction media franchise created by Gene Roddenberry"
+  },
+  "hasPart": featuredSeries.map(series => ({
+    "@type": "TVSeries",
+    "name": series.title,
+    "url": `https://star-trek-timelines.netlify.app/series/${series.slug}/`,
+    "temporalCoverage": series.years
+  }))
+};
+---
+
+<Layout 
+  title="Star Trek Timelines | Interactive Chronology of the Star Trek Universe"
+  description="Explore the vast Star Trek universe chronologically, with detailed timelines of all shows, movies, and key events from the Original Series to Discovery and beyond."
+  schemaData={homePageSchema}
+>
+  <Hero />
+  
+  <div class="container mx-auto px-4 py-16">
+    <div class="lcars-panel my-16" data-animation="fade-up">
+      <h2 class="text-2xl text-starfleet-gold font-semibold mb-4">LCARS: Federation Database Access</h2>
+      <p class="text-gray-300 mb-6 leading-relaxed">
+        Welcome to the Federation Temporal Database. This resource catalogs the entire Star Trek universe 
+        from First Contact in 2063 to the far future of the 32nd century. 
+        Access complete series information, character profiles, and timeline data 
+        using official Starfleet Library Computer Access/Retrieval System (LCARS) protocols.
+      </p>
+      
+      <div class="flex flex-wrap justify-center gap-6 mt-8">
+        <a href="/timeline/" class="trek-button primary">Explore Timeline</a>
+        <a href="/series/" class="trek-button">Browse Series</a>
+      </div>
+    </div>
+    
+    <div class="my-24" data-animation="fade-up">
+      <div class="lcars-header mb-12">
+        <div class="lcars-header-content">
+          <h2 class="text-2xl font-semibold flex items-center">
+            <span class="inline-block w-3 h-3 bg-starfleet-gold rounded-full mr-3"></span>
+            Featured Series
+          </h2>
+        </div>
+      </div>
+      <LatestSeries series={featuredSeries} />
+    </div>
+    
+    <div class="my-24" data-animation="fade-up">
+      <div class="lcars-header mb-12">
+        <div class="lcars-header-content">
+          <h2 class="text-2xl font-semibold flex items-center">
+            <span class="inline-block w-3 h-3 bg-starfleet-blue rounded-full mr-3"></span>
+            Timeline Overview
+          </h2>
+        </div>
+      </div>
+      <TimelinePreview />
+    </div>
+    
+    <div class="my-24" data-animation="fade-up">
+      <div class="lcars-header mb-12">
+        <div class="lcars-header-content">
+          <h2 class="text-2xl font-semibold flex items-center">
+            <span class="inline-block w-3 h-3 bg-starfleet-red rounded-full mr-3"></span>
+            Iconic Characters
+          </h2>
+        </div>
+      </div>
+      <FeaturedCharacters />
+    </div>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Simpler animation without GSAP dependency for better performance
+    const fadeElements = document.querySelectorAll('[data-animation="fade-up"]');
+    
+    const animateElement = (element) => {
+      const animation = element.animate(
+        [
+          { opacity: 0, transform: 'translateY(40px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        {
+          duration: 800,
+          fill: 'forwards',
+          easing: 'ease-out'
+        }
+      );
+      
+      // Pause animation initially
+      animation.pause();
+      
+      // Play animation when element is in viewport
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animation.play();
+            observer.unobserve(element);
+          }
+        });
+      }, { threshold: 0.1 });
+      
+      observer.observe(element);
+    };
+    
+    fadeElements.forEach(element => {
+      animateElement(element);
+    });
+  });
+</script>
+
+<style>
+  .lcars-panel {
+    background-color: rgba(3, 10, 23, 0.8);
+    border: 1px solid var(--starfleet-gold);
+    border-radius: 0 20px 0 0;
+    border-left-width: 20px;
+    position: relative;
+    padding: 1.5rem 2rem;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 60px;
+      height: 20px;
+      background-color: var(--starfleet-gold);
+      border-top-left-radius: 10px;
+    }
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 60px;
+      height: 20px;
+      background-color: var(--starfleet-blue);
+      border-bottom-right-radius: 10px;
+    }
+  }
+</style>

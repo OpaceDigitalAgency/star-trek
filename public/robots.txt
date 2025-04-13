@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://star-trek-timelines.netlify.app/sitemap.xml
+
+# Prevent access to administrative areas
+Disallow: /admin/
+Disallow: /wp-admin/
+Disallow: /login/

@@ -1,0 +1,215 @@
+---
+// A preview of the timeline showing key eras with LCARS design
+// Using explicit static data for better stability
+
+const timelineEras = [
+  {
+    name: "22nd Century",
+    years: "2151-2200",
+    series: ["Enterprise"],
+    color: "console-green",
+    icon: "🚀"
+  },
+  {
+    name: "23rd Century",
+    years: "2233-2299",
+    series: ["Discovery (S1-2)", "The Original Series", "TOS Films"],
+    color: "starfleet-gold",
+    icon: "🌟"
+  },
+  {
+    name: "24th Century",
+    years: "2364-2399",
+    series: ["The Next Generation", "Deep Space Nine", "Voyager", "TNG Films", "Picard"],
+    color: "starfleet-blue",
+    icon: "🖖"
+  },
+  {
+    name: "32nd Century",
+    years: "3188-3190",
+    series: ["Discovery (S3+)"],
+    color: "starfleet-red",
+    icon: "✨"
+  }
+];
+---
+
+<div class="timeline-track py-8 relative">
+  <div class="timeline-line absolute top-0 bottom-0 left-1/2 w-0.5 bg-starfleet-blue z-10"></div>
+  
+  {timelineEras.map((era, index) => (
+    <div class={`timeline-era relative mb-20 flex ${index % 2 === 0 ? '' : 'flex-row-reverse'}`} data-era={era.name.toLowerCase().replace(' ', '-')}>
+      <div class={`timeline-node bg-${era.color} absolute left-1/2 transform -translate-x-1/2 z-20`}></div>
+      
+      <div class={`era-content ${index % 2 === 0 ? 'mr-auto pr-12 text-right' : 'ml-auto pl-12'} w-5/12`}>
+        <div class={`era-box border-${era.color} relative`}>
+          <div class={`absolute top-0 left-0 w-full h-1 bg-${era.color}`}></div>
+          
+          <h3 class={`text-${era.color} text-2xl font-semibold mb-2 flex ${index % 2 === 0 ? 'justify-end' : 'justify-start'} items-center`}>
+            {index % 2 === 0 ? (
+              <>
+                {era.name} <span class="ml-2 era-icon">{era.icon}</span>
+              </>
+            ) : (
+              <>
+                <span class="mr-2 era-icon">{era.icon}</span> {era.name}
+              </>
+            )}
+          </h3>
+          
+          <p class="text-white mb-2">{era.years}</p>
+          <ul class={`text-gray-300 text-sm ${index % 2 === 0 ? 'text-right' : 'text-left'}`}>
+            {era.series.map(series => (
+              <li class="mb-1">{series}</li>
+            ))}
+          </ul>
+        </div>
+        
+        <div class={`connector absolute top-1/2 ${index % 2 === 0 ? 'right-0' : 'left-0'} w-12 h-0.5 bg-${era.color} transform -translate-y-1/2 z-10`}></div>
+      </div>
+    </div>
+  ))}
+  
+  <div class="text-center mt-12">
+    <a href="/timeline/" class="trek-button primary">
+      View Complete Timeline
+    </a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Simple reveal animation for timeline nodes
+    const animateTimelineElements = () => {
+      const eras = document.querySelectorAll('.timeline-era');
+      
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const era = entry.target;
+            const node = era.querySelector('.timeline-node');
+            const content = era.querySelector('.era-content');
+            const connector = era.querySelector('.connector');
+            
+            // Animate node
+            node.animate(
+              [
+                { transform: 'translate(-50%, 0) scale(0)', opacity: 0 },
+                { transform: 'translate(-50%, 0) scale(1)', opacity: 1 }
+              ],
+              { duration: 500, fill: 'forwards', easing: 'ease-out' }
+            );
+            
+            // Animate content
+            content.animate(
+              [
+                { opacity: 0, transform: 'translateY(20px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+              ],
+              { duration: 800, delay: 200, fill: 'forwards', easing: 'ease-out' }
+            );
+            
+            // Animate connector
+            connector.animate(
+              [
+                { width: '0' },
+                { width: '3rem' }
+              ],
+              { duration: 600, delay: 400, fill: 'forwards', easing: 'ease-out' }
+            );
+            
+            observer.unobserve(era);
+          }
+        });
+      }, { threshold: 0.2 });
+      
+      eras.forEach(era => {
+        observer.observe(era);
+      });
+    };
+    
+    animateTimelineElements();
+  });
+</script>
+
+<style>
+  .timeline-line {
+    background: linear-gradient(to bottom, 
+      rgba(0, 178, 255, 0.3), 
+      rgba(0, 178, 255, 0.7),
+      rgba(0, 178, 255, 0.3)
+    );
+  }
+
+  .timeline-node {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0 0 15px currentColor;
+  }
+  
+  .timeline-era {
+    min-height: 160px;
+    padding: 1rem 0;
+  }
+  
+  .era-box {
+    background-color: rgba(3, 10, 23, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 1.5rem;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.3s ease;
+    border-width: 1px;
+    border-style: solid;
+  }
+  
+  .era-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px currentColor;
+  }
+  
+  .era-icon {
+    display: inline-block;
+  }
+  
+  @media (max-width: 768px) {
+    .timeline-track {
+      padding-left: 2rem;
+    }
+    
+    .timeline-line {
+      left: 0;
+      transform: none;
+    }
+    
+    .timeline-node {
+      left: 0 !important;
+      transform: none !important;
+    }
+    
+    .timeline-era {
+      flex-direction: row !important;
+    }
+    
+    .era-content {
+      width: calc(100% - 40px) !important;
+      margin-left: auto !important;
+      padding-left: 2rem !important;
+      padding-right: 0 !important;
+      text-align: left !important;
+    }
+    
+    .connector {
+      left: 12px !important;
+      right: auto !important;
+      width: 2rem !important;
+    }
+    
+    .era-box h3,
+    .era-box ul {
+      text-align: left !important;
+      justify-content: flex-start !important;
+    }
+  }
+</style>

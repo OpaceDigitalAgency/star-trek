@@ -1,0 +1,165 @@
+---
+// Dynamic starfield background - optimized for performance
+---
+
+<div class="starfield-container">
+  <canvas id="starfield" class="starfield"></canvas>
+</div>
+
+<script>
+  class Star {
+    constructor(canvas, ctx, width, height) {
+      this.canvas = canvas;
+      this.ctx = ctx;
+      this.x = Math.random() * width;
+      this.y = Math.random() * height;
+      this.z = Math.random() * 1000 + 100;
+      this.radius = Math.random() * 1.5;
+      this.color = this.getStarColor();
+      this.velocity = Math.random() * 0.2 + 0.05; // Reduced velocity for better performance
+    }
+    
+    getStarColor() {
+      const colors = [
+        'rgba(255, 255, 255, 0.8)',
+        'rgba(173, 216, 230, 0.8)',
+        'rgba(240, 248, 255, 0.8)',
+        'rgba(255, 255, 224, 0.8)'
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+    draw() {
+      const x = this.x;
+      const y = this.y;
+      const radius = this.radius * (800 / this.z);
+      
+      this.ctx.beginPath();
+      this.ctx.arc(x, y, radius, 0, Math.PI * 2);
+      this.ctx.fillStyle = this.color;
+      this.ctx.fill();
+    }
+    
+    update(width, height) {
+      this.z -= this.velocity;
+      
+      // Reset star when it gets too close
+      if (this.z < 1) {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.z = 1000;
+      }
+      
+      // Keep stars within canvas
+      if (this.x < 0) this.x = width;
+      if (this.x > width) this.x = 0;
+      if (this.y < 0) this.y = height;
+      if (this.y > height) this.y = 0;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const canvas = document.getElementById('starfield');
+    if (!canvas) return; // Exit if canvas doesn't exist
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return; // Exit if context can't be created
+    
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+    let stars = [];
+    let isPaused = false;
+    let animationFrame;
+    let lastTime = 0;
+    const targetFPS = 30; // Lower target FPS for better performance
+    const frameInterval = 1000 / targetFPS;
+    
+    // Set canvas size
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Recreate stars when resizing
+      createStars();
+    }
+    
+    function createStars() {
+      // Drastically reduced star count for better performance
+      const starCount = Math.min(Math.floor((width * height) / 10000), 150);
+      stars = [];
+      
+      for (let i = 0; i < starCount; i++) {
+        stars.push(new Star(canvas, ctx, width, height));
+      }
+    }
+    
+    function draw(timestamp) {
+      // Throttle drawing to match target FPS
+      if (timestamp - lastTime < frameInterval) {
+        animationFrame = requestAnimationFrame(draw);
+        return;
+      }
+      
+      lastTime = timestamp;
+      
+      // Clear canvas with less opacity for better performance
+      ctx.fillStyle = 'rgba(3, 10, 23, 0.2)'; // More subtle clearing
+      ctx.fillRect(0, 0, width, height);
+      
+      if (!isPaused && document.visibilityState === 'visible') {
+        // Update and draw stars
+        for (let star of stars) {
+          star.update(width, height);
+          star.draw();
+        }
+      }
+      
+      animationFrame = requestAnimationFrame(draw);
+    }
+    
+    // Pause animation when window is not visible
+    document.addEventListener('visibilitychange', () => {
+      isPaused = document.hidden;
+    });
+    
+    // Performance optimization: throttle resize event
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(resizeCanvas, 200);
+    });
+    
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+    });
+    
+    // Initialize
+    resizeCanvas();
+    requestAnimationFrame(draw);
+  });
+</script>
+
+<style>
+  .starfield-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  
+  .starfield {
+    width: 100%;
+    height: 100%;
+    will-change: transform; /* Performance optimization */
+    transform: translateZ(0); /* Force GPU acceleration */
+  }
+</style>

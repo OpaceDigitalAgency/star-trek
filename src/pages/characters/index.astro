@@ -1,0 +1,435 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { stapiService } from '../../services/stapiService';
+
+// Fetch characters data from STAPI
+let response;
+try {
+  response = await stapiService.getCharacters(0, 100);
+} catch (error) {
+  console.error('Error fetching characters:', error);
+}
+
+const characters = response?.characters || [];
+
+// Organize characters by species
+const charactersBySpecies = {};
+
+characters.forEach(character => {
+  if (character.characterSpecies && character.characterSpecies.length > 0) {
+    character.characterSpecies.forEach(species => {
+      const speciesName = species.name || 'Unknown';
+      if (!charactersBySpecies[speciesName]) {
+        charactersBySpecies[speciesName] = [];
+      }
+      charactersBySpecies[speciesName].push(character);
+    });
+  } else {
+    // For characters without a species, assume Human by default (common in Star Trek)
+    const speciesName = 'Human';
+    if (!charactersBySpecies[speciesName]) {
+      charactersBySpecies[speciesName] = [];
+    }
+    charactersBySpecies[speciesName].push(character);
+  }
+});
+
+// Get array of species names sorted alphabetically
+const speciesNames = Object.keys(charactersBySpecies).sort();
+
+// Enhance character data with Memory Alpha information for the first few characters of each species
+const MAX_CHARACTERS_PER_SPECIES = 5;
+for (const species of speciesNames) {
+  const speciesCharacters = charactersBySpecies[species];
+  if (speciesCharacters && speciesCharacters.length > 0) {
+    for (let i = 0; i < Math.min(speciesCharacters.length, MAX_CHARACTERS_PER_SPECIES); i++) {
+      try {
+        const character = speciesCharacters[i];
+        const wikiData = await stapiService.getMemoryAlphaContent(character.name);
+        if (wikiData.image) {
+          character.wikiImage = wikiData.image;
+        }
+        if (wikiData.wikiUrl) {
+          character.wikiUrl = wikiData.wikiUrl;
+        }
+      } catch (error) {
+        console.error(`Error fetching Memory Alpha data for character:`, error);
+      }
+    }
+  }
+}
+
+// Fallback data if API fails
+if (speciesNames.length === 0) {
+  const fallbackCharacters = [
+    {
+      name: "Captain James T. Kirk",
+      species: "Human",
+      uid: "kirk",
+      image: stapiService.getImageUrl("James T. Kirk", 'character'),
+      description: "Captain of the USS Enterprise"
+    },
+    {
+      name: "Captain Jean-Luc Picard",
+      species: "Human",
+      uid: "picard",
+      image: stapiService.getImageUrl("Jean-Luc Picard", 'character'),
+      description: "Captain of the USS Enterprise-D and E"
+    },
+    {
+      name: "Captain Benjamin Sisko",
+      species: "Human",
+      uid: "sisko",
+      image: stapiService.getImageUrl("Benjamin Sisko", 'character'),
+      description: "Commander of Deep Space Nine"
+    },
+    {
+      name: "Captain Kathryn Janeway",
+      species: "Human",
+      uid: "janeway",
+      image: stapiService.getImageUrl("Kathryn Janeway", 'character'),
+      description: "Captain of the USS Voyager"
+    },
+    {
+      name: "Spock",
+      species: "Vulcan/Human",
+      uid: "spock",
+      image: stapiService.getImageUrl("Spock", 'character'),
+      description: "Science Officer of the USS Enterprise"
+    },
+    {
+      name: "Worf",
+      species: "Klingon",
+      uid: "worf",
+      image: stapiService.getImageUrl("Worf", 'character'),
+      description: "Security Officer"
+    }
+  ];
+  
+  // Populate charactersBySpecies with fallback data
+  charactersBySpecies["Human"] = fallbackCharacters.filter(c => c.species === "Human");
+  charactersBySpecies["Vulcan/Human"] = fallbackCharacters.filter(c => c.species === "Vulcan/Human");
+  charactersBySpecies["Klingon"] = fallbackCharacters.filter(c => c.species === "Klingon");
+  speciesNames.push("Human", "Vulcan/Human", "Klingon");
+}
+
+// Prepare data for filtering
+let availableRanks = [];
+// Extract unique ranks
+characters.forEach(character => {
+  if (character.title && !availableRanks.includes(character.title)) {
+    availableRanks.push(character.title);
+  }
+});
+availableRanks.sort();
+
+// Create JSON-LD schema for characters page
+const charactersSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Star Trek Characters | Complete Guide to Characters in the Star Trek Universe",
+  "description": "Explore the diverse characters of Star Trek from all series and movies. Learn about captains, officers, aliens, and more from across the Federation and beyond.",
+  "url": "https://star-trek-timelines.netlify.app/characters/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Star Trek Timelines",
+    "url": "https://star-trek-timelines.netlify.app/"
+  },
+  "about": {
+    "@type": "CreativeWorkSeries",
+    "name": "Star Trek",
+    "description": "Science fiction media franchise created by Gene Roddenberry"
+  },
+  "hasPart": Object.entries(charactersBySpecies).slice(0, 5).flatMap(([species, chars]) => {
+    return chars.slice(0, 5).map(char => ({
+      "@type": "Person",
+      "name": char.name,
+      "url": `https://star-trek-timelines.netlify.app/characters/${char.uid}/`,
+      "jobTitle": char.title || "Officer",
+      "description": `${species} character from Star Trek`
+    }));
+  })
+};
+---
+
+<Layout
+  title="Star Trek Characters | Complete Guide to Characters in the Star Trek Universe"
+  description="Explore the diverse characters of Star Trek from all series and movies. Learn about captains, officers, aliens, and more from across the Federation and beyond."
+  schemaData={charactersSchema}
+>
+  <div class="container mx-auto px-4 py-12">
+    <div class="lcars-header mb-8">
+      <div class="lcars-header-content">
+        <h1 class="text-3xl">Federation Personnel Database</h1>
+      </div>
+    </div>
+    
+    <div class="lcars-panel mb-12">
+      <div class="lcars-top-bar flex">
+        <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+        <div class="flex-1 h-8 bg-starfleet-blue"></div>
+        <div class="w-16 h-8 bg-starfleet-red"></div>
+      </div>
+      
+      <div class="panel-content p-6">
+        <p class="text-gray-300 mb-6">
+          Accessing Federation personnel records... This database contains information on notable individuals
+          from across the Star Trek universe, organized by species and rank. Explore the profiles of Starfleet officers,
+          diplomats, scientists, and others who have shaped the history of the galaxy.
+        </p>
+        
+        <div class="filters mb-8">
+          <div class="flex flex-wrap gap-4">
+            <div class="filter-group">
+              <h3 class="text-white text-lg mb-2">Filter by Species</h3>
+              <select id="species-filter" class="lcars-select bg-space-black border border-starfleet-blue text-white p-2 rounded">
+                <option value="all">All Species</option>
+                {speciesNames.map(species => (
+                  <option value={species}>{species}</option>
+                ))}
+              </select>
+            </div>
+            
+            {availableRanks.length > 0 && (
+              <div class="filter-group">
+                <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
+                <select id="rank-filter" class="lcars-select bg-space-black border border-starfleet-blue text-white p-2 rounded">
+                  <option value="all">All Ranks</option>
+                  {availableRanks.map(rank => (
+                    <option value={rank}>{rank}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+            
+            <div class="filter-group ml-auto">
+              <h3 class="text-white text-lg mb-2">Search</h3>
+              <input type="text" id="search-input" placeholder="Search characters..." 
+                class="lcars-input bg-space-black border border-starfleet-blue text-white p-2 rounded">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Species sections -->
+    <div id="characters-container">
+      {speciesNames.map(species => (
+        <div class="species-section mb-12" data-species={species}>
+          <div class={`species-header bg-starfleet-blue p-3 rounded-lg mb-6 flex items-center`}>
+            <div class="w-4 h-4 bg-starfleet-gold rounded-full mr-3"></div>
+            <h2 class="text-2xl text-white">{species}</h2>
+            <div class="character-count ml-auto px-3 py-1 bg-space-black rounded-full text-white text-sm">
+              {charactersBySpecies[species]?.length || 0} characters
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {charactersBySpecies[species]?.map(character => (
+              <div class="character-card" data-rank={character.title}>
+                <a href={`/characters/${character.uid}/`} class="block">
+                  <div class="lcars-character-container">
+                    <div class="lcars-side-bar w-3 h-full bg-starfleet-gold absolute left-0 top-0 bottom-0"></div>
+                    
+                    <div class="character-image aspect-square overflow-hidden">
+                      <img 
+                        src={character.wikiImage || stapiService.getImageUrl(character.name, 'character')} 
+                        alt={character.name} 
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                        onerror="this.onerror=null; this.src='https://www.startrek.com/sites/default/files/styles/content_full/public/images/2019-07/576a164c73d2d7c2318d0e0e4d49191f.jpg';"
+                      />
+                      <div class="character-overlay absolute inset-0 bg-gradient-to-t from-space-black to-transparent opacity-70"></div>
+                    </div>
+                    
+                    <div class="character-info p-4 bg-space-black relative">
+                      <h3 class="text-lg text-white font-semibold">{character.name}</h3>
+                      {character.title && (
+                        <p class="text-console-blue">{character.title}</p>
+                      )}
+                      {character.gender && (
+                        <div class="character-gender absolute top-4 right-4 px-2 py-1 rounded-full bg-starfleet-blue text-white text-xs">
+                          {character.gender}
+                        </div>
+                      )}
+                      
+                      {character.wikiUrl && (
+                        <a href={character.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center mt-1" onclick="event.stopPropagation()">
+                          Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    <!-- No results message (hidden by default) -->
+    <div id="no-results" class="hidden text-center py-8">
+      <div class="lcars-panel p-6 inline-block">
+        <p class="text-console-blue text-xl">No characters match your search criteria.</p>
+        <p class="text-white mt-2">Please adjust your filters or try a different search term.</p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const speciesFilter = document.getElementById('species-filter');
+    const rankFilter = document.getElementById('rank-filter');
+    const searchInput = document.getElementById('search-input');
+    const charactersContainer = document.getElementById('characters-container');
+    const noResults = document.getElementById('no-results');
+    
+    // Filter functionality
+    const filterCharacters = () => {
+      const selectedSpecies = speciesFilter.value;
+      const selectedRank = rankFilter?.value;
+      const searchTerm = searchInput.value.toLowerCase();
+      
+      // Get all species sections
+      const speciesSections = document.querySelectorAll('.species-section');
+      
+      // Track if we have any visible characters
+      let visibleCharactersCount = 0;
+      
+      // Process each species section
+      speciesSections.forEach(section => {
+        const sectionSpecies = section.getAttribute('data-species');
+        const shouldShowSection = selectedSpecies === 'all' || selectedSpecies === sectionSpecies;
+        
+        // Get all character cards in this section
+        const characterCards = section.querySelectorAll('.character-card');
+        let visibleInSection = 0;
+        
+        // Filter character cards
+        characterCards.forEach(card => {
+          const cardRank = card.getAttribute('data-rank');
+          const characterName = card.querySelector('h3').textContent.toLowerCase();
+          
+          // Check if character matches all filters
+          const matchesRank = !selectedRank || selectedRank === 'all' || cardRank === selectedRank;
+          const matchesSearch = !searchTerm || characterName.includes(searchTerm);
+          
+          // Show/hide character card
+          if (matchesRank && matchesSearch) {
+            card.classList.remove('hidden');
+            visibleInSection++;
+            visibleCharactersCount++;
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+        
+        // Show/hide section based on whether it has visible characters
+        if (shouldShowSection && visibleInSection > 0) {
+          section.classList.remove('hidden');
+        } else {
+          section.classList.add('hidden');
+        }
+      });
+      
+      // Show/hide no results message
+      if (visibleCharactersCount === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
+    };
+    
+    // Attach event listeners
+    speciesFilter.addEventListener('change', filterCharacters);
+    if (rankFilter) rankFilter.addEventListener('change', filterCharacters);
+    searchInput.addEventListener('input', filterCharacters);
+    
+    // Lazy load images as they come into view for better performance
+    const lazyLoadImages = () => {
+      const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const img = entry.target;
+            if (img.dataset.src) {
+              img.src = img.dataset.src;
+              img.removeAttribute('data-src');
+            }
+            observer.unobserve(img);
+          }
+        });
+      });
+      
+      document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+      });
+    };
+    
+    // Initialize image lazy loading
+    if ('IntersectionObserver' in window) {
+      lazyLoadImages();
+    } else {
+      // Fallback for browsers that don't support IntersectionObserver
+      document.querySelectorAll('img[data-src]').forEach(img => {
+        img.src = img.dataset.src;
+      });
+    }
+  });
+</script>
+
+<style>
+  .lcars-character-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .lcars-character-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 20px rgba(0, 178, 255, 0.4);
+  }
+  
+  .character-image {
+    position: relative;
+  }
+  
+  .character-info {
+    border-left: 3px solid var(--starfleet-gold);
+    min-height: 80px;
+  }
+  
+  .lcars-select, .lcars-input {
+    transition: all 0.3s ease;
+  }
+  
+  .lcars-select:focus, .lcars-input:focus {
+    border-color: var(--starfleet-gold);
+    outline: none;
+    box-shadow: 0 0 10px rgba(0, 178, 255, 0.4);
+  }
+  
+  .species-header {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .species-header::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    animation: sweep 3s infinite;
+  }
+  
+  @keyframes sweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+</style>

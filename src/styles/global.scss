@@ -1,0 +1,190 @@
+/**
+ * LCARS (Library Computer Access/Retrieval System) inspired styling
+ * for Star Trek Timelines application
+ */
+
+// Define LCARS color scheme
+:root {
+  --starfleet-blue: #0099ff;
+  --starfleet-blue-dark: #004C99;
+  --starfleet-red: #ff3d3d;
+  --starfleet-gold: #ffcc00;
+  --klingon-red: #9A1515;
+  --space-black: #030a17;
+  --space-deep: #010a1f;
+  --console-green: #39FF88;
+  --console-blue: #00B2FF;
+  --neon-blue: #00f6ff;
+  --holodeck-grid: rgba(0, 178, 255, 0.2);
+}
+
+// Custom scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--starfleet-blue);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--console-blue);
+}
+
+html {
+  background-color: var(--space-black);
+  color: white;
+  scroll-behavior: auto; // Disable smooth scrolling for better performance
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+  background: radial-gradient(circle at 50% 50%, var(--space-black), var(--space-deep));
+  overflow-x: hidden;
+}
+
+/* Global effects */
+.noise-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  pointer-events: none;
+  background-image: url('/images/noise.png');
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+}
+
+// LCARS-inspired UI elements
+.lcars-header {
+  display: flex;
+  border-radius: 35px 0 0 0;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  background: var(--space-black);
+  position: relative;
+  
+  &::before {
+    content: '';
+    width: 50px;
+    background: var(--starfleet-gold);
+    border-radius: 35px 0 0 35px;
+  }
+  
+  .lcars-header-content {
+    background: linear-gradient(90deg, var(--starfleet-gold), #F8E589);
+    color: var(--space-black);
+    padding: 0.7rem 2.5rem;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: bold;
+    flex-grow: 1;
+    position: relative;
+    z-index: 1;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+// Console-style elements
+.console-panel {
+  background-color: rgba(3, 10, 23, 0.7);
+  border: 1px solid var(--console-blue);
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 178, 255, 0.3), inset 0 0 20px rgba(0, 178, 255, 0.05);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(5px);
+  transform: translateZ(0);
+  transition: all 0.4s cubic-bezier(0.17, 0.67, 0.3, 0.96);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--console-blue), transparent);
+  }
+  
+  &:hover {
+    box-shadow: 0 0 25px rgba(0, 178, 255, 0.5), inset 0 0 30px rgba(0, 178, 255, 0.1);
+    transform: translateY(-2px) translateZ(0);
+  }
+}
+
+// Buttons and interactive elements
+.trek-button {
+  background-color: var(--starfleet-blue);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.7rem 1.8rem;
+  font-family: 'Space Grotesk', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.17, 0.67, 0.3, 0.96);
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg, 
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transform: skewX(-20deg);
+    transition: all 0.6s ease;
+  }
+  
+  &:hover {
+    background-color: color-mix(in srgb, var(--starfleet-blue) 90%, white);
+    box-shadow: 0 0 20px rgba(0, 178, 255, 0.5), 0 0 40px rgba(0, 178, 255, 0.2);
+    transform: translateY(-2px);
+    
+    &::before {
+      left: 150%;
+    }
+  }
+  
+  &.primary {
+    background-color: var(--starfleet-gold);
+    color: var(--space-black);
+    font-weight: 600;
+    
+    &:hover {
+      background-color: color-mix(in srgb, var(--starfleet-gold) 90%, white);
+      box-shadow: 0 0 20px rgba(255, 204, 0, 0.5), 0 0 40px rgba(255, 204, 0, 0.2);
+    }
+  }
+}
+
+// Responsive styles for mobile devices
+@media (max-width: 768px) {
+  .lcars-header {
+    &::before {
+      width: 30px;
+    }
+  }
+}

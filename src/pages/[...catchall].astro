@@ -1,0 +1,85 @@
+---
+// Catch-all route for 404 pages with proper static paths
+import Layout from '../layouts/Layout.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { catchall: 'not-found' } },
+  ];
+}
+
+const { catchall } = Astro.params;
+
+// Create JSON-LD schema for 404 page
+const notFoundSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "404 - Page Not Found | Star Trek Timelines",
+  "description": "The page you are looking for cannot be found.",
+  "url": "https://star-trek-timelines.netlify.app/not-found/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Star Trek Timelines",
+    "url": "https://star-trek-timelines.netlify.app/"
+  }
+};
+---
+
+<Layout 
+  title="404 - Page Not Found | Star Trek Timelines"
+  description="The page you are looking for cannot be found."
+  schemaData={notFoundSchema}
+>
+  <div class="container mx-auto px-4 py-24 text-center">
+    <h1 class="text-4xl md:text-6xl font-trek text-starfleet-gold mb-6">404</h1>
+    <p class="text-2xl md:text-3xl text-white mb-8">The coordinates you requested are outside known space.</p>
+    
+    <div class="lcars-panel w-full max-w-2xl mx-auto p-6 border border-console-blue rounded-lg bg-space-black">
+      <pre class="text-console-green font-mono text-left text-sm md:text-base overflow-x-auto">
+        <code>
+          === ERROR REPORT ===
+          
+          LOCATION: UNKNOWN
+          STARDATE: {new Date().toLocaleDateString()}
+          
+          Scanners have detected no Federation outposts
+          or Star Trek content at these coordinates.
+          
+          RECOMMENDED ACTION:
+          Return to a charted sector.
+        </code>
+      </pre>
+    </div>
+    
+    <a href="/" class="trek-button primary inline-block mt-12 text-lg py-3 px-8">
+      Return to Main Bridge
+    </a>
+  </div>
+</Layout>
+
+<style>
+  .lcars-panel {
+    box-shadow: 0 0 15px rgba(0, 178, 255, 0.3);
+  }
+  
+  @keyframes scanline {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+  
+  .lcars-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(0, 178, 255, 0.5);
+    animation: scanline 2s linear infinite;
+    pointer-events: none;
+  }
+</style>

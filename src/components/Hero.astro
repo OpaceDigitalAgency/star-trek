@@ -1,0 +1,211 @@
+---
+// LCARS-inspired Hero component with Star Trek authentic design
+---
+
+<section class="hero-section relative min-h-screen flex items-center justify-center overflow-hidden">
+  <div class="hero-bg absolute inset-0 z-0">
+    <div class="stars-bg"></div>
+    <div class="grid-overlay"></div>
+  </div>
+  
+  <div class="hero-content relative z-10 text-center max-w-5xl px-4 py-20">
+    <div class="title-container mb-8" data-animation="title">
+      <h1 class="hero-title flex flex-col items-center font-semibold">
+        <span class="text-5xl sm:text-6xl md:text-7xl text-starfleet-gold tracking-wider mb-2">
+          STAR TREK
+        </span>
+        <span class="text-4xl sm:text-5xl md:text-6xl text-white tracking-[0.2em]">
+          TIMELINES
+        </span>
+      </h1>
+      <div class="title-decoration mx-auto mt-4 flex items-center justify-center space-x-2">
+        <span class="inline-block h-[2px] w-20 bg-starfleet-gold"></span>
+        <span class="inline-block h-2 w-2 rounded-full bg-starfleet-gold"></span>
+        <span class="inline-block h-[2px] w-20 bg-starfleet-gold"></span>
+      </div>
+    </div>
+    
+    <p class="hero-subtitle text-xl md:text-2xl text-white mb-12 max-w-3xl mx-auto leading-relaxed">
+      Explore the interconnected universe of Star Trek shows and movies
+      <span class="block mt-2">spanning centuries of in-universe history</span>
+    </p>
+    
+    <div class="flex flex-wrap justify-center gap-6">
+      <a href="/timeline/" class="trek-button primary text-lg py-3 px-8 flex items-center">
+        <span class="mr-2">Explore Timeline</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"></path>
+          <path d="M12 5l7 7-7 7"></path>
+        </svg>
+      </a>
+      <a href="/series/" class="trek-button text-lg py-3 px-8 flex items-center">
+        <span class="mr-2">View All Series</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+          <polyline points="17 2 12 7 7 2"></polyline>
+        </svg>
+      </a>
+    </div>
+  </div>
+  
+  <!-- LCARS-style UI elements - authentic to Star Trek -->
+  <div class="lcars-ui-elements">
+    <div class="lcars-top-panel"></div>
+    <div class="lcars-side-panel"></div>
+    <div class="lcars-bottom-panel">
+      <div class="w-24 h-16 bg-starfleet-gold rounded-tr-full"></div>
+      <div class="flex-1 h-16 bg-starfleet-red"></div>
+      <div class="w-32 h-16 bg-starfleet-blue"></div>
+      <div class="w-64 h-16 bg-starfleet-gold"></div>
+    </div>
+  </div>
+  
+  <!-- Enterprise silhouette -->
+  <div class="enterprise-silhouette">
+    <img src="https://raw.githubusercontent.com/joernroeder/StarTrekIpsum/master/assets/enterprise.svg" alt="Enterprise Silhouette" class="opacity-20 w-96 absolute bottom-32 right-10 z-1" />
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Simple fade-in animation for title
+    const titleElement = document.querySelector('[data-animation="title"]');
+    if (titleElement) {
+      titleElement.animate(
+        [
+          { opacity: 0, transform: 'translateY(40px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        {
+          duration: 800, // Reduced for better performance
+          fill: 'forwards',
+          easing: 'cubic-bezier(0.17, 0.67, 0.3, 0.96)'
+        }
+      );
+    }
+
+    // Animate subtitle
+    const subtitle = document.querySelector('.hero-subtitle');
+    if (subtitle) {
+      subtitle.animate(
+        [
+          { opacity: 0, transform: 'translateY(30px)' },
+          { opacity: 1, transform: 'translateY(0)' }
+        ],
+        {
+          duration: 800, // Reduced for better performance
+          delay: 200, // Reduced delay
+          fill: 'forwards',
+          easing: 'cubic-bezier(0.17, 0.67, 0.3, 0.96)'
+        }
+      );
+    }
+
+    // Animate buttons
+    const buttons = document.querySelectorAll('.hero-content .trek-button');
+    if (buttons.length) {
+      buttons.forEach((button, index) => {
+        button.animate(
+          [
+            { opacity: 0, transform: 'translateY(20px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+          ],
+          {
+            duration: 600, // Reduced for better performance
+            delay: 400 + (index * 150), // Reduced delay
+            fill: 'forwards',
+            easing: 'cubic-bezier(0.17, 0.67, 0.3, 0.96)'
+          }
+        );
+      });
+    }
+  });
+</script>
+
+<style>
+  .hero-section {
+    --lcars-radius: 20px;
+    padding-top: 80px;
+    min-height: calc(100vh);
+    background-color: var(--space-black);
+    will-change: transform; /* Performance optimization */
+  }
+  
+  .hero-bg {
+    background: radial-gradient(ellipse at bottom, rgba(0, 24, 68, 0.7), transparent 70%);
+  }
+  
+  .stars-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('https://www.transparenttextures.com/patterns/stardust.png'), url('https://www.transparenttextures.com/patterns/asfalt-light.png');
+    background-size: cover;
+    opacity: 0.4;
+  }
+  
+  .grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      linear-gradient(to right, var(--holodeck-grid) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(to bottom, var(--holodeck-grid) 1px, transparent 1px) 0 0 / 40px 40px;
+    opacity: 0.15;
+    will-change: transform; /* Performance optimization */
+  }
+  
+  .hero-title {
+    position: relative;
+    text-shadow: 0 0 30px rgba(230, 184, 0, 0.5);
+  }
+  
+  .hero-subtitle {
+    text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+    opacity: 0.9;
+  }
+  
+  /* LCARS UI Elements */
+  .lcars-bottom-panel {
+    height: 16px;
+    display: flex;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+  }
+  
+  .lcars-top-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 70%;
+    height: 20px;
+    background-color: var(--starfleet-gold);
+    border-bottom-left-radius: var(--lcars-radius);
+  }
+  
+  .lcars-side-panel {
+    position: absolute;
+    top: 20px;
+    right: 0;
+    width: 20px;
+    height: 60%;
+    background-color: var(--starfleet-blue);
+  }
+  
+  /* Performance optimizations */
+  .enterprise-silhouette img {
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  .trek-button {
+    will-change: transform;
+  }
+</style>

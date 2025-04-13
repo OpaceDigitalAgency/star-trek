@@ -1,0 +1,451 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { stapiService, getEraFromYear, extractStardateYears } from '../../services/stapiService';
+
+// Fetch series data from STAPI to populate timeline
+const allSeries = await stapiService.getSeries();
+
+// Create more sophisticated timeline eras based on STAPI data
+const prePopulatedTimelineEras = [
+  {
+    name: "Pre-Federation Era",
+    years: "2063-2161",
+    description: "From first contact with Vulcans to the founding of the United Federation of Planets",
+    key_events: [
+      { year: 2063, title: "First Contact Day", description: "Zefram Cochrane's first warp flight attracts the attention of the Vulcans." },
+      { year: 2151, title: "Launch of Enterprise NX-01", description: "Earth's first warp 5 capable starship begins its mission of exploration." },
+      { year: 2155, title: "Earth-Romulan War begins", description: "A devastating conflict that eventually leads to the founding of the Federation." },
+      { year: 2161, title: "Federation Founding", description: "Earth, Vulcan, Andoria, and Tellar sign the Federation Charter." }
+    ],
+    series: ["Enterprise"],
+    color: "console-green"
+  },
+  {
+    name: "Early Federation",
+    years: "2161-2233",
+    description: "The formative years of the Federation and Starfleet",
+    key_events: [
+      { year: 2165, title: "NX-01 Enterprise decommissioned", description: "The historic vessel is retired and later preserved in a museum." },
+      { year: 2222, title: "Birth of Spock", description: "Spock is born to Sarek and Amanda Grayson on Vulcan." },
+      { year: 2233, title: "USS Kelvin Incident", description: "In the prime timeline, the USS Kelvin encounters a spatial anomaly." }
+    ],
+    series: [],
+    color: "starfleet-gold"
+  },
+  {
+    name: "Constitution-Class Era",
+    years: "2233-2293",
+    description: "The golden age of exploration led by Constitution-class starships",
+    key_events: [
+      { year: 2254, title: "Captain Pike commands Enterprise", description: "The USS Enterprise NCC-1701 explores the galaxy under Captain Pike." },
+      { year: 2265, title: "Kirk's Five-Year Mission begins", description: "Captain Kirk takes command of the Enterprise for its historic five-year mission." },
+      { year: 2285, title: "Battle of the Mutara Nebula", description: "The Enterprise confronts Khan, resulting in the death of Spock." },
+      { year: 2293, title: "Khitomer Accords", description: "Historic peace treaty between the Federation and the Klingon Empire." }
+    ],
+    series: ["The Original Series", "The Animated Series", "Discovery (S1-2)"],
+    color: "starfleet-gold"
+  },
+  {
+    name: "Mid Federation Era",
+    years: "2293-2364",
+    description: "A period of relative peace and continued expansion",
+    key_events: [
+      { year: 2311, title: "Tomed Incident", description: "A confrontation with the Romulans leads to the Treaty of Algeron." },
+      { year: 2344, title: "USS Enterprise-C destruction", description: "The ship is destroyed defending a Klingon outpost from Romulans." },
+      { year: 2355, title: "Battle of Maxia", description: "Captain Picard's first encounter with the Ferengi." }
+    ],
+    series: [],
+    color: "starfleet-blue"
+  },
+  {
+    name: "Galaxy-Class Era",
+    years: "2364-2379",
+    description: "The era of Galaxy-class starships and renewed exploration",
+    key_events: [
+      { year: 2364, title: "Enterprise-D launched", description: "The new flagship of the Federation begins its mission." },
+      { year: 2367, title: "Battle of Wolf 359", description: "The Federation suffers a devastating defeat against the Borg." },
+      { year: 2369, title: "Discovery of the Bajoran Wormhole", description: "A stable wormhole to the Gamma Quadrant is discovered near Bajor." },
+      { year: 2371, title: "USS Voyager lost in Delta Quadrant", description: "Voyager is pulled 70,000 light-years from Federation space." },
+      { year: 2373, title: "Dominion War begins", description: "The Federation enters a devastating conflict with the Dominion." },
+      { year: 2375, title: "Dominion War ends", description: "The Alliance defeats the Dominion, ending the war." },
+      { year: 2379, title: "Shinzon Incident", description: "Reman uprising against the Romulan Star Empire." }
+    ],
+    series: ["The Next Generation", "Deep Space Nine", "Voyager"],
+    color: "starfleet-blue"
+  },
+  {
+    name: "Post-Nemesis Era",
+    years: "2380-2401",
+    description: "The aftermath of the Dominion War and relations with the Romulan Empire",
+    key_events: [
+      { year: 2387, title: "Romulan Supernova", description: "The Romulan sun goes supernova, destroying Romulus." },
+      { year: 2399, title: "Picard leaves retirement", description: "Jean-Luc Picard embarks on a mission to help Romulan refugees." },
+      { year: 2401, title: "Reunion of Enterprise-D crew", description: "Former Enterprise officers reunite for one final mission." }
+    ],
+    series: ["Picard", "Lower Decks"],
+    color: "starfleet-red"
+  },
+  {
+    name: "32nd Century",
+    years: "3188-3190",
+    description: "Far future era after 'The Burn' devastated the Federation",
+    key_events: [
+      { year: 3069, title: "The Burn", description: "A catastrophic event causes dilithium to become inert, crippling warp travel." },
+      { year: 3188, title: "USS Discovery arrives", description: "The Discovery arrives from the 23rd century via time travel." },
+      { year: 3189, title: "Federation Restoration begins", description: "Efforts to reconnect the remaining Federation worlds." }
+    ],
+    series: ["Discovery (S3+)"],
+    color: "console-blue"
+  }
+];
+
+// Enhance the timeline data with real STAPI data where possible
+const timelineEras = prePopulatedTimelineEras.map(era => {
+  // Find corresponding series from STAPI data
+  const seriesInEra = allSeries.filter(series => {
+    const stardateYears = extractStardateYears(series);
+    const [startYear] = stardateYears.split('-').map(y => parseInt(y));
+    
+    // Extract years from era's years field
+    const [eraStart, eraEnd] = era.years.split('-').map(y => parseInt(y));
+    
+    // Check if this series belongs in this era
+    return startYear >= eraStart && startYear <= eraEnd;
+  });
+  
+  // Update the era with series from STAPI if we found any
+  if (seriesInEra.length > 0) {
+    era.series = seriesInEra.map(s => s.title.replace('Star Trek: ', ''));
+  }
+  
+  return era;
+});
+
+// Attempt to fetch some conflicts for historical events
+let historicalConflicts = [];
+try {
+  historicalConflicts = await stapiService.searchConflicts({ pageSize: 10 });
+  
+  // Add significant conflicts to appropriate eras if they're not already included
+  if (historicalConflicts && historicalConflicts.length > 0) {
+    historicalConflicts.forEach(conflict => {
+      if (!conflict.yearFrom) return;
+      
+      const era = timelineEras.find(e => {
+        const [startYear, endYear] = e.years.split('-').map(y => parseInt(y));
+        return conflict.yearFrom >= startYear && conflict.yearFrom <= endYear;
+      });
+      
+      if (era) {
+        // Check if this conflict is already in the key events
+        const isAlreadyAdded = era.key_events.some(event => 
+          event.title.includes(conflict.name) || 
+          event.description.includes(conflict.name)
+        );
+        
+        if (!isAlreadyAdded && conflict.name) {
+          era.key_events.push({
+            year: conflict.yearFrom,
+            title: conflict.name,
+            description: `${conflict.name} involving ${conflict.parties || 'multiple parties'}.`
+          });
+        }
+      }
+    });
+  }
+} catch (error) {
+  console.error('Failed to fetch historical conflicts:', error);
+}
+
+// Create JSON-LD schema for timeline page
+const timelineSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Complete Star Trek Timeline | Chronological History of the Star Trek Universe",
+  "description": "Explore the complete Star Trek timeline from First Contact to the 32nd Century. Discover how all Star Trek series, movies, and key events connect chronologically.",
+  "url": "https://star-trek-timelines.netlify.app/timeline/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Star Trek Timelines",
+    "url": "https://star-trek-timelines.netlify.app/"
+  },
+  "about": {
+    "@type": "CreativeWorkSeries",
+    "name": "Star Trek",
+    "description": "Science fiction media franchise created by Gene Roddenberry"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListElement": timelineEras.map((era, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Event",
+        "name": era.name,
+        "description": era.description,
+        "startDate": era.years.split('-')[0],
+        "endDate": era.years.split('-')[1],
+        "location": {
+          "@type": "Place",
+          "name": "Star Trek Universe"
+        }
+      }
+    }))
+  }
+};
+---
+
+<Layout
+  title="Complete Star Trek Timeline | Chronological History of the Star Trek Universe"
+  description="Explore the complete Star Trek timeline from First Contact to the 32nd Century. Discover how all Star Trek series, movies, and key events connect chronologically."
+  schemaData={timelineSchema}
+>
+  <div class="container mx-auto px-4 py-12">
+    <div class="lcars-header mb-8">
+      <div class="lcars-header-content">
+        <h1 class="text-3xl">LCARS: Federation Historical Database</h1>
+      </div>
+    </div>
+    
+    <div class="lcars-panel mb-12">
+      <div class="lcars-top-bar flex">
+        <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+        <div class="flex-1 h-8 bg-starfleet-blue"></div>
+        <div class="w-16 h-8 bg-starfleet-red"></div>
+      </div>
+      
+      <div class="panel-content p-6">
+        <p class="text-gray-300">
+          Accessing Federation temporal archives... This comprehensive timeline maps the chronological history of the Star Trek universe, 
+          spanning from First Contact Day in 2063 to the far future of the 32nd century. Below you'll find key eras, 
+          major historical events, and the placement of each Star Trek series within the timeline.
+        </p>
+        
+        <div class="legend flex flex-wrap gap-4 mt-6">
+          <div class="flex items-center">
+            <span class="inline-block w-4 h-4 bg-console-green mr-2"></span>
+            <span class="text-console-green">22nd Century</span>
+          </div>
+          <div class="flex items-center">
+            <span class="inline-block w-4 h-4 bg-starfleet-gold mr-2"></span>
+            <span class="text-starfleet-gold">23rd Century</span>
+          </div>
+          <div class="flex items-center">
+            <span class="inline-block w-4 h-4 bg-starfleet-blue mr-2"></span>
+            <span class="text-starfleet-blue">24th Century</span>
+          </div>
+          <div class="flex items-center">
+            <span class="inline-block w-4 h-4 bg-starfleet-red mr-2"></span>
+            <span class="text-starfleet-red">25th Century</span>
+          </div>
+          <div class="flex items-center">
+            <span class="inline-block w-4 h-4 bg-console-blue mr-2"></span>
+            <span class="text-console-blue">32nd Century</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="timeline-track py-8 relative">
+      <div class="timeline-line absolute top-0 bottom-0 left-1/2 w-1 bg-gray-700 transform -translate-x-1/2"></div>
+      
+      {timelineEras.map((era, index) => (
+        <div class="timeline-era relative mb-24">
+          <div class={`timeline-node bg-${era.color} absolute left-1/2 transform -translate-x-1/2`}>
+            <div class="pulse-circle"></div>
+          </div>
+          
+          <div class={`era-content ${index % 2 === 0 ? 'text-right ml-auto pr-12' : 'mr-auto pl-12'} w-5/12`}>
+            <div class="lcars-era-header flex mb-2">
+              <div class={`w-4 h-4 ${index % 2 === 0 ? 'ml-auto mr-2' : 'mr-auto ml-2'} bg-${era.color} rounded-full my-auto`}></div>
+              <h3 class={`text-${era.color} text-2xl font-trek`}>{era.name}</h3>
+            </div>
+            
+            <div class={`era-box border-${era.color}`}>
+              <div class={`absolute top-0 left-0 right-0 h-1 bg-${era.color}`}></div>
+              
+              <p class="text-white text-lg mb-4">{era.years}</p>
+              <p class="text-gray-300 mb-4">{era.description}</p>
+              
+              {era.series && era.series.length > 0 && (
+                <div class="mb-4">
+                  <h4 class="text-white font-trek mb-2">Series in this era:</h4>
+                  <ul class="text-console-blue grid grid-cols-2 gap-2">
+                    {era.series.map(series => (
+                      <li class="lcars-list-item">{series}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {era.key_events && era.key_events.length > 0 && (
+                <div class="key-events">
+                  <h4 class="text-white font-trek mb-2">Key Events:</h4>
+                  <div class="space-y-3">
+                    {era.key_events.sort((a, b) => a.year - b.year).map(event => (
+                      <div class="event-card console-panel p-3 bg-opacity-50">
+                        <div class="flex justify-between">
+                          <h5 class={`text-${era.color} font-bold`}>{event.title}</h5>
+                          <span class="text-gray-400">{event.year}</span>
+                        </div>
+                        <p class="text-gray-300 text-sm">{event.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div class={`connector absolute top-1/2 ${index % 2 === 0 ? 'right-0' : 'left-0'} w-12 h-0.5 bg-${era.color} transform -translate-y-1/2`}></div>
+          </div>
+        </div>
+      ))}
+    </div>
+    
+    <div class="lcars-footer mt-8 mb-16">
+      <div class="lcars-footer-bar flex">
+        <div class="w-48 h-6 bg-starfleet-gold rounded-bl-lg"></div>
+        <div class="flex-1 h-6 bg-starfleet-blue"></div>
+        <div class="w-24 h-6 bg-starfleet-red"></div>
+      </div>
+      <div class="text-center mt-8 text-gray-400">
+        <p>Timeline data collected from Federation temporal archives and STAPI, the comprehensive Star Trek API.</p>
+        <p class="mt-2">Stardate: {Math.floor(Math.random() * 100000) / 10}</p>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .timeline-node {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: 0 0 15px currentColor;
+    z-index: 2;
+    position: relative;
+  }
+  
+  .pulse-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background-color: currentColor;
+    border-radius: 50%;
+    opacity: 0.5;
+    animation: pulse 2s infinite;
+  }
+  
+  .timeline-era {
+    display: flex;
+    padding: 2rem 0;
+    position: relative;
+  }
+  
+  .timeline-line {
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0, 178, 255, 0.1),
+      rgba(0, 178, 255, 0.1) 10px,
+      rgba(0, 178, 255, 0.3) 10px,
+      rgba(0, 178, 255, 0.3) 20px
+    );
+  }
+  
+  .key-events {
+    margin-top: 1rem;
+  }
+  
+  .event-card {
+    transition: all 0.3s ease;
+  }
+  
+  .event-card:hover {
+    background-color: rgba(0, 30, 60, 0.8);
+    transform: translateY(-2px);
+  }
+  
+  .era-box {
+    background-color: rgba(3, 10, 23, 0.7);
+    backdrop-filter: blur(5px);
+    padding: 1.5rem;
+    border-radius: 8px;
+    position: relative;
+    transition: all 0.3s ease;
+    border-width: 1px;
+    border-style: solid;
+  }
+  
+  .era-box:hover {
+    box-shadow: 0 0 20px currentColor;
+  }
+  
+  .lcars-list-item {
+    position: relative;
+    padding-left: 12px;
+  }
+  
+  .lcars-list-item::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--starfleet-blue);
+  }
+  
+  @keyframes pulse {
+    0% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translate(-50%, -50%) scale(1.2);
+      opacity: 0.2;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(0.5);
+      opacity: 0.5;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .timeline-track {
+      padding-left: 2rem;
+    }
+    
+    .timeline-line {
+      left: 0;
+      transform: none;
+    }
+    
+    .timeline-node {
+      left: 0 !important;
+      transform: none !important;
+    }
+    
+    .era-content {
+      width: calc(100% - 40px) !important;
+      margin-left: auto !important;
+      padding-left: 2rem !important;
+      padding-right: 0 !important;
+      text-align: left !important;
+    }
+    
+    .connector {
+      left: 12px !important;
+      right: auto !important;
+      width: 2rem !important;
+    }
+    
+    .lcars-era-header {
+      flex-direction: row-reverse;
+    }
+    
+    .lcars-era-header div {
+      margin-left: 0.5rem !important;
+      margin-right: 0 !important;
+    }
+  }
+</style>

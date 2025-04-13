@@ -1,0 +1,236 @@
+---
+// Advanced futuristic navigation bar
+---
+
+<header class="main-header fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="main-header">
+  <div class="container mx-auto px-4 py-4">
+    <nav class="flex justify-between items-center">
+      <a href="/" class="site-logo group flex items-baseline">
+        <span class="text-2xl font-bold text-starfleet-gold mr-2 group-hover:text-white transition-colors duration-300">STAR TREK</span>
+        <span class="text-xl text-white group-hover:text-starfleet-gold transition-colors duration-300">TIMELINES</span>
+        <div class="logo-underline"></div>
+      </a>
+      
+      <div class="nav-controls hidden md:flex items-center space-x-8">
+        <a href="/series/" class="nav-link">Series</a>
+        <a href="/timeline/" class="nav-link">Timeline</a>
+        <a href="/characters/" class="nav-link">Characters</a>
+        <a href="/about/" class="nav-link">About</a>
+      </div>
+      
+      <button class="mobile-menu-toggle md:hidden" aria-label="Toggle Menu">
+        <div class="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    </nav>
+  </div>
+  
+  <!-- Mobile navigation menu -->
+  <div class="mobile-menu hidden">
+    <div class="mobile-nav-links">
+      <a href="/series/" class="mobile-nav-link">Series</a>
+      <a href="/timeline/" class="mobile-nav-link">Timeline</a>
+      <a href="/characters/" class="mobile-nav-link">Characters</a>
+      <a href="/about/" class="mobile-nav-link">About</a>
+    </div>
+  </div>
+</header>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const header = document.getElementById('main-header');
+    const menuToggle = document.querySelector('.mobile-menu-toggle');
+    const mobileMenu = document.querySelector('.mobile-menu');
+    
+    // Handle scroll effect for header
+    let lastScrollY = window.scrollY;
+    
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      
+      // Add background when scrolling down
+      if (scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+      
+      // Hide header when scrolling down, show when scrolling up
+      if (scrollY > lastScrollY && scrollY > 100) {
+        header.classList.add('header-hidden');
+      } else {
+        header.classList.remove('header-hidden');
+      }
+      
+      lastScrollY = scrollY;
+    });
+    
+    // Mobile menu toggle
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('active');
+      mobileMenu.classList.toggle('hidden');
+      document.body.classList.toggle('menu-open');
+    });
+    
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('.mobile-nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('active');
+        mobileMenu.classList.add('hidden');
+        document.body.classList.remove('menu-open');
+      });
+    });
+  });
+</script>
+
+<style>
+  .main-header {
+    transition: all 0.4s cubic-bezier(0.17, 0.67, 0.3, 0.96);
+  }
+  
+  .main-header.scrolled {
+    background-color: rgba(3, 10, 23, 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+  
+  .main-header.header-hidden {
+    transform: translateY(-100%);
+  }
+  
+  .site-logo {
+    position: relative;
+    padding-bottom: 4px;
+  }
+  
+  .logo-underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--starfleet-gold);
+    transition: width 0.3s ease;
+  }
+  
+  .site-logo:hover .logo-underline {
+    width: 100%;
+  }
+  
+  .nav-link {
+    color: white;
+    position: relative;
+    padding: 4px 0;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--console-blue);
+    transition: width 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: var(--console-blue);
+  }
+  
+  .nav-link:hover::after {
+    width: 100%;
+  }
+  
+  /* Mobile menu */
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 24px;
+    height: 18px;
+  }
+  
+  .hamburger span {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background-color: white;
+    transition: all 0.3s ease;
+  }
+  
+  .mobile-menu-toggle.active .hamburger span:nth-child(1) {
+    transform: translateY(8px) rotate(45deg);
+  }
+  
+  .mobile-menu-toggle.active .hamburger span:nth-child(2) {
+    opacity: 0;
+  }
+  
+  .mobile-menu-toggle.active .hamburger span:nth-child(3) {
+    transform: translateY(-8px) rotate(-45deg);
+  }
+  
+  .mobile-menu {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(3, 10, 23, 0.97);
+    backdrop-filter: blur(10px);
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: opacity 0.4s ease;
+  }
+  
+  .mobile-menu.hidden {
+    display: none;
+  }
+  
+  .mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .mobile-nav-link {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.3s ease;
+  }
+  
+  .mobile-nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--console-blue);
+    transition: width 0.3s ease;
+  }
+  
+  .mobile-nav-link:hover {
+    color: var(--console-blue);
+  }
+  
+  .mobile-nav-link:hover::after {
+    width: 100%;
+  }
+  
+  .menu-open {
+    overflow: hidden;
+  }
+</style>

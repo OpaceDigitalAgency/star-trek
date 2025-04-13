@@ -1,0 +1,404 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
+
+// Fetch data from STAPI
+let allSeries = await stapiService.getSeries();
+
+// Map STAPI data to our format
+allSeries = allSeries.map(series => ({
+  title: series.title,
+  slug: series.uid,
+  abbreviation: series.abbreviation || "ST",
+  years: extractYears(series),
+  stardate: extractStardateYears(series),
+  seasons: series.seasonsCount || "?",
+  episodes: series.episodesCount || "?",
+  image: stapiService.getImageUrl(series.title, 'series'),
+  description: series.productionEndYear 
+    ? `${series.abbreviation || "Star Trek"} series that ran from ${series.productionStartYear} to ${series.productionEndYear}.` 
+    : `${series.abbreviation || "Star Trek"} series that started in ${series.productionStartYear}.`
+}));
+
+// Filter out irrelevant entries and ensure we have the main series
+const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
+                    "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
+                    "Star Trek: Picard", "Star Trek: The Animated Series"];
+
+allSeries = allSeries.filter(series => mainSeries.includes(series.title));
+
+// If STAPI fails or returns insufficient data, use fallback
+if (allSeries.length < 5) {
+  allSeries = [
+    {
+      title: "Star Trek: The Original Series",
+      slug: "the-original-series",
+      abbreviation: "TOS",
+      years: "1966-1969",
+      stardate: "2265-2269",
+      seasons: 3,
+      episodes: 79,
+      image: stapiService.getImageUrl("The Original Series", 'series'),
+      description: "The adventures of the USS Enterprise under the command of Captain James T. Kirk."
+    },
+    {
+      title: "Star Trek: The Animated Series",
+      slug: "the-animated-series",
+      abbreviation: "TAS",
+      years: "1973-1974",
+      stardate: "2269-2270",
+      seasons: 2,
+      episodes: 22,
+      image: stapiService.getImageUrl("The Animated Series", 'series'),
+      description: "Continuing the five-year mission of the USS Enterprise in animated form."
+    },
+    {
+      title: "Star Trek: The Next Generation",
+      slug: "the-next-generation",
+      abbreviation: "TNG",
+      years: "1987-1994",
+      stardate: "2364-2370",
+      seasons: 7,
+      episodes: 178,
+      image: stapiService.getImageUrl("The Next Generation", 'series'),
+      description: "Set almost 100 years after the original series, it follows a new crew aboard the Enterprise-D."
+    },
+    {
+      title: "Star Trek: Deep Space Nine",
+      slug: "deep-space-nine",
+      abbreviation: "DS9",
+      years: "1993-1999",
+      stardate: "2369-2375",
+      seasons: 7,
+      episodes: 176,
+      image: stapiService.getImageUrl("Deep Space Nine", 'series'),
+      description: "Set on a space station near the newly discovered Bajoran wormhole."
+    },
+    {
+      title: "Star Trek: Voyager",
+      slug: "voyager",
+      abbreviation: "VOY",
+      years: "1995-2001",
+      stardate: "2371-2378",
+      seasons: 7,
+      episodes: 172,
+      image: stapiService.getImageUrl("Voyager", 'series'),
+      description: "Following the USS Voyager, stranded 70,000 light-years from Earth."
+    },
+    {
+      title: "Star Trek: Enterprise",
+      slug: "enterprise",
+      abbreviation: "ENT",
+      years: "2001-2005",
+      stardate: "2151-2155",
+      seasons: 4,
+      episodes: 98,
+      image: stapiService.getImageUrl("Enterprise", 'series'),
+      description: "Set before the founding of the Federation, following Earth's first deep space explorers."
+    },
+    {
+      title: "Star Trek: Discovery",
+      slug: "discovery",
+      abbreviation: "DISC",
+      years: "2017-2024",
+      stardate: "2255-2258, 3188-3190",
+      seasons: 5,
+      episodes: 65,
+      image: stapiService.getImageUrl("Discovery", 'series'),
+      description: "Following the adventures of the USS Discovery and later 32nd century exploration."
+    },
+    {
+      title: "Star Trek: Picard",
+      slug: "picard",
+      abbreviation: "PIC",
+      years: "2020-2023",
+      stardate: "2399-2401",
+      seasons: 3,
+      episodes: 30,
+      image: stapiService.getImageUrl("Picard", 'series'),
+      description: "Following the later life of Jean-Luc Picard, decades after his retirement from Starfleet."
+    }
+  ];
+}
+
+// Sort by in-universe chronology (stardate)
+const seriesByChronology = [...allSeries].sort((a, b) => {
+  const aYear = parseInt(a.stardate.split('-')[0]);
+  const bYear = parseInt(b.stardate.split('-')[0]);
+  return aYear - bYear;
+});
+
+// Sort by release date
+const seriesByRelease = [...allSeries].sort((a, b) => {
+  const aYear = parseInt(a.years.split('-')[0]);
+  const bYear = parseInt(b.years.split('-')[0]);
+  return aYear - bYear;
+});
+
+// Enhance with Memory Alpha data for each series
+for (let i = 0; i < seriesByChronology.length; i++) {
+  try {
+    const series = seriesByChronology[i];
+    const wikiTitle = series.title.replace('Star Trek: ', '');
+    const wikiData = await stapiService.getMemoryAlphaContent(wikiTitle);
+    
+    // Enhance both arrays since they share the same underlying objects
+    if (wikiData.image) {
+      series.wikiImage = wikiData.image;
+    }
+    if (wikiData.summary) {
+      series.wikiSummary = wikiData.summary;
+    }
+    series.wikiUrl = wikiData.wikiUrl;
+  } catch (error) {
+    console.error(`Error fetching Memory Alpha data for series:`, error);
+  }
+}
+
+// Create JSON-LD schema for the series list page
+const seriesListSchema = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "Star Trek Series | Complete Guide to All Star Trek TV Shows",
+  "description": "Explore all Star Trek series from The Original Series to Discovery, Picard and beyond. Get episode guides, character information, and timeline placement.",
+  "url": "https://star-trek-timelines.netlify.app/series/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "Star Trek Timelines",
+    "url": "https://star-trek-timelines.netlify.app/"
+  },
+  "about": {
+    "@type": "CreativeWorkSeries",
+    "name": "Star Trek",
+    "description": "Science fiction media franchise created by Gene Roddenberry"
+  },
+  "hasPart": allSeries.map(series => ({
+    "@type": "TVSeries",
+    "name": series.title,
+    "alternateName": series.abbreviation,
+    "url": `https://star-trek-timelines.netlify.app/series/${series.slug}/`,
+    "temporalCoverage": series.years,
+    "numberOfEpisodes": series.episodes,
+    "numberOfSeasons": series.seasons
+  }))
+};
+---
+
+<Layout
+  title="Star Trek Series | Complete Guide to All Star Trek TV Shows"
+  description="Explore all Star Trek series from The Original Series to Discovery, Picard and beyond. Get episode guides, character information, and timeline placement."
+  schemaData={seriesListSchema}
+>
+  <div class="container mx-auto px-4 py-12">
+    <div class="lcars-header mb-8">
+      <div class="lcars-header-content">
+        <h1 class="text-3xl">Federation Database: Star Trek Series</h1>
+      </div>
+    </div>
+    
+    <div class="lcars-panel mb-12">
+      <div class="lcars-top-bar flex">
+        <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+        <div class="flex-1 h-8 bg-starfleet-blue"></div>
+        <div class="w-16 h-8 bg-starfleet-red"></div>
+      </div>
+      
+      <div class="panel-content p-6">
+        <p class="text-gray-300 mb-4">
+          Accessing Federation archives... Displaying all Star Trek television series spanning from the 1960s to today. 
+          Each series expands the rich tapestry of the Star Trek universe, introducing new characters, 
+          technologies, and interstellar civilizations.
+        </p>
+        
+        <div class="flex gap-4 my-6">
+          <button id="view-chronology" class="trek-button active">In-Universe Chronology</button>
+          <button id="view-release" class="trek-button">Release Order</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Series grid - chronological view (default) -->
+    <div id="chronology-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {seriesByChronology.map((series) => (
+        <a href={`/series/${series.slug}/`} class="series-card">
+          <div class="lcars-card-header flex">
+            <div class="w-16 h-6 bg-starfleet-gold rounded-tl-lg"></div>
+            <div class="flex-1 h-6 bg-starfleet-blue flex items-center justify-center">
+              <span class="text-sm font-bold">{series.abbreviation}</span>
+            </div>
+          </div>
+          
+          <div class="card-body bg-space-black bg-opacity-80 p-4 border-x border-starfleet-blue">
+            <div class="relative aspect-video mb-4 overflow-hidden">
+              <img 
+                src={series.wikiImage || series.image} 
+                alt={series.title} 
+                class="w-full h-full object-cover"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
+              />
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-2">
+                <span class="text-console-green text-sm font-mono">{series.stardate}</span>
+              </div>
+            </div>
+            
+            <h2 class="text-xl text-white font-semibold mb-2">{series.title}</h2>
+            
+            <div class="flex justify-between text-gray-400 text-sm mb-3">
+              <span>Aired: {series.years}</span>
+              <span>{series.seasons} seasons</span>
+            </div>
+            
+            <p class="text-gray-300 text-sm">{series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : series.description}</p>
+            
+            {series.wikiUrl && (
+              <div class="mt-3">
+                <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center" onclick="event.stopPropagation()">
+                  Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+                </a>
+              </div>
+            )}
+          </div>
+          
+          <div class="lcars-card-footer flex">
+            <div class="w-10 h-6 bg-starfleet-red"></div>
+            <div class="flex-1 h-6 bg-console-blue"></div>
+            <div class="w-24 h-6 bg-starfleet-gold rounded-br-lg"></div>
+          </div>
+        </a>
+      ))}
+    </div>
+    
+    <!-- Series grid - release order view (hidden by default) -->
+    <div id="release-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
+      {seriesByRelease.map((series) => (
+        <a href={`/series/${series.slug}/`} class="series-card">
+          <div class="lcars-card-header flex">
+            <div class="w-16 h-6 bg-starfleet-gold rounded-tl-lg"></div>
+            <div class="flex-1 h-6 bg-starfleet-red flex items-center justify-center">
+              <span class="text-sm font-bold">{series.abbreviation}</span>
+            </div>
+          </div>
+          
+          <div class="card-body bg-space-black bg-opacity-80 p-4 border-x border-starfleet-red">
+            <div class="relative aspect-video mb-4 overflow-hidden">
+              <img 
+                src={series.wikiImage || series.image} 
+                alt={series.title} 
+                class="w-full h-full object-cover"
+                loading="lazy"
+                onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
+              />
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-2">
+                <span class="text-console-blue text-sm font-mono">{series.years}</span>
+              </div>
+            </div>
+            
+            <h2 class="text-xl text-white font-semibold mb-2">{series.title}</h2>
+            
+            <div class="flex justify-between text-gray-400 text-sm mb-3">
+              <span>In-Universe: {series.stardate}</span>
+              <span>{series.episodes} episodes</span>
+            </div>
+            
+            <p class="text-gray-300 text-sm">{series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : series.description}</p>
+            
+            {series.wikiUrl && (
+              <div class="mt-3">
+                <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center" onclick="event.stopPropagation()">
+                  Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+                </a>
+              </div>
+            )}
+          </div>
+          
+          <div class="lcars-card-footer flex">
+            <div class="w-10 h-6 bg-starfleet-blue"></div>
+            <div class="flex-1 h-6 bg-console-blue"></div>
+            <div class="w-24 h-6 bg-starfleet-gold rounded-br-lg"></div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</Layout>
+
+<script>
+  // Toggle between chronology and release order views
+  const chronologyView = document.getElementById('chronology-view');
+  const releaseView = document.getElementById('release-view');
+  const chronologyBtn = document.getElementById('view-chronology');
+  const releaseBtn = document.getElementById('view-release');
+  
+  chronologyBtn.addEventListener('click', () => {
+    chronologyView.classList.remove('hidden');
+    releaseView.classList.add('hidden');
+    chronologyBtn.classList.add('active');
+    releaseBtn.classList.remove('active');
+  });
+  
+  releaseBtn.addEventListener('click', () => {
+    releaseView.classList.remove('hidden');
+    chronologyView.classList.add('hidden');
+    releaseBtn.classList.add('active');
+    chronologyBtn.classList.remove('active');
+  });
+  
+  // Lazy load images as they come into view
+  if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const lazyImage = entry.target;
+          if (lazyImage.dataset.src) {
+            lazyImage.src = lazyImage.dataset.src;
+            lazyImage.removeAttribute('data-src');
+          }
+          imageObserver.unobserve(lazyImage);
+        }
+      });
+    });
+    
+    document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+      imageObserver.observe(img);
+    });
+  }
+</script>
+
+<style>
+  .trek-button.active {
+    background-color: var(--console-blue);
+    box-shadow: 0 0 10px var(--console-blue);
+  }
+  
+  .series-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+    display: block;
+  }
+  
+  .series-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .series-card:hover img {
+    transform: scale(1.05);
+    transition: transform 0.5s ease;
+  }
+  
+  .lcars-panel {
+    background-color: rgba(3, 10, 23, 0.7);
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
+    padding: 0;
+  }
+  
+  .card-body {
+    transition: all 0.3s ease;
+  }
+  
+  img {
+    transition: transform 0.5s ease;
+  }
+</style>
