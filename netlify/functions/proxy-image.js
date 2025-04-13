@@ -81,12 +81,28 @@ exports.handler = async function(event, context) {
     if (!response.ok) {
       console.error(`Error fetching image: ${cleanedUrl}, status: ${response.status}`);
       
+      // Try to determine what type of image this is based on the URL
+      let fallbackImage = '/images/stars-placeholder.jpg';
+      
+      if (cleanedUrl.toLowerCase().includes('character') ||
+          cleanedUrl.toLowerCase().includes('person') ||
+          cleanedUrl.toLowerCase().includes('actor')) {
+        fallbackImage = '/images/generic-character.jpg';
+      } else if (cleanedUrl.toLowerCase().includes('ship') ||
+                cleanedUrl.toLowerCase().includes('vessel') ||
+                cleanedUrl.toLowerCase().includes('starship')) {
+        fallbackImage = '/images/generic-ship.jpg';
+      } else if (cleanedUrl.toLowerCase().includes('series') ||
+                cleanedUrl.toLowerCase().includes('show')) {
+        fallbackImage = '/images/stars-bg.jpg';
+      }
+      
       // If the image failed to load, return a fallback image
       return {
         statusCode: 307,
         headers: {
           ...headers,
-          'Location': '/images/stars-placeholder.jpg'
+          'Location': fallbackImage
         },
         body: ''
       };
@@ -109,12 +125,28 @@ exports.handler = async function(event, context) {
   } catch (error) {
     console.error('Proxy error:', error);
     
+    // Try to determine what type of image this is based on the URL
+    let fallbackImage = '/images/stars-placeholder.jpg';
+    
+    if (cleanedUrl.toLowerCase().includes('character') ||
+        cleanedUrl.toLowerCase().includes('person') ||
+        cleanedUrl.toLowerCase().includes('actor')) {
+      fallbackImage = '/images/generic-character.jpg';
+    } else if (cleanedUrl.toLowerCase().includes('ship') ||
+              cleanedUrl.toLowerCase().includes('vessel') ||
+              cleanedUrl.toLowerCase().includes('starship')) {
+      fallbackImage = '/images/generic-ship.jpg';
+    } else if (cleanedUrl.toLowerCase().includes('series') ||
+              cleanedUrl.toLowerCase().includes('show')) {
+      fallbackImage = '/images/stars-bg.jpg';
+    }
+    
     // Return a fallback image instead of an error
     return {
       statusCode: 307,
       headers: {
         ...headers,
-        'Location': '/images/stars-placeholder.jpg'
+        'Location': fallbackImage
       },
       body: ''
     };
