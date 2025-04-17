@@ -1,12 +1,10 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import fs from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import path from 'path';
 
-// Set up proper path resolution for ES modules
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const cachePath = join(__dirname, '../data/characters.json');
+// Direct path to the characters.json file
+const cachePath = process.cwd() + '/src/data/characters.json';
 
 const BASE_URL = 'https://stapi.co/api/v1/rest';
 const MEMORY_ALPHA_API = 'https://memory-alpha.fandom.com/api.php';
