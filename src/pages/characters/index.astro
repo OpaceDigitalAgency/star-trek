@@ -4,182 +4,51 @@ import { stapiService, getStaticImage } from '../../services/stapiService';
 
 // Pagination settings
 const PAGE_SIZE = 48; // Number of characters to display per page
-const currentPage = 1; // Default to first page
-
-// Fetch all characters data from STAPI
-let characters = [];
-try {
-  characters = await stapiService.getAllCharacters();
-} catch (error) {
-  console.error('Error fetching characters:', error);
-}
-
-// Organize characters by species
-const charactersBySpecies = new Map();           // Map<string, Character[]>
-const seen = new Set();                          // uid dedup for final display
-
-// Process characters for species categorization
-characters.forEach(c => {
-  // Check for both species and characterSpecies properties
-  // STAPI API can return either depending on the endpoint
-  let speciesList = [];
-  
-  // More robust species extraction
-  if (c.characterSpecies && Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
-    speciesList = c.characterSpecies;
-  } else if (c.species && Array.isArray(c.species) && c.species.length > 0) {
-    speciesList = c.species;
-  } else if (c.characterSpecies === null && c.species === null) {
-    // Default to Unknown if both species fields are explicitly null
-    speciesList = [{ name: 'Unknown' }];
-  } else {
-    // Default to Human only if we're sure there's no species data
-    speciesList = [{ name: 'Human' }];
-  }
-  
-  
-  // If speciesList is empty or contains only null/undefined values, default to Unknown
-  if (speciesList.length === 0 || speciesList.every(s => !s || !s.name)) {
-    speciesList = [{ name: 'Unknown' }];
-  }
-  
-  speciesList.forEach(s => {
-    // Ensure we have a valid species name
-    const key = (s && s.name) ? s.name : 'Unknown';
-    
-    if (!charactersBySpecies.has(key)) {
-      charactersBySpecies.set(key, []);
-    }
-    
-    // Only add if we haven't seen this UID before
-    if (!seen.has(c.uid)) {
-      charactersBySpecies.get(key).push(c);
-      seen.add(c.uid);
-    }
-  });
-});
-
-// Sort species names alphabetically, but put "Human" and "Unknown" at the top
-const speciesNames = [...charactersBySpecies.keys()].sort((a, b) => {
-  if (a === 'Human') return -1;
-  if (b === 'Human') return 1;
-  if (a === 'Unknown') return -1;
-  if (b === 'Unknown') return 1;
-  return a.localeCompare(b);
-});
-
-// Implement pagination for better performance
-// Calculate total number of characters across all species
+let initialCharacters = [];
+let totalPages = 1;
 let totalCharacters = 0;
-charactersBySpecies.forEach((chars) => {
-  totalCharacters += chars.length;
-});
+let allSpecies = []; // For filter dropdown
 
-const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
-// Single summary log
-console.log(`Found ${speciesNames.length} species, ${totalCharacters} total characters`);
+// Fetch only the first page of characters for the initial build
+try {
+  const initialData = await stapiService.getCharacters(0, PAGE_SIZE);
+  initialCharacters = initialData.characters || [];
+  totalPages = initialData.page?.totalPages || 1;
+  totalCharacters = initialData.page?.totalElements || initialCharacters.length;
 
-// Enhance character data with Memory Alpha information
-// Increase the budget to ensure more images load
-const IMAGE_BUDGET = 800;          // increased from 400
-let downloaded = 0;
+  // Fetch all species for the filter dropdown (consider caching this later)
+  // This might still be slow if there are thousands of species
+  const speciesData = await stapiService.searchSpecies({ pageSize: 2000 }); // Adjust pageSize as needed
+  allSpecies = speciesData.map(s => s.name).sort((a, b) => {
+    if (a === 'Human') return -1;
+    if (b === 'Human') return 1;
+    if (a === 'Unknown') return -1; // Assuming 'Unknown' might exist
+    if (b === 'Unknown') return 1;
+    return a.localeCompare(b);
+  });
 
-// Process images more efficiently by prioritizing visible characters first
-// We'll process a subset of characters from each species rather than all at once
-for (const [specie, list] of charactersBySpecies) {
-  // Process first 20 characters of each species to ensure good coverage
-  const charsToProcess = list.slice(0, 20);
-  
-  for (const char of charsToProcess) {
-    if (downloaded >= IMAGE_BUDGET) break;
+  console.log(`Initial build: Fetched ${initialCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
 
-    // Expand abbreviated names (e.g. "J. Kirk" → "James T. Kirk")
-    const queryName = char.name.match(/^[A-Z]\./) ? char.fullName ?? char.name : char.name;
-
-    try {
-      const wiki = await stapiService.getMemoryAlphaContent(queryName);
-      if (wiki?.image?.includes('placeholder') || wiki?.image?.endsWith('.svg')) {
-        // keep searching, don't count towards budget
-      } else if (wiki?.image) {
-        char.wikiImage = wiki.image;
-        downloaded++;
-      }
-      
-      if (wiki?.wikiUrl) {
-        char.wikiUrl = wiki.wikiUrl;
-      }
-    } catch (error) {
-      console.error(`Error fetching wiki content for ${queryName}:`, error);
-    }
-  }
+} catch (error) {
+  console.error('Error fetching initial character/species data:', error);
+  // Add fallback data if needed
+  initialCharacters = [ /* Add fallback character objects here if API fails */ ];
+  allSpecies = ['Human', 'Vulcan', 'Klingon']; // Basic fallback species
+  totalCharacters = initialCharacters.length;
+  totalPages = 1;
 }
 
+// Extract ranks *only* from the initial page for the build
+let initialRanks = [...new Set(initialCharacters
+  .map(c => c.title?.trim())
+  .filter(Boolean) // Remove empty/null titles
+)].sort();
 
-// Fallback data if API fails
-if (speciesNames.length === 0) {
-  const fallbackCharacters = [
-    {
-      name: "Captain James T. Kirk",
-      species: "Human",
-      uid: "kirk",
-      image: stapiService.getImageUrl("James T. Kirk", 'character'),
-      description: "Captain of the USS Enterprise"
-    },
-    {
-      name: "Captain Jean-Luc Picard",
-      species: "Human",
-      uid: "picard",
-      image: stapiService.getImageUrl("Jean-Luc Picard", 'character'),
-      description: "Captain of the USS Enterprise-D and E"
-    },
-    {
-      name: "Captain Benjamin Sisko",
-      species: "Human",
-      uid: "sisko",
-      image: stapiService.getImageUrl("Benjamin Sisko", 'character'),
-      description: "Commander of Deep Space Nine"
-    },
-    {
-      name: "Captain Kathryn Janeway",
-      species: "Human",
-      uid: "janeway",
-      image: stapiService.getImageUrl("Kathryn Janeway", 'character'),
-      description: "Captain of the USS Voyager"
-    },
-    {
-      name: "Spock",
-      species: "Vulcan/Human",
-      uid: "spock",
-      image: stapiService.getImageUrl("Spock", 'character'),
-      description: "Science Officer of the USS Enterprise"
-    },
-    {
-      name: "Worf",
-      species: "Klingon",
-      uid: "worf",
-      image: stapiService.getImageUrl("Worf", 'character'),
-      description: "Security Officer"
-    }
-  ];
-  
-  // Populate charactersBySpecies with fallback data
-  charactersBySpecies.set("Human", fallbackCharacters.filter(c => c.species === "Human"));
-  charactersBySpecies.set("Vulcan/Human", fallbackCharacters.filter(c => c.species === "Vulcan/Human"));
-  charactersBySpecies.set("Klingon", fallbackCharacters.filter(c => c.species === "Klingon"));
-  speciesNames.push("Human", "Vulcan/Human", "Klingon");
-}
 
-// Prepare data for filtering
-let availableRanks = [];
-// Extract unique ranks
-characters.forEach(character => {
-  if (character.title?.trim() && !availableRanks.includes(character.title)) {
-    availableRanks.push(character.title);
-  }
-});
-availableRanks.sort();
+// --- REMOVED Memory Alpha image fetching and complex species grouping from build ---
 
-// Create JSON-LD schema for characters page
+
+// Create JSON-LD schema for characters page (using initial data)
 const charactersSchema = {
   "@context": "https://schema.org",
   "@type": "CollectionPage",
@@ -196,15 +65,16 @@ const charactersSchema = {
     "name": "Star Trek",
     "description": "Science fiction media franchise created by Gene Roddenberry"
   },
-  "hasPart": [...charactersBySpecies.entries()].slice(0, 5).flatMap(([species, chars]) => {
-    return chars.slice(0, 5).map(char => ({
+  // Update hasPart to use initialCharacters
+  "hasPart": initialCharacters.slice(0, 10).map(char => ({ // Limit to first 10 for schema
       "@type": "Person",
       "name": char.name,
+      // Ensure slug/uid exists for URL generation
       "url": `https://star-trek-timelines.netlify.app/characters/${char.uid}/`,
       "jobTitle": char.title || "Officer",
-      "description": `${species} character from Star Trek`
-    }));
-  })
+      // Try to get species name if available in character object
+      "description": `${char.characterSpecies?.[0]?.name || char.species?.[0]?.name || 'Unknown'} character from Star Trek`
+  }))
 };
 ---
 
@@ -244,32 +114,33 @@ const charactersSchema = {
                 class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
               >
                 <option value="all">All Species</option>
-                {speciesNames.map(species => (
-                  <option value={species}>{species}</option>
-                ))}
+                {allSpecies.map(species => (
+                                  <option value={species}>{species}</option>
+                                ))}
               </select>
               <!-- chevron -->
               <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
                    viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
             </div>
             
-            {availableRanks.length > 0 && (
-              <div class="filter-group">
-                <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
-                <select
-                  id="rank-filter"
-                  class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
-                >
-                  <option value="all">All Ranks</option>
-                  {availableRanks.map(rank => (
-                    <option value={rank}>{rank}</option>
-                  ))}
-                </select>
-                <!-- chevron -->
-                <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
-                     viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
-              </div>
-            )}
+            {initialRanks.length > 0 && (
+                          <div class="filter-group">
+                            <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
+                            <select
+                              id="rank-filter"
+                              class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
+                            >
+                              <option value="all">All Ranks</option>
+                              {/* Populate ranks dynamically client-side later */}
+                              {initialRanks.map(rank => (
+                                <option value={rank}>{rank}</option>
+                              ))}
+                            </select>
+                            <!-- chevron -->
+                            <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
+                                 viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
+                          </div>
+                        )}
             
             <div class="filter-group ml-4">
               <h3 class="text-white text-lg mb-2">Show Only</h3>
@@ -337,81 +208,263 @@ const charactersSchema = {
 <script
   id="initial-payload"
   type="application/json"
-  set:html={JSON.stringify(Object.fromEntries(charactersBySpecies))}
+  set:html={JSON.stringify({
+    characters: initialCharacters,
+    totalPages: totalPages,
+    totalCharacters: totalCharacters,
+    pageSize: PAGE_SIZE,
+    // Pass initial ranks too, species are already in the dropdown
+    initialRanks: initialRanks
+  })}
 />
 
 <script>
+  // Make stapiService available client-side (simplified version)
+  const stapiClient = {
+    BASE_URL: 'https://stapi.co/api/v1/rest',
+    async getCharacters(page = 0, pageSize = 48) {
+      try {
+        // Construct URL properly
+        const url = `${this.BASE_URL}/character/search?pageNumber=${page}&pageSize=${pageSize}`;
+        console.log(`Fetching: ${url}`); // Log URL
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(`Received page ${page}:`, data); // Log received data
+        return data; // Should contain { characters: [], page: { totalPages, totalElements } }
+      } catch (error) {
+        console.error('Error fetching characters client-side:', error);
+        // Return an empty structure on error to prevent crashes
+        return { characters: [], page: { totalPages: 1, totalElements: 0 } };
+      }
+    },
+    // Add getMemoryAlphaContent client-side if needed for images, or handle in detail page
+    async getMemoryAlphaImage(characterName) {
+       // Basic example - might need a proxy function due to CORS
+       try {
+         const searchParams = new URLSearchParams({
+           action: 'query',
+           format: 'json',
+           prop: 'pageimages',
+           titles: characterName,
+           pithumbsize: 200, // Adjust size as needed
+           origin: '*' // Required for CORS from browser
+         });
+         const response = await fetch(`https://memory-alpha.fandom.com/api.php?${searchParams}`);
+         if (!response.ok) throw new Error('MA API fetch failed');
+         const data = await response.json();
+         const page = Object.values(data.query.pages)[0];
+         return page?.thumbnail?.source || null;
+       } catch (error) {
+         console.error(`Error fetching MA image for ${characterName}:`, error);
+         return null;
+       }
+    }
+  };
+
+
   document.addEventListener('DOMContentLoaded', () => {
-    const payload = JSON.parse(
-      document.getElementById('initial-payload').textContent
-    );
-    const allChars = Object.values(payload).flat();
-    const PAGE_SIZE = 48;
+    const payload = JSON.parse(document.getElementById('initial-payload').textContent);
+    const PAGE_SIZE = payload.pageSize;
     let currentPage = 1;
+    let totalPages = payload.totalPages;
+    let totalCharacters = payload.totalCharacters;
+    let allCharacters = [...payload.characters]; // Start with initial characters
+    let loadedPages = new Set([0]); // Keep track of loaded pages (0-indexed)
+    let isLoading = false; // Prevent multiple simultaneous fetches
 
-    // Grab your inputs/buttons by ID (ensure these IDs exist in your markup)
+    // DOM Elements
     const speciesFilter = document.getElementById('species-filter');
-    const importantBox  = document.getElementById('important-filter');
-    const searchInput   = document.getElementById('search-input');
-    const prevBtn       = document.getElementById('prev-page');
-    const nextBtn       = document.getElementById('next-page');
-    const pageNum       = document.getElementById('current-page-num');
-    const totalNum      = document.getElementById('total-pages');
-    const countBadge    = document.getElementById('characters-count');
-    const container     = document.getElementById('characters-container');
+    const rankFilter = document.getElementById('rank-filter'); // Assuming rank filter exists
+    const importantBox = document.getElementById('important-filter');
+    const searchInput = document.getElementById('search-input');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageNum = document.getElementById('current-page-num');
+    const totalNum = document.getElementById('total-pages');
+    const countBadge = document.getElementById('characters-count');
+    const container = document.getElementById('characters-container');
+    const noResults = document.getElementById('no-results');
 
-    const debounce = (fn, ms=200) => {
-      let t; return (...args) => {
+    const debounce = (fn, ms = 300) => {
+      let t;
+      return (...args) => {
         clearTimeout(t);
         t = setTimeout(() => fn(...args), ms);
       };
     };
 
-    function render() {
-      const term = searchInput.value.trim().toLowerCase();
-      let list = allChars.filter(c => {
-        if (speciesFilter.value !== 'all' && c.speciesName !== speciesFilter.value)
-          return false;
-        if (importantBox.checked && !c.isImportant)
-          return false;
-        if (term && !c.name.toLowerCase().includes(term))
-          return false;
+    // Function to fetch a specific page if not already loaded
+    async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
+      const pageIndex = pageNumber - 1; // API is 0-based
+      if (loadedPages.has(pageIndex) || isLoading) {
+        return; // Already loaded or loading
+      }
+
+      isLoading = true;
+      // Show loading indicator (optional)
+      container.style.opacity = '0.5';
+
+      try {
+        const data = await stapiClient.getCharacters(pageIndex, PAGE_SIZE);
+        if (data.characters && data.characters.length > 0) {
+          // Add new characters, avoiding duplicates (though API should handle this)
+          const newChars = data.characters.filter(nc => !allCharacters.some(ac => ac.uid === nc.uid));
+          allCharacters = [...allCharacters, ...newChars];
+          loadedPages.add(pageIndex);
+
+          // Update total pages/count if necessary (though initial payload should be accurate)
+          if (data.page?.totalPages && data.page.totalPages !== totalPages) {
+             totalPages = data.page.totalPages;
+             totalNum.textContent = totalPages;
+          }
+           if (data.page?.totalElements && data.page.totalElements !== totalCharacters) {
+             totalCharacters = data.page.totalElements;
+             // Update count badge potentially, though filtering affects this more
+          }
+
+        } else {
+          console.warn(`No characters returned for page ${pageIndex}`);
+          // Add page index even if empty to prevent re-fetching
+          loadedPages.add(pageIndex);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch page ${pageIndex}:`, error);
+        // Handle error display if needed
+      } finally {
+        isLoading = false;
+        container.style.opacity = '1';
+        render(); // Re-render after fetching
+      }
+    }
+
+    // Function to render the current page based on filters and loaded data
+    async function render() {
+      if (isLoading) return; // Don't render while loading
+
+      const speciesVal = speciesFilter.value;
+      const rankVal = rankFilter ? rankFilter.value : 'all'; // Handle if rank filter doesn't exist
+      const importantOnly = importantBox.checked;
+      const searchTerm = searchInput.value.trim().toLowerCase();
+
+      // Filter the *currently loaded* characters
+      let filteredList = allCharacters.filter(c => {
+        const characterSpecies = c.characterSpecies?.[0]?.name || c.species?.[0]?.name || 'Unknown';
+        const characterRank = c.title?.trim() || '';
+
+        if (speciesVal !== 'all' && characterSpecies !== speciesVal) return false;
+        if (rankVal !== 'all' && characterRank !== rankVal) return false;
+        if (importantOnly && !c.isImportant) return false; // Assuming 'isImportant' property exists
+        if (searchTerm && !c.name.toLowerCase().includes(searchTerm)) return false;
         return true;
       });
 
-      const totalPages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
-      if (currentPage > totalPages) currentPage = totalPages;
+      // Update total count based on filter
+      countBadge.textContent = `${filteredList.length} characters shown (of ${totalCharacters} total)`;
 
-      // Update UI labels
-      countBadge.textContent = `${list.length} characters`;
-      pageNum.textContent    = currentPage;
-      totalNum.textContent   = totalPages;
+      // Calculate pagination based on the *filtered* list length
+      const filteredTotalPages = Math.max(1, Math.ceil(filteredList.length / PAGE_SIZE));
+      if (currentPage > filteredTotalPages) currentPage = filteredTotalPages;
 
-      // Render only one page of cards
+      pageNum.textContent = currentPage;
+      // Display total pages based on filtered results or overall total? Let's use filtered.
+      totalNum.textContent = filteredTotalPages;
+
+      // Enable/disable pagination buttons
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= filteredTotalPages;
+
+      // Slice the filtered list for the current page view
       const start = (currentPage - 1) * PAGE_SIZE;
-      const page  = list.slice(start, start + PAGE_SIZE);
-      container.innerHTML = page.map(c => `
-        <div class="character-card">
-          <a href="/characters/${c.slug || c.uid}/">
-            <div class="character-image">
-              <img loading="lazy"
-                   src="${c.wikiImage||c.image||'/images/generic-character.jpg'}"
-                   alt="${c.name}" />
-            </div>
-            <div class="character-info"><h3>${c.name}</h3></div>
-          </a>
-        </div>
-      `).join('');
+      const pageItems = filteredList.slice(start, start + PAGE_SIZE);
+
+      // Display "No Results" message if needed
+      noResults.classList.toggle('hidden', pageItems.length > 0);
+
+      // Render character cards
+      container.innerHTML = pageItems.map(c => {
+         // Basic image handling - prefer wikiImage if fetched, fallback
+         const imageUrl = c.wikiImage || c.image || '/images/generic-character.jpg';
+         // Generate slug client-side if needed (ensure slugify utility is available or simplify)
+         const slug = c.uid; // Use UID directly for simplicity now
+
+         return `
+           <div class="character-card bg-space-black border border-starfleet-blue rounded-lg overflow-hidden transition-transform hover:scale-105">
+             <a href="/characters/${slug}/" class="block">
+               <div class="character-image aspect-square bg-gray-800">
+                 <img loading="lazy"
+                      src="${imageUrl}"
+                      alt="${c.name}"
+                      class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                      onerror="this.onerror=null; this.src='/images/generic-character.jpg';" />
+               </div>
+               <div class="character-info p-3 border-t border-starfleet-blue">
+                 <h3 class="text-white font-semibold truncate" title="${c.name}">${c.name}</h3>
+                 <p class="text-gray-400 text-sm">${c.characterSpecies?.[0]?.name || c.species?.[0]?.name || 'Unknown'}</p>
+               </div>
+             </a>
+           </div>
+         `;
+        }).join('');
+
+        // Optional: Fetch Memory Alpha images for visible cards after rendering
+        // This adds complexity but improves initial load
+        /*
+        const imagesToLoad = container.querySelectorAll('img[loading="lazy"]');
+        imagesToLoad.forEach(async img => {
+          if (!img.dataset.maChecked) {
+             img.dataset.maChecked = true; // Prevent re-checking
+             const characterName = img.alt;
+             if (img.src.includes('generic-character')) { // Only fetch if using placeholder
+                const maImage = await stapiClient.getMemoryAlphaImage(characterName);
+                if (maImage) img.src = maImage;
+             }
+          }
+        });
+        */
     }
 
-    // Wire up events
+    // Event Listeners
     speciesFilter.addEventListener('change', () => { currentPage = 1; render(); });
-    importantBox .addEventListener('change', () => { currentPage = 1; render(); });
-    searchInput .addEventListener('input', debounce(() => { currentPage = 1; render(); }));
-    prevBtn     .addEventListener('click', () => { if (currentPage>1){currentPage--;render();} });
-    nextBtn     .addEventListener('click', () => { currentPage++; render(); });
+    if (rankFilter) rankFilter.addEventListener('change', () => { currentPage = 1; render(); });
+    importantBox.addEventListener('change', () => { currentPage = 1; render(); });
+    searchInput.addEventListener('input', debounce(() => { currentPage = 1; render(); }));
 
-    render();  // first paint
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        // No need to fetch here, render handles displaying the correct slice
+        render();
+      }
+    });
+
+    nextBtn.addEventListener('click', async () => {
+       // Calculate the page index we *will* need data for
+       const nextPageNum = currentPage + 1;
+       const requiredPageIndex = nextPageNum - 1;
+
+       // Check if we need to load the *next* page's data before incrementing currentPage
+       if (!loadedPages.has(requiredPageIndex) && requiredPageIndex < totalPages) {
+          await fetchPageIfNeeded(nextPageNum); // Fetch data for the page we are moving to
+       }
+
+       // Now, check if we can actually move to the next page based on filtered results
+       const filteredListLength = allCharacters.filter(c => { /* apply filters */ return true; }).length; // Re-apply filters quickly to get count
+       const filteredTotalPages = Math.max(1, Math.ceil(filteredListLength / PAGE_SIZE));
+
+       if (currentPage < filteredTotalPages) {
+          currentPage++;
+          render(); // Render the new page
+       } else {
+          // Optionally disable next button more definitively if already on the last possible filtered page
+          nextBtn.disabled = true;
+       }
+    });
+
+    // Initial Render
+    render();
   });
 </script>
 
