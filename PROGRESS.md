@@ -56,3 +56,26 @@
   - Images load correctly for all characters
   - No duplicate character entries appear
 - Committed all changes and pushed to the fix/characters-species-images branch
+- Merged the fix/characters-species-images branch into the main branch
+
+- Discovered persistent issues with the implementation:
+  1. Pagination showing only "1 of 1" pages
+  2. Species dropdown still only containing humans
+  3. Search not finding expected characters
+- Conducted extensive debugging and implemented additional fixes:
+  1. Enhanced getAllCharacters() function in stapiService.js:
+     - Added detailed logging to track API responses and pagination
+     - Improved error handling with more detailed error logging
+     - Added debugging for species information
+     - Fixed pagination handling to properly detect the last page
+  2. Improved species extraction in characters/index.astro:
+     - Added robust species data extraction with better edge case handling
+     - Improved handling of null/undefined values
+     - Added fallback to "Unknown" species when needed
+  3. Fixed pagination calculation in characters/index.astro:
+     - Added more detailed logging of character counts
+     - Ensured totalPages is always at least 1
+  4. Enhanced search functionality:
+     - Added error handling for missing name elements
+     - Improved search matching for partial names and abbreviations
+- Committed these additional fixes and pushed them to the main branch (commit 9cfdf9cd)

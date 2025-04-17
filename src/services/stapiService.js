@@ -598,99 +598,123 @@ export const stapiService = {
   // Function to fetch all characters from STAPI (approximately 6,000 characters)
   async getAllCharacters() {
     try {
-      const pageSize = 100;          // STAPI max allowed
-      let pageNumber = 0;
-      const full = [];
-      const seenUids = new Set();  // For deduplication
+      // Try to get from cache first to avoid unnecessary API calls during development
+      const cacheKey = 'all_characters_v2'; // v2 to force refresh if needed
+      return await this.getCachedData(cacheKey, async () => {
+        const pageSize = 100;          // STAPI max allowed
+        let pageNumber = 0;
+        const full = [];
+        const seenUids = new Set();  // For deduplication
+        
+        console.log(`Starting to fetch all characters from STAPI with pageSize=${pageSize}`);
+        
+        let totalPages = 0;
+        let totalCharacters = 0;
       
-      console.log(`Starting to fetch all characters from STAPI with pageSize=${pageSize}`);
-      
-      let totalPages = 0;
-      let totalCharacters = 0;
-    
-      while (true) {
-        console.log(`Fetching page ${pageNumber}...`);
-        const response = await axios.get(
-          `${BASE_URL}/character/search`,
-          { params: { pageSize, pageNumber } }
-        );
+        // Make sure we fetch at least 10 pages to get a good sample of characters
+        const minPagesToFetch = 10;
         
-        const data = response.data;
-        
-        // Log pagination information
-        if (pageNumber === 0) {
-          totalPages = data.page?.totalPages || 0;
-          totalCharacters = data.page?.totalElements || 0;
-          console.log(`API reports ${totalCharacters} total characters across ${totalPages} pages`);
-        }
-    
-        if (!data.characters?.length) {
-          console.log(`No characters returned on page ${pageNumber}, stopping`);
-          break;
-        }
-        
-        console.log(`Received ${data.characters.length} characters on page ${pageNumber}`);
-        
-        // Add only unique characters based on UID
-        let newCharactersCount = 0;
-        data.characters.forEach(character => {
-          if (!seenUids.has(character.uid)) {
-            seenUids.add(character.uid);
-            full.push(character);
-            newCharactersCount++;
-            
-            // Debug species information
-            const speciesInfo = character.characterSpecies?.length
-              ? character.characterSpecies
-              : (character.species?.length ? character.species : [{ name: 'Human' }]);
-            
-            // Log every 100th character for debugging
-            if (full.length % 100 === 0) {
-              console.log(`Character #${full.length}: ${character.name}, Species:`,
-                speciesInfo.map(s => s.name).join(', '));
+        while (true) {
+          console.log(`Fetching page ${pageNumber}...`);
+          const response = await axios.get(
+            `${BASE_URL}/character/search`,
+            {
+              params: {
+                pageSize,
+                pageNumber,
+                // Request more detailed character data including species
+                includeCharacterSpecies: true
+              }
             }
+          );
+          
+          const data = response.data;
+          
+          // Log pagination information
+          if (pageNumber === 0) {
+            totalPages = data.page?.totalPages || 0;
+            totalCharacters = data.page?.totalElements || 0;
+            console.log(`API reports ${totalCharacters} total characters across ${totalPages} pages`);
           }
-        });
-        
-        console.log(`Added ${newCharactersCount} new unique characters from page ${pageNumber}`);
-        
-        pageNumber += 1;
-        
-        // Check if we've reached the last page according to API pagination
-        if (data.page && pageNumber >= data.page.totalPages) {
-          console.log(`Reached last page (${pageNumber-1} of ${data.page.totalPages}), stopping`);
-          break;
+      
+          if (!data.characters?.length) {
+            console.log(`No characters returned on page ${pageNumber}, stopping`);
+            break;
+          }
+          
+          console.log(`Received ${data.characters.length} characters on page ${pageNumber}`);
+          
+          // Add only unique characters based on UID
+          let newCharactersCount = 0;
+          data.characters.forEach(character => {
+            if (!seenUids.has(character.uid)) {
+              seenUids.add(character.uid);
+              
+              // Ensure species data is properly structured
+              if (character.characterSpecies && !Array.isArray(character.characterSpecies)) {
+                character.characterSpecies = [character.characterSpecies];
+              }
+              if (character.species && !Array.isArray(character.species)) {
+                character.species = [character.species];
+              }
+              
+              full.push(character);
+              newCharactersCount++;
+              
+              // Debug species information
+              const speciesInfo = character.characterSpecies?.length
+                ? character.characterSpecies
+                : (character.species?.length ? character.species : [{ name: 'Unknown' }]);
+              
+              // Log every 100th character for debugging
+              if (full.length % 100 === 0) {
+                console.log(`Character #${full.length}: ${character.name}, Species:`,
+                  speciesInfo.map(s => s.name || 'Unknown').join(', '));
+              }
+            }
+          });
+          
+          console.log(`Added ${newCharactersCount} new unique characters from page ${pageNumber}`);
+          
+          pageNumber += 1;
+          
+          // Check if we've reached the last page according to API pagination
+          // But ensure we fetch at least minPagesToFetch pages to get a good sample
+          if (data.page && pageNumber >= data.page.totalPages && pageNumber >= minPagesToFetch) {
+            console.log(`Reached last page (${pageNumber-1} of ${data.page.totalPages}), stopping`);
+            break;
+          }
+          
+          // Safety check to prevent infinite loops
+          if (pageNumber > 100) {
+            console.log(`Reached safety limit of 100 pages, stopping`);
+            break;
+          }
         }
         
-        // Safety check to prevent infinite loops
-        if (pageNumber > 100) {
-          console.log(`Reached safety limit of 100 pages, stopping`);
-          break;
-        }
-      }
-      
-      console.log(`Fetched ${full.length} unique characters from STAPI`);
-      
-      // Log species distribution for debugging
-      const speciesCount = {};
-      full.forEach(character => {
-        const speciesList = character.characterSpecies?.length
-          ? character.characterSpecies
-          : (character.species?.length ? character.species : [{ name: 'Human' }]);
+        console.log(`Fetched ${full.length} unique characters from STAPI`);
         
-        speciesList.forEach(s => {
-          const speciesName = s.name || 'Unknown';
-          speciesCount[speciesName] = (speciesCount[speciesName] || 0) + 1;
+        // Log species distribution for debugging
+        const speciesCount = {};
+        full.forEach(character => {
+          const speciesList = character.characterSpecies?.length
+            ? character.characterSpecies
+            : (character.species?.length ? character.species : [{ name: 'Unknown' }]);
+          
+          speciesList.forEach(s => {
+            const speciesName = s.name || 'Unknown';
+            speciesCount[speciesName] = (speciesCount[speciesName] || 0) + 1;
+          });
         });
-      });
-      
-      console.log('Species distribution:', Object.entries(speciesCount)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 20)
-        .map(([name, count]) => `${name}: ${count}`)
-        .join(', '));
-      
-      return full;
+        
+        console.log('Species distribution:', Object.entries(speciesCount)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 20)
+          .map(([name, count]) => `${name}: ${count}`)
+          .join(', '));
+        
+        return full;
+      }, 3600000); // Cache for 1 hour
     } catch (error) {
       console.error('Error in getAllCharacters:', error);
       console.error('Error details:', error.message);

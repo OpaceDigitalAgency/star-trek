@@ -42,9 +42,17 @@ characters.forEach(c => {
     speciesList = c.characterSpecies;
   } else if (c.species && Array.isArray(c.species) && c.species.length > 0) {
     speciesList = c.species;
+  } else if (c.characterSpecies === null && c.species === null) {
+    // Default to Unknown if both species fields are explicitly null
+    speciesList = [{ name: 'Unknown' }];
   } else {
     // Default to Human only if we're sure there's no species data
     speciesList = [{ name: 'Human' }];
+  }
+  
+  // Log species data for debugging
+  if (full.length % 100 === 0) {
+    console.log(`Character species data for ${c.name}:`, JSON.stringify(speciesList));
   }
   
   // If speciesList is empty or contains only null/undefined values, default to Unknown
@@ -72,7 +80,17 @@ characters.forEach(c => {
 // Log species counts for debugging
 console.log(`Found ${charactersBySpecies.size} unique species`);
 
-const speciesNames = [...charactersBySpecies.keys()].sort();
+// Sort species names alphabetically, but put "Human" and "Unknown" at the top
+const speciesNames = [...charactersBySpecies.keys()].sort((a, b) => {
+  if (a === 'Human') return -1;
+  if (b === 'Human') return 1;
+  if (a === 'Unknown') return -1;
+  if (b === 'Unknown') return 1;
+  return a.localeCompare(b);
+});
+
+// Log species counts for debugging
+console.log(`Sorted species (${speciesNames.length}):`, speciesNames.slice(0, 10).join(', ') + (speciesNames.length > 10 ? '...' : ''));
 
 // Implement pagination for better performance
 // Calculate total number of characters across all species
@@ -406,7 +424,9 @@ const charactersSchema = {
     const filterAndPaginateCharacters = () => {
       const selectedSpecies = speciesFilter.value;
       const selectedRank = rankFilter?.value;
-      const searchTerm = searchInput.value.toLowerCase();
+      const searchTerm = searchInput.value.toLowerCase().trim();
+      
+      console.log(`Filtering with species=${selectedSpecies}, rank=${selectedRank}, search="${searchTerm}"`);
       
       // Get all species sections
       const speciesSections = document.querySelectorAll('.species-section');
@@ -428,6 +448,8 @@ const charactersSchema = {
         // Get all character cards for this species (from our stored data)
         const allCards = allCharactersBySpecies[sectionSpecies] || [];
         
+        console.log(`Processing ${sectionSpecies} section with ${allCards.length} characters`);
+        
         // Filter cards based on rank and search
         const filteredCards = allCards.filter(card => {
           const cardRank = card.getAttribute('data-rank');
@@ -441,31 +463,44 @@ const charactersSchema = {
           
           const characterName = characterNameElement.textContent.toLowerCase();
           
-          // Debug search matching
-          if (searchTerm && characterName.includes(searchTerm)) {
-            console.log(`Search match: "${searchTerm}" found in "${characterName}"`);
-          }
-          
           // More robust search - check if character matches all filters
           const matchesRank = !selectedRank || selectedRank === 'all' || cardRank === selectedRank;
           
           // Improved search matching - handle partial names and common prefixes
-          const matchesSearch = !searchTerm ||
-                               characterName.includes(searchTerm) ||
-                               // Handle "Lt." vs "Lieutenant" etc.
-                               (characterName.replace(/\b(lt|cmdr|capt|adm|cmd|dr)\b\./i, match => {
-                                 return {
-                                   'lt.': 'lieutenant',
-                                   'cmdr.': 'commander',
-                                   'capt.': 'captain',
-                                   'adm.': 'admiral',
-                                   'cmd.': 'commander',
-                                   'dr.': 'doctor'
-                                 }[match.toLowerCase()] || match;
-                               }).includes(searchTerm));
+          let matchesSearch = false;
+          
+          if (!searchTerm) {
+            // No search term, so it matches
+            matchesSearch = true;
+          } else if (characterName.includes(searchTerm)) {
+            // Direct match
+            matchesSearch = true;
+            console.log(`Search match: "${searchTerm}" found in "${characterName}"`);
+          } else {
+            // Try expanded titles
+            const expandedName = characterName.replace(/\b(lt|cmdr|capt|adm|cmd|dr)\b\./i, match => {
+              return {
+                'lt.': 'lieutenant',
+                'cmdr.': 'commander',
+                'capt.': 'captain',
+                'adm.': 'admiral',
+                'cmd.': 'commander',
+                'dr.': 'doctor'
+              }[match.toLowerCase()] || match;
+            });
+            
+            if (expandedName.includes(searchTerm)) {
+              matchesSearch = true;
+              console.log(`Expanded search match: "${searchTerm}" found in "${expandedName}" (original: "${characterName}")`);
+            }
+          }
           
           return matchesRank && matchesSearch;
         });
+        
+        console.log(`Filtered ${sectionSpecies} section: ${filteredCards.length} of ${allCards.length} characters match criteria`);
+        
+        console.log(`Filtered ${sectionSpecies} section: ${filteredCards.length} of ${allCards.length} characters match criteria`);
         
         // Add to our overall filtered list
         filteredCharacters = filteredCharacters.concat(filteredCards);
@@ -497,9 +532,14 @@ const charactersSchema = {
         }
       });
       
+      console.log(`Total filtered characters: ${filteredCharacters.length}, visible: ${visibleCharactersCount}`);
+      
+      console.log(`Total filtered characters: ${filteredCharacters.length}, visible: ${visibleCharactersCount}`);
+      
       // Update pagination
       totalPages = Math.max(1, Math.ceil(filteredCharacters.length / pageSize));
       totalPagesDisplay.textContent = totalPages;
+      console.log(`Pagination: page ${currentPage} of ${totalPages}`);
       
       // Ensure current page is valid
       if (currentPage > totalPages) {
@@ -510,6 +550,14 @@ const charactersSchema = {
       // Update pagination button states
       prevPageBtn.disabled = currentPage <= 1;
       nextPageBtn.disabled = currentPage >= totalPages;
+      
+      // Make pagination controls visible only if we have multiple pages
+      const paginationControls = document.getElementById('pagination-controls');
+      if (totalPages > 1) {
+        paginationControls.classList.remove('hidden');
+      } else {
+        paginationControls.classList.add('hidden');
+      }
       
       // Show/hide no results message
       if (visibleCharactersCount === 0) {

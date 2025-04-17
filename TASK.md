@@ -11,6 +11,10 @@ None currently active.
    - Visual polish
    - Pagination implementation
    - Proper deduplication
+   - Enhanced character data fetching
+   - Improved species extraction
+   - Fixed pagination calculation
+   - Enhanced search functionality
 
 2. Fix the characters page issues:
    - Implement getAllCharacters() function to fetch all characters at build time
@@ -46,6 +50,10 @@ None currently active.
 4. ✅ Add visual polish with Tailwind utilities
 5. ✅ Implement pagination for better performance
 6. ✅ Ensure proper deduplication of character data
+7. ✅ Debug and fix character data fetching
+8. ✅ Improve species extraction from API data
+9. ✅ Fix pagination calculation
+10. ✅ Enhance search functionality
 
 ### Fix Characters Page (COMPLETED)
 1. ✅ Update stapiService.js to add getAllCharacters() function
