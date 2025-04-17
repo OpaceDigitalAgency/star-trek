@@ -597,21 +597,40 @@ export const stapiService = {
   
   // Function to fetch all characters from STAPI (approximately 6,000 characters)
   async getAllCharacters() {
-    const pageSize = 100;          // STAPI max allowed
-    let pageNumber = 0;
-    const full = [];
-  
-    while (true) {
-      const { data } = await axios.get(
-        `${BASE_URL}/character/search`,
-        { params: { pageSize, pageNumber } }
-      );
-  
-      if (!data.characters?.length) break;
-      full.push(...data.characters);
-      pageNumber += 1;
+    try {
+      const pageSize = 100;          // STAPI max allowed
+      let pageNumber = 0;
+      const full = [];
+      const seenUids = new Set();  // For deduplication
+    
+      while (true) {
+        const { data } = await axios.get(
+          `${BASE_URL}/character/search`,
+          { params: { pageSize, pageNumber } }
+        );
+    
+        if (!data.characters?.length) break;
+        
+        // Add only unique characters based on UID
+        data.characters.forEach(character => {
+          if (!seenUids.has(character.uid)) {
+            seenUids.add(character.uid);
+            full.push(character);
+          }
+        });
+        
+        pageNumber += 1;
+        
+        // Safety check to prevent infinite loops
+        if (pageNumber > 100) break;
+      }
+      
+      console.log(`Fetched ${full.length} unique characters from STAPI`);
+      return full;
+    } catch (error) {
+      console.error('Error in getAllCharacters:', error);
+      return [];
     }
-    return full;
   }
 };
 

@@ -1,21 +1,25 @@
 # Task Management
 
 ## Active Tasks
+None currently active.
+
+## Completed Tasks
 1. Fix admin issues:
    - Species dropdown, duplicates & search
    - Images not loading
    - Rank dropdown safety
    - Visual polish
+   - Pagination implementation
+   - Proper deduplication
 
-## Completed Tasks
-1. Fix the characters page issues:
+2. Fix the characters page issues:
    - Implement getAllCharacters() function to fetch all characters at build time
    - Fix the Memory Alpha image loop to fetch images more efficiently
    - Repair the client-side filter script for character search
    - Fix the rank dropdown feature
    - Implement graceful image fallback
 
-2. Apply additional code patches:
+3. Apply additional code patches:
    - Species mapping & deduplication using Map and Set
    - Improved image enrichment loop with higher budget and smart name handling
    - Search selector fix verification
@@ -31,15 +35,17 @@
   - Add data:image/svg+xml placeholder via astro:assets (15min)
 
 ## Subtasks
-### Fix Admin Issues (IN PROGRESS)
-1. ⏳ Fix species dropdown, duplicates & search:
+### Fix Admin Issues (COMPLETED)
+1. ✅ Fix species dropdown, duplicates & search:
    - Correct the import and the species field
    - Keep only one entry per display name
-2. ⏳ Fix images not loading:
+2. ✅ Fix images not loading:
    - Work around STAPI 301 redirects
    - Skip empty Memory Alpha results quickly
-3. ⏳ Fix rank dropdown safety
-4. ⏳ Add visual polish with Tailwind utilities
+3. ✅ Fix rank dropdown safety
+4. ✅ Add visual polish with Tailwind utilities
+5. ✅ Implement pagination for better performance
+6. ✅ Ensure proper deduplication of character data
 
 ### Fix Characters Page (COMPLETED)
 1. ✅ Update stapiService.js to add getAllCharacters() function

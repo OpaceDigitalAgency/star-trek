@@ -40,3 +40,19 @@
      - Implement static image helper for STAPI
      - Add safety check for rank dropdown
      - Add Tailwind utility for appearance-none
+
+- Implemented initial fixes but discovered they didn't fully resolve the issues
+- Conducted deeper investigation and implemented comprehensive fixes:
+  1. Fixed species dropdown by checking both `characterSpecies` and `species` properties in the API response
+  2. Implemented pagination with 100 characters per page and Previous/Next navigation controls
+  3. Fixed image loading by:
+     - Increasing the image budget
+     - Improving the lazy loading implementation
+     - Ensuring proper fallbacks for missing images
+  4. Eliminated duplicates by implementing proper deduplication in both the API service and character organization logic
+- Tested all fixes thoroughly to ensure:
+  - Species dropdown now shows all available species
+  - Page loads efficiently with pagination
+  - Images load correctly for all characters
+  - No duplicate character entries appear
+- Committed all changes and pushed to the fix/characters-species-images branch

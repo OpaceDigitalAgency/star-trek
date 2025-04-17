@@ -2,27 +2,35 @@
 import Layout from '../../layouts/Layout.astro';
 import { stapiService, getStaticImage } from '../../services/stapiService';
 
+// Pagination settings
+const PAGE_SIZE = 100; // Number of characters to display per page
+const currentPage = 1; // Default to first page
+
 // Fetch all characters data from STAPI
 let characters = [];
 try {
   characters = await stapiService.getAllCharacters();
+  console.log(`Loaded ${characters.length} characters from STAPI`);
 } catch (error) {
   console.error('Error fetching characters:', error);
 }
 
 // Organize characters by species
 const charactersBySpecies = new Map();           // Map<string, Character[]>
-const seen = new Set();                          // uid dedup
+const seen = new Set();                          // uid dedup for final display
 
 characters.forEach(c => {
-  if (seen.has(c.name)) return;   // shields against George Kirk v1/v2 duplicates
-  // Use the STAPI property name
-  const list = c.species?.length ? c.species : [{ name: 'Human' }];
-
-  list.forEach(s => {
+  // Check for both species and characterSpecies properties
+  // STAPI API can return either depending on the endpoint
+  const speciesList = c.characterSpecies?.length
+    ? c.characterSpecies
+    : (c.species?.length ? c.species : [{ name: 'Human' }]);
+  
+  speciesList.forEach(s => {
     const key = s.name ?? 'Unknown';
     if (!charactersBySpecies.has(key)) charactersBySpecies.set(key, []);
-
+    
+    // Only add if we haven't seen this UID before
     if (!seen.has(c.uid)) {
       charactersBySpecies.get(key).push(c);
       seen.add(c.uid);
@@ -30,33 +38,57 @@ characters.forEach(c => {
   });
 });
 
+// Log species counts for debugging
+console.log(`Found ${charactersBySpecies.size} unique species`);
+
 const speciesNames = [...charactersBySpecies.keys()].sort();
 
+// Implement pagination for better performance
+// Calculate total number of characters across all species
+let totalCharacters = 0;
+charactersBySpecies.forEach((chars) => {
+  totalCharacters += chars.length;
+});
+
+const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
+console.log(`Total characters: ${totalCharacters}, Pages: ${totalPages}`);
+
 // Enhance character data with Memory Alpha information
-const IMAGE_BUDGET = 400;          // hard stop to stay polite
+// Increase the budget to ensure more images load
+const IMAGE_BUDGET = 800;          // increased from 400
 let downloaded = 0;
 
-// Iterate species buckets
+// Process images more efficiently by prioritizing visible characters first
+// We'll process a subset of characters from each species rather than all at once
 for (const [specie, list] of charactersBySpecies) {
-  for (const char of list) {
+  // Process first 20 characters of each species to ensure good coverage
+  const charsToProcess = list.slice(0, 20);
+  
+  for (const char of charsToProcess) {
     if (downloaded >= IMAGE_BUDGET) break;
 
     // Expand abbreviated names (e.g. "J. Kirk" → "James T. Kirk")
     const queryName = char.name.match(/^[A-Z]\./) ? char.fullName ?? char.name : char.name;
 
-    const wiki = await stapiService.getMemoryAlphaContent(queryName);
-    if (wiki?.image?.includes('placeholder') || wiki?.image?.endsWith('.svg')) {
-      // keep searching, don't count towards budget
-    } else if (wiki?.image) {
-      char.wikiImage = wiki.image;
-      downloaded++;
-    }
-    
-    if (wiki?.wikiUrl) {
-      char.wikiUrl = wiki.wikiUrl;
+    try {
+      const wiki = await stapiService.getMemoryAlphaContent(queryName);
+      if (wiki?.image?.includes('placeholder') || wiki?.image?.endsWith('.svg')) {
+        // keep searching, don't count towards budget
+      } else if (wiki?.image) {
+        char.wikiImage = wiki.image;
+        downloaded++;
+      }
+      
+      if (wiki?.wikiUrl) {
+        char.wikiUrl = wiki.wikiUrl;
+      }
+    } catch (error) {
+      console.error(`Error fetching wiki content for ${queryName}:`, error);
     }
   }
 }
+
+console.log(`Downloaded ${downloaded} character images`);
 
 // Fallback data if API fails
 if (speciesNames.length === 0) {
@@ -227,7 +259,7 @@ const charactersSchema = {
       </div>
     </div>
     
-    <!-- Species sections -->
+    <!-- Species sections with pagination -->
     <div id="characters-container">
       {speciesNames.map(species => (
         <div class="species-section mb-12" data-species={species}>
@@ -240,7 +272,7 @@ const charactersSchema = {
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {charactersBySpecies.get(species)?.map(character => (
+            {charactersBySpecies.get(species)?.slice(0, PAGE_SIZE).map(character => (
               <div class="character-card" data-rank={character.title}>
                 <a href={`/characters/${character.uid}/`} class="block">
                   <div class="lcars-character-container">
@@ -250,10 +282,10 @@ const charactersSchema = {
                       <img
                         width="160" height="160"
                         loading="lazy"
-                        src="/images/avatar-placeholder.svg"
+                        src="/images/generic-character.jpg"
                         data-src={character.wikiImage
                           ?? getStaticImage(character.uid)
-                          ?? '/images/avatar-placeholder.svg'}
+                          ?? '/images/generic-character.jpg'}
                         alt={character.name}
                         class="w-full h-full object-cover"
                         onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
@@ -287,6 +319,21 @@ const charactersSchema = {
       ))}
     </div>
     
+    <!-- Pagination controls -->
+    <div id="pagination-controls" class="flex justify-center items-center my-8">
+      <div class="lcars-pagination flex items-center bg-space-black border border-starfleet-blue rounded-lg overflow-hidden">
+        <button id="prev-page" class="px-4 py-2 bg-starfleet-blue text-white hover:bg-starfleet-gold hover:text-space-black transition-colors">
+          Previous
+        </button>
+        <div class="px-4 py-2 text-white">
+          Page <span id="current-page-num">1</span> of <span id="total-pages">{totalPages}</span>
+        </div>
+        <button id="next-page" class="px-4 py-2 bg-starfleet-blue text-white hover:bg-starfleet-gold hover:text-space-black transition-colors">
+          Next
+        </button>
+      </div>
+    </div>
+    
     <!-- No results message (hidden by default) -->
     <div id="no-results" class="hidden text-center py-8">
       <div class="lcars-panel p-6 inline-block">
@@ -304,9 +351,28 @@ const charactersSchema = {
     const searchInput = document.getElementById('search-input');
     const charactersContainer = document.getElementById('characters-container');
     const noResults = document.getElementById('no-results');
+    const prevPageBtn = document.getElementById('prev-page');
+    const nextPageBtn = document.getElementById('next-page');
+    const currentPageDisplay = document.getElementById('current-page-num');
+    const totalPagesDisplay = document.getElementById('total-pages');
     
-    // Filter functionality
-    const filterCharacters = () => {
+    // Pagination state
+    let currentPage = 1;
+    const pageSize = 100; // Should match PAGE_SIZE in Astro
+    let totalPages = parseInt(totalPagesDisplay.textContent) || 1;
+    
+    // Store all character cards by species for pagination
+    const allCharactersBySpecies = {};
+    
+    // Initialize by storing all character cards
+    document.querySelectorAll('.species-section').forEach(section => {
+      const species = section.getAttribute('data-species');
+      const cards = Array.from(section.querySelectorAll('.character-card'));
+      allCharactersBySpecies[species] = cards;
+    });
+    
+    // Filter and pagination functionality
+    const filterAndPaginateCharacters = () => {
       const selectedSpecies = speciesFilter.value;
       const selectedRank = rankFilter?.value;
       const searchTerm = searchInput.value.toLowerCase();
@@ -316,18 +382,23 @@ const charactersSchema = {
       
       // Track if we have any visible characters
       let visibleCharactersCount = 0;
+      let filteredCharacters = [];
       
       // Process each species section
       speciesSections.forEach(section => {
         const sectionSpecies = section.getAttribute('data-species');
         const shouldShowSection = selectedSpecies === 'all' || selectedSpecies === sectionSpecies;
         
-        // Get all character cards in this section
-        const characterCards = section.querySelectorAll('.character-card');
-        let visibleInSection = 0;
+        if (!shouldShowSection) {
+          section.classList.add('hidden');
+          return;
+        }
         
-        // Filter character cards
-        characterCards.forEach(card => {
+        // Get all character cards for this species (from our stored data)
+        const allCards = allCharactersBySpecies[sectionSpecies] || [];
+        
+        // Filter cards based on rank and search
+        const filteredCards = allCards.filter(card => {
           const cardRank = card.getAttribute('data-rank');
           const characterName = card.querySelector('[data-name]').textContent.toLowerCase();
           
@@ -335,23 +406,52 @@ const charactersSchema = {
           const matchesRank = !selectedRank || selectedRank === 'all' || cardRank === selectedRank;
           const matchesSearch = !searchTerm || characterName.includes(searchTerm);
           
-          // Show/hide character card
-          if (matchesRank && matchesSearch) {
-            card.classList.remove('hidden');
-            visibleInSection++;
-            visibleCharactersCount++;
-          } else {
-            card.classList.add('hidden');
-          }
+          return matchesRank && matchesSearch;
         });
         
+        // Add to our overall filtered list
+        filteredCharacters = filteredCharacters.concat(filteredCards);
+        
         // Show/hide section based on whether it has visible characters
-        if (shouldShowSection && visibleInSection > 0) {
+        if (filteredCards.length > 0) {
           section.classList.remove('hidden');
+          
+          // Get the grid container for this section
+          const gridContainer = section.querySelector('.grid');
+          
+          // Clear existing cards
+          gridContainer.innerHTML = '';
+          
+          // Calculate pagination for this section
+          const startIdx = (currentPage - 1) * pageSize;
+          const endIdx = startIdx + pageSize;
+          
+          // Add cards for current page
+          const cardsToShow = filteredCards.slice(startIdx, endIdx);
+          cardsToShow.forEach(card => {
+            gridContainer.appendChild(card);
+            card.classList.remove('hidden');
+            visibleCharactersCount++;
+          });
+          
         } else {
           section.classList.add('hidden');
         }
       });
+      
+      // Update pagination
+      totalPages = Math.max(1, Math.ceil(filteredCharacters.length / pageSize));
+      totalPagesDisplay.textContent = totalPages;
+      
+      // Ensure current page is valid
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+        currentPageDisplay.textContent = currentPage;
+      }
+      
+      // Update pagination button states
+      prevPageBtn.disabled = currentPage <= 1;
+      nextPageBtn.disabled = currentPage >= totalPages;
       
       // Show/hide no results message
       if (visibleCharactersCount === 0) {
@@ -359,26 +459,86 @@ const charactersSchema = {
       } else {
         noResults.classList.add('hidden');
       }
+      
+      // Reinitialize lazy loading for newly visible images
+      initLazyLoading();
     };
     
-    // Attach event listeners
-    speciesFilter.addEventListener('change', filterCharacters);
-    if (rankFilter) rankFilter.addEventListener('change', filterCharacters);
-    searchInput.addEventListener('input', filterCharacters);
+    // Pagination event handlers
+    prevPageBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        currentPageDisplay.textContent = currentPage;
+        filterAndPaginateCharacters();
+        window.scrollTo(0, 0);
+      }
+    });
     
-    // Lazy load images as they come into view for better performance
-    const lazyLoadImages = () => {
+    nextPageBtn.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        currentPageDisplay.textContent = currentPage;
+        filterAndPaginateCharacters();
+        window.scrollTo(0, 0);
+      }
+    });
+    
+    // Attach filter event listeners
+    speciesFilter.addEventListener('change', () => {
+      currentPage = 1; // Reset to first page on filter change
+      currentPageDisplay.textContent = currentPage;
+      filterAndPaginateCharacters();
+    });
+    
+    if (rankFilter) {
+      rankFilter.addEventListener('change', () => {
+        currentPage = 1; // Reset to first page on filter change
+        currentPageDisplay.textContent = currentPage;
+        filterAndPaginateCharacters();
+      });
+    }
+    
+    searchInput.addEventListener('input', () => {
+      currentPage = 1; // Reset to first page on search
+      currentPageDisplay.textContent = currentPage;
+      filterAndPaginateCharacters();
+    });
+    
+    // Improved lazy loading function
+    const initLazyLoading = () => {
+      if (!('IntersectionObserver' in window)) {
+        // Fallback for browsers that don't support IntersectionObserver
+        document.querySelectorAll('img[data-src]').forEach(img => {
+          img.src = img.dataset.src;
+          img.removeAttribute('data-src');
+        });
+        return;
+      }
+      
       const imageObserver = new IntersectionObserver((entries, observer) => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
             const img = entry.target;
             if (img.dataset.src) {
-              img.src = img.dataset.src;
+              // Create a new image to preload
+              const tempImg = new Image();
+              tempImg.onload = () => {
+                img.src = img.dataset.src;
+                img.classList.add('loaded');
+              };
+              tempImg.onerror = () => {
+                // If image fails to load, use the error handler already in the HTML
+                img.onerror();
+              };
+              tempImg.src = img.dataset.src;
               img.removeAttribute('data-src');
             }
             observer.unobserve(img);
           }
         });
+      }, {
+        rootMargin: '100px', // Start loading when image is 100px from viewport
+        threshold: 0.1
       });
       
       document.querySelectorAll('img[data-src]').forEach(img => {
@@ -386,15 +546,9 @@ const charactersSchema = {
       });
     };
     
-    // Initialize image lazy loading
-    if ('IntersectionObserver' in window) {
-      lazyLoadImages();
-    } else {
-      // Fallback for browsers that don't support IntersectionObserver
-      document.querySelectorAll('img[data-src]').forEach(img => {
-        img.src = img.dataset.src;
-      });
-    }
+    // Initialize on page load
+    initLazyLoading();
+    filterAndPaginateCharacters();
   });
 </script>
 
@@ -414,6 +568,15 @@ const charactersSchema = {
   
   .character-image {
     position: relative;
+  }
+  
+  .character-image img {
+    transition: opacity 0.3s ease;
+    opacity: 0.2;
+  }
+  
+  .character-image img.loaded {
+    opacity: 1;
   }
   
   .character-info {
@@ -445,6 +608,36 @@ const charactersSchema = {
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
     animation: sweep 3s infinite;
+  }
+  
+  /* Pagination styles */
+  .lcars-pagination {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .lcars-pagination button {
+    position: relative;
+    z-index: 2;
+    transition: all 0.2s ease;
+  }
+  
+  .lcars-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .lcars-pagination::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 204, 0, 0.1), transparent);
+    animation: sweep 2s infinite;
+    z-index: 1;
   }
   
   @keyframes sweep {
