@@ -3,14 +3,6 @@ import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
 import { slugify } from '../../utils/slugify.js';
 
-export async function getStaticPaths() {
-  const characters = await stapiService.getAllCharacters();
-  
-  return characters.map(character => ({
-    params: { slug: slugify(character.name) },
-    props: { character }
-  }));
-}
 
 const { character } = Astro.props;
 
