@@ -1,8 +1,8 @@
-// Import fetch using dynamic import to support both ESM and CommonJS
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const cheerio = require('cheerio');
+// Import fetch using dynamic import to support ESM
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+import cheerio from 'cheerio';
 
-exports.handler = async function(event, context) {
+const handler = async function(event, context) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -91,3 +91,5 @@ exports.handler = async function(event, context) {
     };
   }
 };
+
+export default handler;

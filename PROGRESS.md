@@ -38,6 +38,14 @@
 - Applied additional code patches to further improve the characters page:
   1. Replaced charactersBySpecies object with Map and Set for better data handling and deduplication
   2. Improved image enrichment loop with higher IMAGE_BUDGET (400) and smart name handling
+
+## 2025-04-17 (continued)
+
+- Diagnosed pagination/API error on characters page:
+  - Error: "Failed to load module script: Expected a JavaScript module script but the server responded with a MIME type of 'text/html'..."
+  - Root cause: In local development, requests to `/api/characters` are sometimes routed to the Astro catch-all 404 page (`src/pages/[...catchall].astro`) instead of the Netlify function (`stapi-proxy.cjs`). This causes the frontend to receive HTML instead of JSON, resulting in a parsing error.
+  - Confirmed that in production, the Netlify redirect in `netlify.toml` correctly routes `/api/characters` to the function, but in local dev (`npx netlify dev`), proxying may not work as expected.
+  - Recommendation: Ensure that `npx netlify dev` is used (not just `astro dev`), and that the frontend is making requests to the correct local API endpoint. If issues persist, test `/api/characters` directly in the browser during local dev to confirm the response is JSON, not HTML. If not, review Netlify dev server logs and configuration.
   3. Verified search selector implementation
   4. Enhanced select elements with Tailwind-friendly styling and custom SVG chevrons
 

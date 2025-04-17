@@ -1,7 +1,7 @@
-// Import fetch using dynamic import to support both ESM and CommonJS
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// Import fetch using dynamic import to support ESM
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-exports.handler = async function(event, context) {
+const handler = async function(event, context) {
   // CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*',
@@ -129,17 +129,19 @@ exports.handler = async function(event, context) {
     // Try to determine what type of image this is based on the URL
     let fallbackImage = '/images/stars-placeholder.jpg';
     
-    if (cleanedUrl.toLowerCase().includes('character') ||
-        cleanedUrl.toLowerCase().includes('person') ||
-        cleanedUrl.toLowerCase().includes('actor')) {
-      fallbackImage = '/images/generic-character.jpg';
-    } else if (cleanedUrl.toLowerCase().includes('ship') ||
-              cleanedUrl.toLowerCase().includes('vessel') ||
-              cleanedUrl.toLowerCase().includes('starship')) {
-      fallbackImage = '/images/generic-ship.jpg';
-    } else if (cleanedUrl.toLowerCase().includes('series') ||
-              cleanedUrl.toLowerCase().includes('show')) {
-      fallbackImage = '/images/stars-bg.jpg';
+    if (typeof cleanedUrl === 'string') {
+      if (cleanedUrl.toLowerCase().includes('character') ||
+          cleanedUrl.toLowerCase().includes('person') ||
+          cleanedUrl.toLowerCase().includes('actor')) {
+        fallbackImage = '/images/generic-character.jpg';
+      } else if (cleanedUrl.toLowerCase().includes('ship') ||
+                cleanedUrl.toLowerCase().includes('vessel') ||
+                cleanedUrl.toLowerCase().includes('starship')) {
+        fallbackImage = '/images/generic-ship.jpg';
+      } else if (cleanedUrl.toLowerCase().includes('series') ||
+                cleanedUrl.toLowerCase().includes('show')) {
+        fallbackImage = '/images/stars-bg.jpg';
+      }
     }
     
     // Return a fallback image instead of an error
@@ -153,3 +155,5 @@ exports.handler = async function(event, context) {
     };
   }
 };
+
+export default handler;

@@ -1,8 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Use node-fetch for HTTP requests
-const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
+// __dirname workaround for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const charactersPath = path.join(__dirname, '../../src/data/characters.json');
 let charactersCache = null;
@@ -109,7 +114,7 @@ function saveEnrichmentCache() {
   }
 }
 
-exports.handler = async function(event) {
+const handler = async function(event) {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -195,3 +200,5 @@ exports.handler = async function(event) {
     body: JSON.stringify(character)
   };
 };
+
+export default handler;
