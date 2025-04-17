@@ -361,7 +361,7 @@ const charactersSchema = {
             allCharacters = data.characters || [];
             totalPages = data.page?.totalPages || 1;
             totalCharacters = data.page?.totalElements || allCharacters.length;
-            loadedPages.add(0); // Mark page 0 as loaded for this filter set
+            // loadedPages.add(0); // Removed: no longer used in new pagination/filter logic
         } catch (error) {
             console.error("Error applying filters and fetching initial data:", error);
             allCharacters = [];
