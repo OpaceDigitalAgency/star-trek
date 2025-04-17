@@ -308,7 +308,7 @@ const charactersSchema = {
 
         if (speciesVal !== 'all') filters.species = speciesVal; // Assuming API filter key is 'species'
         if (rankVal !== 'all') filters.title = rankVal; // Assuming API filter key is 'title' for rank
-        if (importantOnly) filters.isImportant = 'true'; // Example: Adjust key/value as needed for API
+        if (importantOnly) filters.important = 'true'; // Using the correct property name from the JSON file
         if (searchTerm) filters.name = searchTerm; // Assuming API filter key is 'name'
 
         return filters;

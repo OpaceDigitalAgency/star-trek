@@ -59,8 +59,8 @@ exports.handler = async (event) => {
             const titleLower = filters.title.toLowerCase();
             filtered = filtered.filter(c => c.title && c.title.toLowerCase().includes(titleLower));
         }
-        if (filters.isImportant === 'true') {
-            filtered = filtered.filter(c => c.isImportant === true);
+        if (filters.isImportant === 'true' || filters.important === 'true') {
+            filtered = filtered.filter(c => c.important === true || c.isImportant === true);
         }
     
         // Paginate
