@@ -19,23 +19,11 @@ try {
 const charactersBySpecies = new Map();           // Map<string, Character[]>
 const seen = new Set();                          // uid dedup for final display
 
-// Debug the characters data
-console.log(`Processing ${characters.length} characters for species categorization`);
-
+// Process characters for species categorization
 characters.forEach(c => {
   // Check for both species and characterSpecies properties
   // STAPI API can return either depending on the endpoint
   let speciesList = [];
-  
-  // Debug species data for this character
-  if (c.uid && c.uid.includes('CHMA')) {
-    console.log(`Character ${c.name} (${c.uid}) species data:`,
-      JSON.stringify({
-        characterSpecies: c.characterSpecies,
-        species: c.species
-      })
-    );
-  }
   
   // More robust species extraction
   if (c.characterSpecies && Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
@@ -440,8 +428,6 @@ const charactersSchema = {
       const searchTerm = searchInput.value.toLowerCase().trim();
       const showImportantOnly = importantOnlyCheckbox.checked;
       
-      console.log(`Filtering with species=${selectedSpecies}, rank=${selectedRank}, search="${searchTerm}", importantOnly=${showImportantOnly}`);
-      
       // Get all species sections
       const speciesSections = document.querySelectorAll('.species-section');
       
@@ -461,8 +447,6 @@ const charactersSchema = {
         
         // Get all character cards for this species (from our stored data)
         const allCards = allCharactersBySpecies[sectionSpecies] || [];
-        
-        console.log(`Processing ${sectionSpecies} section with ${allCards.length} characters`);
         
         // Filter cards based on rank, search, and important flag
         const filteredCards = allCards.filter(card => {
@@ -491,7 +475,6 @@ const charactersSchema = {
           } else if (characterName.includes(searchTerm)) {
             // Direct match
             matchesSearch = true;
-            console.log(`Search match: "${searchTerm}" found in "${characterName}"`);
           } else {
             // Try expanded titles
             const expandedName = characterName.replace(/\b(lt|cmdr|capt|adm|cmd|dr)\b\./i, match => {
@@ -507,16 +490,12 @@ const charactersSchema = {
             
             if (expandedName.includes(searchTerm)) {
               matchesSearch = true;
-              console.log(`Expanded search match: "${searchTerm}" found in "${expandedName}" (original: "${characterName}")`);
             }
           }
           
           return matchesRank && matchesSearch && matchesImportant;
         });
         
-        console.log(`Filtered ${sectionSpecies} section: ${filteredCards.length} of ${allCards.length} characters match criteria`);
-        
-        console.log(`Filtered ${sectionSpecies} section: ${filteredCards.length} of ${allCards.length} characters match criteria`);
         
         // Add to our overall filtered list
         filteredCharacters = filteredCharacters.concat(filteredCards);
@@ -548,16 +527,12 @@ const charactersSchema = {
         }
       });
       
-      console.log(`Total filtered characters: ${filteredCharacters.length}, visible: ${visibleCharactersCount}`);
-      
-      console.log(`Total filtered characters: ${filteredCharacters.length}, visible: ${visibleCharactersCount}`);
       
       // Update pagination
       totalPages = Math.max(1, Math.ceil(filteredCharacters.length / pageSize));
       if (currentPage > totalPages) currentPage = totalPages;
       totalPagesDisplay.textContent = totalPages;
       currentPageDisplay.textContent = currentPage;
-      console.log(`Pagination: page ${currentPage} of ${totalPages}`);
       
       // Update pagination button states
       prevPageBtn.disabled = currentPage <= 1;
