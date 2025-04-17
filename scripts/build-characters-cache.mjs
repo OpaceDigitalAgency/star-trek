@@ -7,6 +7,8 @@ const output = path.resolve('src/data/characters.json');
 
 // Get all characters from STAPI
 console.log('Fetching all characters from STAPI...');
+// Force a fresh fetch by setting SKIP_CHAR_CACHE=true
+process.env.SKIP_CHAR_CACHE = 'true';
 const characters = await stapiService.getAllCharacters();
 console.log(`Fetched ${characters.length} characters from STAPI`);
 
