@@ -262,14 +262,15 @@ const charactersSchema = {
 
 
   document.addEventListener('DOMContentLoaded', () => {
-    const payload = JSON.parse(document.getElementById('initial-payload').textContent);
-    const PAGE_SIZE = payload.pageSize;
-    let currentPage = 1;
-    let totalPages = payload.totalPages;
-    let totalCharacters = payload.totalCharacters;
-    let allCharacters = [...payload.characters]; // Start with initial characters
-    let loadedPages = new Set([0]); // Keep track of loaded pages (0-indexed)
-    let isLoading = false; // Prevent multiple simultaneous fetches
+      const payload = JSON.parse(document.getElementById('initial-payload').textContent);
+      const PAGE_SIZE = payload.pageSize;
+      let currentPage = 1;
+      let totalPages = payload.totalPages;
+      let totalCharacters = payload.totalCharacters;
+      let allCharacters = [...payload.characters]; // Start with initial characters
+      let loadedPages = new Set([0]); // Keep track of loaded pages (0-indexed)
+      let isLoading = false; // Prevent multiple simultaneous fetches
+      let currentFilters = {}; // Initialize current filters
 
     // DOM Elements
     const speciesFilter = document.getElementById('species-filter');
@@ -322,9 +323,8 @@ const charactersSchema = {
         // Fetch using current filters
         const data = await stapiClient.getCharacters(pageIndex, PAGE_SIZE, currentFilters);
         if (data.characters && data.characters.length > 0) {
-          // Add new characters to our *current* set, avoid duplicates just in case
-          const newChars = data.characters.filter(nc => !allCharacters.some(ac => ac.uid === nc.uid));
-          allCharacters = [...allCharacters, ...newChars].sort((a, b) => a.name.localeCompare(b.name)); // Keep sorted
+          // Replace the current characters with the new page data
+          allCharacters = data.characters;
           loadedPages.add(pageIndex);
 
           // Update totals ONLY if they differ (e.g., first load of a filter set)
@@ -416,8 +416,8 @@ const charactersSchema = {
       // Render character cards for the current page's items
       if (totalCharacters > 0) {
           container.innerHTML = pageItems.map(c => {
-             // Use character.image primarily, fallback to generic
-             const imageUrl = c.image || '/images/generic-character.jpg';
+             // Use character.wikiImage primarily, fallback to generic
+             const imageUrl = c.wikiImage || '/images/generic-character.jpg';
              const slug = c.uid; // Use UID for link
 
              return `
@@ -454,13 +454,14 @@ const charactersSchema = {
     importantBox.addEventListener('change', applyFiltersAndFetch);
     searchInput.addEventListener('input', debouncedApplyFilters); // Use debounced version for search
 
-    prevBtn.addEventListener('click', () => {
+    prevBtn.addEventListener('click', async () => {
       if (currentPage > 1 && !isLoading) {
+        const prevPageNum = currentPage - 1;
+        // Fetch the previous page data before decrementing currentPage
+        await fetchPageIfNeeded(prevPageNum);
+        // Only decrement if fetch didn't fail
         currentPage--;
-        // We assume the previous page's data is loaded if we were on page > 1
-        // If not (e.g., direct URL access to page 5), fetchPageIfNeeded would handle it,
-        // but standard navigation implies it's loaded.
-        render(); // Just render the previous slice
+        render();
       }
     });
 
