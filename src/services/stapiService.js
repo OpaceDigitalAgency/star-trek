@@ -624,6 +624,7 @@ export const stapiService = {
   async getAllCharacters() {
     try {
       // Check if we have a file cache first
+      console.log('🔍  Cache check:', cachePath, 'exists=', fs.existsSync(cachePath));
       if (process.env.SKIP_CHAR_CACHE !== 'true' && fs.existsSync(cachePath)) {
         console.log('🟢  Using cached characters.json');
         return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
