@@ -11,10 +11,16 @@ let allSpecies = []; // For filter dropdown
 
 // Fetch only the first page of characters for the initial build
 try {
-  const initialData = await stapiService.getCharacters(0, PAGE_SIZE);
-  initialCharacters = initialData.characters || [];
-  totalPages = initialData.page?.totalPages || 1;
-  totalCharacters = initialData.page?.totalElements || initialCharacters.length;
+  // Use local characters data directly for the initial build
+  import.meta.env.SSR && console.log('Using local characters data for initial build');
+  
+  // Import the local characters data
+  import charactersData from '../../data/characters-local.json';
+  
+  // Get the first page of characters
+  initialCharacters = charactersData.slice(0, PAGE_SIZE);
+  totalPages = Math.ceil(charactersData.length / PAGE_SIZE);
+  totalCharacters = charactersData.length;
 
   // Fetch all species for the filter dropdown (consider caching this later)
   // This might still be slow if there are thousands of species
