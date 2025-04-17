@@ -26,3 +26,17 @@
   2. Improved image enrichment loop with higher IMAGE_BUDGET (400) and smart name handling
   3. Verified search selector implementation
   4. Enhanced select elements with Tailwind-friendly styling and custom SVG chevrons
+
+- Started work on new admin issues:
+  1. Analyzed the code to identify the following problems:
+     - Species dropdown showing incorrect data due to wrong field reference (characterSpecies vs species)
+     - Duplicate character entries in the list (e.g., George Kirk appearing multiple times)
+     - Images not loading due to STAPI 301 redirects
+     - Rank dropdown potentially causing errors with null titles
+     - Custom select chevrons not displaying properly
+  2. Breaking down the fixes into subtasks:
+     - Correct import and species field references
+     - Add deduplication by character name
+     - Implement static image helper for STAPI
+     - Add safety check for rank dropdown
+     - Add Tailwind utility for appearance-none

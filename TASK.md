@@ -1,7 +1,11 @@
 # Task Management
 
 ## Active Tasks
-None currently active.
+1. Fix admin issues:
+   - Species dropdown, duplicates & search
+   - Images not loading
+   - Rank dropdown safety
+   - Visual polish
 
 ## Completed Tasks
 1. Fix the characters page issues:
@@ -27,6 +31,16 @@ None currently active.
   - Add data:image/svg+xml placeholder via astro:assets (15min)
 
 ## Subtasks
+### Fix Admin Issues (IN PROGRESS)
+1. ⏳ Fix species dropdown, duplicates & search:
+   - Correct the import and the species field
+   - Keep only one entry per display name
+2. ⏳ Fix images not loading:
+   - Work around STAPI 301 redirects
+   - Skip empty Memory Alpha results quickly
+3. ⏳ Fix rank dropdown safety
+4. ⏳ Add visual polish with Tailwind utilities
+
 ### Fix Characters Page (COMPLETED)
 1. ✅ Update stapiService.js to add getAllCharacters() function
 2. ✅ Modify characters/index.astro to use getAllCharacters() instead of getCharacters(0, 100)
