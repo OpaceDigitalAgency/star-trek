@@ -40,7 +40,7 @@ exports.handler = async (event) => {
     }
     apiUrl += `?${params.toString()}`;
     
-    console.log(`Proxying STAPI request to: ${apiUrl}`);
+    console.log(`[ROO-DEBUG-GET] Proxying STAPI request to: ${apiUrl}`);
     
     try {
         const response = await fetch(apiUrl, {
