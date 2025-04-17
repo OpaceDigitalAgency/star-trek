@@ -404,12 +404,12 @@ const charactersSchema = {
                <div class="character-card bg-space-black border border-starfleet-blue rounded-lg overflow-hidden transition-transform hover:scale-105">
                  <a href="/characters/${slug}/" class="block">
                    <div class="character-image aspect-square bg-gray-800">
-                     <progressive-image
+                     <img
                        src="${imageUrl}"
                        alt="${c.name}"
-                       fallback="/images/generic-character.jpg"
                        class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                     ></progressive-image>
+                       onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
+                     />
                    </div>
                    <div class="character-info p-3 border-t border-starfleet-blue">
                      <h3 class="text-white font-semibold truncate" title="${c.name}">${c.name}</h3>
@@ -464,10 +464,7 @@ const charactersSchema = {
   });
 </script>
 
-<!-- ProgressiveImage web component loader -->
-<script type="module">
-  import '/src/components/ProgressiveImage.js';
-</script>
+<!-- No longer needed since we're using standard img tag -->
 
 <style>
   .lcars-character-container {
