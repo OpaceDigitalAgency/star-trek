@@ -171,3 +171,12 @@
     - All logic assuming `allCharacters` contains all pages has been removed, including the `loadedPages` set and related caching.
     - Pagination controls and character counts continue to function as expected.
   - **Outcome:** When a user navigates between pages, the correct characters for the selected page are now displayed. Pagination is fully functional.
+
+## 2025-04-17
+
+- Implemented progressive image loading and fallback for all character images:
+  - Created a reusable `ProgressiveImage` web component that displays a skeleton loader while images are loading, uses the `wikiImage` field as the primary source, and falls back to `/images/generic-character.jpg` if loading fails.
+  - Updated both the `/characters/` list page and the character detail page to use this component for all character images.
+  - Ensured accessibility by preserving `alt` text and using semantic markup.
+  - Documented the new component and approach in `PLANNING.md`.
+  - Marked the subtask as complete in `TASK.md`.

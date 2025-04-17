@@ -40,12 +40,12 @@ const characterSchema = {
           
           <div class="panel-content p-6">
             <div class="character-image aspect-square overflow-hidden mb-4">
-              <img
+              <progressive-image
                 src={character.wikiImage || character.image || "/images/generic-character.jpg"}
                 alt={character.name}
+                fallback="/images/generic-character.jpg"
                 class="w-full h-full object-cover"
-                onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
-              />
+              ></progressive-image>
             </div>
             
             {character.wikiUrl && (
@@ -119,6 +119,11 @@ const characterSchema = {
     </div>
   </div>
 </Layout>
+
+<!-- ProgressiveImage web component loader -->
+<script type="module">
+  import '/src/components/ProgressiveImage.js';
+</script>
 
 <style>
   .character-image {

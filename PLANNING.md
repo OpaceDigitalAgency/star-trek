@@ -60,3 +60,17 @@ Star Trek Timelines - A chronological guide to the Star Trek universe
 5. Update frontend to handle loading/progressive image states and fallbacks.
 
 This ensures all character pages have proper images in production, balancing performance and completeness within Netlify's constraints.
+
+---
+
+## Frontend Progressive Image Loading
+
+A reusable `ProgressiveImage` web component is used for all character images on both the /characters/ list and character detail pages. This component:
+
+- Shows a skeleton loader while the image is loading.
+- Uses the `wikiImage` field as the primary image source.
+- Falls back to `/images/generic-character.jpg` if the image fails to load.
+- Preserves accessibility by passing through `alt` text.
+- Is loaded as a native web component and used in place of `<img>` tags.
+
+This approach ensures a smooth, accessible, and robust image experience for all users.
