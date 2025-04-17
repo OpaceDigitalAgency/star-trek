@@ -1,10 +1,27 @@
 // netlify/functions/stapi-proxy.js
-import fetch from 'node-fetch';
+// Import fetch using dynamic import to support both ESM and CommonJS
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 const STAPI_BASE_URL = 'https://stapi.co/api/v1/rest';
 
-export const handler = async (event) => {
-    const { pageNumber = 0, pageSize = 20, ...filters } = event.queryStringParameters;
+exports.handler = async (event) => {
+    // Define headers for all responses
+    const headers = {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*', // Allow requests from any origin (adjust if needed)
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+    };
+
+    // Handle OPTIONS request (preflight)
+    if (event.httpMethod === 'OPTIONS') {
+        return {
+            statusCode: 200,
+            headers
+        };
+    }
+
+    const { pageNumber = 0, pageSize = 20, ...filters } = event.queryStringParameters || {};
 
     const apiUrl = `${STAPI_BASE_URL}/character/search`;
     const body = new URLSearchParams();
@@ -36,6 +53,7 @@ export const handler = async (event) => {
             console.error(`STAPI Error (${response.status}): ${errorText}`);
             return {
                 statusCode: response.status,
+                headers,
                 body: JSON.stringify({ error: `STAPI request failed: ${response.statusText}`, details: errorText }),
             };
         }
@@ -44,16 +62,14 @@ export const handler = async (event) => {
 
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*', // Allow requests from any origin (adjust if needed)
-            },
+            headers,
             body: JSON.stringify(data),
         };
     } catch (error) {
         console.error('Proxy Error:', error);
         return {
             statusCode: 500,
+            headers,
             body: JSON.stringify({ error: 'Internal Server Error in proxy function', details: error.message }),
         };
     }
