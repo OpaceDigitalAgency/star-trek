@@ -655,3 +655,22 @@ export const getEraFromYear = (year) => {
   
   return 'Unknown Era';
 };
+
+// Function to fetch all characters from STAPI (approximately 6,000 characters)
+export async function getAllCharacters() {
+  const pageSize = 100;          // STAPI max allowed
+  let pageNumber = 0;
+  const full = [];
+
+  while (true) {
+    const { data } = await axios.get(
+      `${BASE_URL}/character/search`,
+      { params: { pageSize, pageNumber } }
+    );
+
+    if (!data.characters?.length) break;
+    full.push(...data.characters);
+    pageNumber += 1;
+  }
+  return full;
+}
