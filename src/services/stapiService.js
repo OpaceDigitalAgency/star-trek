@@ -3,8 +3,9 @@ import * as cheerio from 'cheerio';
 import fs from 'fs';
 import path from 'path';
 
-// Direct path to the characters.json file
-const cachePath = process.cwd() + '/src/data/characters.json';
+// Direct paths to the characters files
+const charactersJsonPath = process.cwd() + '/src/data/characters.json';
+const charactersLocalJsonPath = process.cwd() + '/src/data/characters-local.json';
 
 const BASE_URL = 'https://stapi.co/api/v1/rest';
 const MEMORY_ALPHA_API = 'https://memory-alpha.fandom.com/api.php';
@@ -460,12 +461,25 @@ export const stapiService = {
   proxyImageUrl(url) {
     if (!url) return null;
     
-    // IMPORTANT: Always use the direct Netlify function path
-    // The redirect from /api/proxy-image to /.netlify/functions/proxy-image
-    // might not be working correctly on Netlify
-    const proxyPath = '/.netlify/functions/proxy-image';
+    // First check if we have a local cached version of this image
+    try {
+      // Check if characters-local.json exists and use it if available
+      if (fs.existsSync(charactersLocalJsonPath)) {
+        const localData = JSON.parse(fs.readFileSync(charactersLocalJsonPath, 'utf8'));
+        
+        // Find if any character has this image URL
+        const character = localData.find(c => c.wikiImage && c.wikiImage.includes(url));
+        if (character && character.wikiImage && character.wikiImage.startsWith('/images/character-cache/')) {
+          // Return the local cached image path
+          return character.wikiImage;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking local image cache:', error);
+    }
     
-    // Return the proxied URL
+    // If no local cached version, use the proxy
+    const proxyPath = '/.netlify/functions/proxy-image';
     return `${proxyPath}?url=${encodeURIComponent(url)}`;
   },
   

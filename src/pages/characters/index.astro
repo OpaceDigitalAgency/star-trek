@@ -1,6 +1,6 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { stapiService, getStaticImage } from '../../services/stapiService';
+import { stapiService } from '../../services/stapiService';
 
 // Pagination settings
 const PAGE_SIZE = 48; // Number of characters to display per page
@@ -396,7 +396,7 @@ const charactersSchema = {
       // Render character cards for the current page's items (allCharacters is always current page)
       if (totalCharacters > 0) {
           container.innerHTML = allCharacters.map(c => {
-             // Use character.wikiImage primarily, fallback to generic
+             // Try to use local cached image first, then wikiImage, then fallback to generic
              const imageUrl = c.wikiImage || '/images/generic-character.jpg';
              const slug = c.uid; // Use UID for link
 
