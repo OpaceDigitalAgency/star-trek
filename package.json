@@ -8,7 +8,12 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "postbuild": "echo '/api/characters    /.netlify/functions/stapi-proxy    200\n/api/proxy-image   /.netlify/functions/proxy-image    200\n/api/memory-alpha/* /.netlify/functions/memory-alpha-search 200\n/characters/:slug  /.netlify/functions/character-detail 200\n/*                 /.netlify/functions/entry           200' > dist/_redirects"
+    "postbuild": "echo '/api/characters    /.netlify/functions/stapi-proxy    200\n/api/proxy-image   /.netlify/functions/proxy-image    200\n/api/memory-alpha/* /.netlify/functions/memory-alpha-search 200\n/characters/:slug  /.netlify/functions/character-detail 200\n/*                 /.netlify/functions/entry           200' > dist/_redirects",
+    "cache-images": "node scripts/cache-character-images.mjs",
+    "update-json": "node scripts/update-characters-json.mjs",
+    "prepare-images": "npm run cache-images && npm run update-json",
+    "prepare-deploy": "node scripts/prepare-deployment.mjs",
+    "deploy": "npm run prepare-deploy && netlify deploy"
   },
   "dependencies": {
     "@astrojs/react": "^3.0.10",
@@ -27,10 +32,10 @@
     "three": "^0.161.0"
   },
   "devDependencies": {
+    "@astrojs/netlify": "^3.0.0",
     "autoprefixer": "^10.4.17",
     "postcss": "^8.4.35",
     "sass": "^1.71.1",
-    "typescript": "^5.3.3",
-    "@astrojs/netlify": "^3.0.0"
+    "typescript": "^5.3.3"
   }
 }

@@ -15,6 +15,7 @@ async function ensureDir(dir) {
 
 async function downloadImage(url, dest) {
   try {
+    console.log(`Downloading: ${url}`);
     const res = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0',
@@ -24,8 +25,10 @@ async function downloadImage(url, dest) {
       }
     });
     if (!res.ok) throw new Error(`Failed to fetch: ${url} (${res.status})`);
-    const buffer = await res.buffer();
+    const arrayBuffer = await res.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     await fs.writeFile(dest, buffer);
+    console.log(`Successfully saved to: ${dest}`);
     return true;
   } catch (err) {
     console.error(`Error downloading ${url}: ${err.message}`);
@@ -42,7 +45,15 @@ async function main() {
 
   for (const char of characters) {
     let imageUrl = char.wikiImage;
-    if (!imageUrl || !imageUrl.startsWith('http')) {
+    // Extract the actual URL from the proxy URL
+    if (imageUrl && imageUrl.includes('proxy-image?url=')) {
+      const urlParam = new URLSearchParams(imageUrl.split('?')[1]).get('url');
+      if (urlParam) {
+        imageUrl = decodeURIComponent(urlParam);
+      }
+    }
+    
+    if (!imageUrl || (!imageUrl.startsWith('http') && !imageUrl.startsWith('/.'))) {
       updated.push({ ...char, wikiImage: null });
       continue;
     }
