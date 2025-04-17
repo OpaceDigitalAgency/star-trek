@@ -19,16 +19,47 @@ try {
 const charactersBySpecies = new Map();           // Map<string, Character[]>
 const seen = new Set();                          // uid dedup for final display
 
+// Debug the characters data
+console.log(`Processing ${characters.length} characters for species categorization`);
+
 characters.forEach(c => {
   // Check for both species and characterSpecies properties
   // STAPI API can return either depending on the endpoint
-  const speciesList = c.characterSpecies?.length
-    ? c.characterSpecies
-    : (c.species?.length ? c.species : [{ name: 'Human' }]);
+  let speciesList = [];
+  
+  // Debug species data for this character
+  if (c.uid && c.uid.includes('CHMA')) {
+    console.log(`Character ${c.name} (${c.uid}) species data:`,
+      JSON.stringify({
+        characterSpecies: c.characterSpecies,
+        species: c.species
+      })
+    );
+  }
+  
+  // More robust species extraction
+  if (c.characterSpecies && Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
+    speciesList = c.characterSpecies;
+  } else if (c.species && Array.isArray(c.species) && c.species.length > 0) {
+    speciesList = c.species;
+  } else {
+    // Default to Human only if we're sure there's no species data
+    speciesList = [{ name: 'Human' }];
+  }
+  
+  // If speciesList is empty or contains only null/undefined values, default to Unknown
+  if (speciesList.length === 0 || speciesList.every(s => !s || !s.name)) {
+    speciesList = [{ name: 'Unknown' }];
+  }
   
   speciesList.forEach(s => {
-    const key = s.name ?? 'Unknown';
-    if (!charactersBySpecies.has(key)) charactersBySpecies.set(key, []);
+    // Ensure we have a valid species name
+    const key = (s && s.name) ? s.name : 'Unknown';
+    
+    if (!charactersBySpecies.has(key)) {
+      charactersBySpecies.set(key, []);
+      console.log(`Created new species category: ${key}`);
+    }
     
     // Only add if we haven't seen this UID before
     if (!seen.has(c.uid)) {
@@ -400,11 +431,38 @@ const charactersSchema = {
         // Filter cards based on rank and search
         const filteredCards = allCards.filter(card => {
           const cardRank = card.getAttribute('data-rank');
-          const characterName = card.querySelector('[data-name]').textContent.toLowerCase();
+          const characterNameElement = card.querySelector('[data-name]');
           
-          // Check if character matches all filters
+          // Ensure we have a valid name element
+          if (!characterNameElement) {
+            console.error('Character card missing name element:', card);
+            return false;
+          }
+          
+          const characterName = characterNameElement.textContent.toLowerCase();
+          
+          // Debug search matching
+          if (searchTerm && characterName.includes(searchTerm)) {
+            console.log(`Search match: "${searchTerm}" found in "${characterName}"`);
+          }
+          
+          // More robust search - check if character matches all filters
           const matchesRank = !selectedRank || selectedRank === 'all' || cardRank === selectedRank;
-          const matchesSearch = !searchTerm || characterName.includes(searchTerm);
+          
+          // Improved search matching - handle partial names and common prefixes
+          const matchesSearch = !searchTerm ||
+                               characterName.includes(searchTerm) ||
+                               // Handle "Lt." vs "Lieutenant" etc.
+                               (characterName.replace(/\b(lt|cmdr|capt|adm|cmd|dr)\b\./i, match => {
+                                 return {
+                                   'lt.': 'lieutenant',
+                                   'cmdr.': 'commander',
+                                   'capt.': 'captain',
+                                   'adm.': 'admiral',
+                                   'cmd.': 'commander',
+                                   'dr.': 'doctor'
+                                 }[match.toLowerCase()] || match;
+                               }).includes(searchTerm));
           
           return matchesRank && matchesSearch;
         });
