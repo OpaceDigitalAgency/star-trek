@@ -298,6 +298,18 @@ const charactersSchema = {
               </div>
             )}
             
+            <div class="filter-group ml-4">
+              <h3 class="text-white text-lg mb-2">Show Only</h3>
+              <div class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="important-only"
+                  class="mr-2"
+                >
+                <label for="important-only" class="text-white">Important Characters</label>
+              </div>
+            </div>
+            
             <div class="filter-group ml-auto">
               <h3 class="text-white text-lg mb-2">Search</h3>
               <input
@@ -326,7 +338,7 @@ const charactersSchema = {
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {charactersBySpecies.get(species)?.slice(0, PAGE_SIZE).map(character => (
-              <div class="character-card" data-rank={character.title}>
+              <div class="character-card" data-rank={character.title} data-important={character.important ? "true" : undefined}>
                 <a href={`/characters/${character.uid}/`} class="block">
                   <div class="lcars-character-container">
                     <div class="lcars-side-bar w-3 h-full bg-starfleet-gold absolute left-0 top-0 bottom-0"></div>
@@ -402,6 +414,7 @@ const charactersSchema = {
     const speciesFilter = document.getElementById('species-filter');
     const rankFilter = document.getElementById('rank-filter');
     const searchInput = document.getElementById('search-input');
+    const importantOnlyCheckbox = document.getElementById('important-only');
     const charactersContainer = document.getElementById('characters-container');
     const noResults = document.getElementById('no-results');
     const prevPageBtn = document.getElementById('prev-page');
@@ -425,8 +438,9 @@ const charactersSchema = {
       const selectedSpecies = speciesFilter.value;
       const selectedRank = rankFilter?.value;
       const searchTerm = searchInput.value.toLowerCase().trim();
+      const showImportantOnly = importantOnlyCheckbox.checked;
       
-      console.log(`Filtering with species=${selectedSpecies}, rank=${selectedRank}, search="${searchTerm}"`);
+      console.log(`Filtering with species=${selectedSpecies}, rank=${selectedRank}, search="${searchTerm}", importantOnly=${showImportantOnly}`);
       
       // Get all species sections
       const speciesSections = document.querySelectorAll('.species-section');
@@ -450,9 +464,10 @@ const charactersSchema = {
         
         console.log(`Processing ${sectionSpecies} section with ${allCards.length} characters`);
         
-        // Filter cards based on rank and search
+        // Filter cards based on rank, search, and important flag
         const filteredCards = allCards.filter(card => {
           const cardRank = card.getAttribute('data-rank');
+          const isImportant = card.hasAttribute('data-important');
           const characterNameElement = card.querySelector('[data-name]');
           
           // Ensure we have a valid name element
@@ -465,6 +480,7 @@ const charactersSchema = {
           
           // More robust search - check if character matches all filters
           const matchesRank = !selectedRank || selectedRank === 'all' || cardRank === selectedRank;
+          const matchesImportant = !showImportantOnly || isImportant;
           
           // Improved search matching - handle partial names and common prefixes
           let matchesSearch = false;
@@ -495,7 +511,7 @@ const charactersSchema = {
             }
           }
           
-          return matchesRank && matchesSearch;
+          return matchesRank && matchesSearch && matchesImportant;
         });
         
         console.log(`Filtered ${sectionSpecies} section: ${filteredCards.length} of ${allCards.length} characters match criteria`);
@@ -609,6 +625,7 @@ const charactersSchema = {
     }
     
     searchInput.addEventListener('input', debouncedFilter);
+    importantOnlyCheckbox.addEventListener('change', debouncedFilter);
     
     // Improved lazy loading function
     const initLazyLoading = () => {

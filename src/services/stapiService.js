@@ -1,8 +1,11 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import fs from 'fs';
+import path from 'path';
 
 const BASE_URL = 'https://stapi.co/api/v1/rest';
 const MEMORY_ALPHA_API = 'https://memory-alpha.fandom.com/api.php';
+const cachePath = new URL('../data/characters.json', import.meta.url).pathname;
 
 // Main API service for Star Trek API (STAPI)
 export const stapiService = {
@@ -616,7 +619,13 @@ export const stapiService = {
   // Function to fetch all characters from STAPI (approximately 6,000 characters)
   async getAllCharacters() {
     try {
-      // Try to get from cache first to avoid unnecessary API calls during development
+      // Check if we have a file cache first
+      if (fs.existsSync(cachePath) && !process.env.SKIP_CHAR_CACHE) {
+        console.log(`Using cached characters from ${cachePath}`);
+        return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+      }
+      
+      // If no file cache or SKIP_CHAR_CACHE=true, use in-memory cache
       const cacheKey = 'all_characters_v2'; // v2 to force refresh if needed
       return await this.getCachedData(cacheKey, async () => {
         const pageSize = 100;          // STAPI max allowed
