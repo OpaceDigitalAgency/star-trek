@@ -214,7 +214,7 @@ const charactersSchema = {
   schemaData={charactersSchema}
 >
   <script id="initial-payload" type="application/json">
-    {JSON.stringify(Object.fromEntries(charactersBySpecies))}
+{JSON.stringify(Object.fromEntries(charactersBySpecies))}
   </script>
   
   <div class="container mx-auto px-4 py-12">
@@ -438,17 +438,9 @@ const charactersSchema = {
         
         // Filter cards based on rank, search, and important flag
         const filteredCards = allCards.filter(card => {
-          const cardRank = card.getAttribute('data-rank');
-          const isImportant = card.hasAttribute('data-important');
-          const characterNameElement = card.querySelector('[data-name]');
-          
-          // Ensure we have a valid name element
-          if (!characterNameElement) {
-            console.error('Character card missing name element:', card);
-            return false;
-          }
-          
-          const characterName = characterNameElement.textContent.toLowerCase();
+          const cardRank = card.title || '';
+          const isImportant = card.important || false;
+          const characterName = (card.name || '').toLowerCase();
           
           // More robust search - check if character matches all filters
           const matchesRank = !selectedRank || selectedRank === 'all' || cardRank === selectedRank;
@@ -505,8 +497,9 @@ const charactersSchema = {
           // Add cards for current page
           const cardsToShow = filteredCards.slice(startIdx, endIdx);
           cardsToShow.forEach(card => {
-            gridContainer.appendChild(card);
-            card.classList.remove('hidden');
+            // Create a new card element
+            const cardElement = createCardElement(card, sectionSpecies);
+            gridContainer.appendChild(cardElement);
             visibleCharactersCount++;
           });
           
@@ -545,6 +538,57 @@ const charactersSchema = {
       initLazyLoading();
     };
     
+    // Function to create a card element from character data
+    const createCardElement = (character, species) => {
+      const cardElement = document.createElement('div');
+      cardElement.className = 'character-card';
+      if (character.title) {
+        cardElement.setAttribute('data-rank', character.title);
+      }
+      if (character.important) {
+        cardElement.setAttribute('data-important', 'true');
+      }
+      
+      cardElement.innerHTML = `
+        <a href="/characters/${character.uid}/" class="block">
+          <div class="lcars-character-container">
+            <div class="lcars-side-bar w-3 h-full bg-starfleet-gold absolute left-0 top-0 bottom-0"></div>
+            
+            <div class="character-image aspect-square overflow-hidden">
+              <img
+                width="160" height="160"
+                loading="lazy"
+                src="/images/generic-character.jpg"
+                data-src="${character.wikiImage || '/images/generic-character.jpg'}"
+                alt="${character.name}"
+                class="w-full h-full object-cover"
+                onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
+              />
+              <div class="character-overlay absolute inset-0 bg-gradient-to-t from-space-black to-transparent opacity-70"></div>
+            </div>
+            
+            <div class="character-info p-4 bg-space-black relative">
+              <h3 class="text-lg text-white font-semibold" data-name>${character.name}</h3>
+              ${character.title ? `<p class="text-console-blue">${character.title}</p>` : ''}
+              ${character.gender ? `
+                <div class="character-gender absolute top-4 right-4 px-2 py-1 rounded-full bg-starfleet-blue text-white text-xs">
+                  ${character.gender}
+                </div>
+              ` : ''}
+              
+              ${character.wikiUrl ? `
+                <a href="${character.wikiUrl}" target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center mt-1" onclick="event.stopPropagation()">
+                  Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+                </a>
+              ` : ''}
+            </div>
+          </div>
+        </a>
+      `;
+      
+      return cardElement;
+    };
+
     // Debounce function to prevent UI flashing
     const debounce = (func, delay) => {
       let timeout;
@@ -633,8 +677,9 @@ const charactersSchema = {
     };
     
     // Initialize on page load
-    initLazyLoading();
     filterAndPaginateCharacters();
+    // Initialize lazy loading after cards are rendered
+    setTimeout(initLazyLoading, 100);
   });
 </script>
 
