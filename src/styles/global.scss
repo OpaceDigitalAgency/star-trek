@@ -188,3 +188,8 @@ body {
     }
   }
 }
+
+// Tailwind utilities
+@layer utilities {
+  .appearance-none::-ms-expand { display: none; }
+}

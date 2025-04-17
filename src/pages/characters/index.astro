@@ -1,11 +1,11 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { stapiService, getAllCharacters } from '../../services/stapiService';
+import { stapiService, getStaticImage } from '../../services/stapiService';
 
 // Fetch all characters data from STAPI
 let characters = [];
 try {
-  characters = await getAllCharacters();
+  characters = await stapiService.getAllCharacters();
 } catch (error) {
   console.error('Error fetching characters:', error);
 }
@@ -15,8 +15,9 @@ const charactersBySpecies = new Map();           // Map<string, Character[]>
 const seen = new Set();                          // uid dedup
 
 characters.forEach(c => {
+  if (seen.has(c.name)) return;   // shields against George Kirk v1/v2 duplicates
   // Use the STAPI property name
-  const list = c.characterSpecies?.length ? c.characterSpecies : [{ name: 'Human' }];
+  const list = c.species?.length ? c.species : [{ name: 'Human' }];
 
   list.forEach(s => {
     const key = s.name ?? 'Unknown';
@@ -44,7 +45,9 @@ for (const [specie, list] of charactersBySpecies) {
     const queryName = char.name.match(/^[A-Z]\./) ? char.fullName ?? char.name : char.name;
 
     const wiki = await stapiService.getMemoryAlphaContent(queryName);
-    if (wiki?.image) {
+    if (wiki?.image?.includes('placeholder') || wiki?.image?.endsWith('.svg')) {
+      // keep searching, don't count towards budget
+    } else if (wiki?.image) {
       char.wikiImage = wiki.image;
       downloaded++;
     }
@@ -113,7 +116,7 @@ if (speciesNames.length === 0) {
 let availableRanks = [];
 // Extract unique ranks
 characters.forEach(character => {
-  if (character.title && !availableRanks.includes(character.title)) {
+  if (character.title?.trim() && !availableRanks.includes(character.title)) {
     availableRanks.push(character.title);
   }
 });
@@ -248,7 +251,9 @@ const charactersSchema = {
                         width="160" height="160"
                         loading="lazy"
                         src="/images/avatar-placeholder.svg"
-                        data-src={character.wikiImage ?? stapiService.getImageUrl(character.name,'character')}
+                        data-src={character.wikiImage
+                          ?? getStaticImage(character.uid)
+                          ?? '/images/avatar-placeholder.svg'}
                         alt={character.name}
                         class="w-full h-full object-cover"
                         onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
