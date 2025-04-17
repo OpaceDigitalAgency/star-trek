@@ -9,7 +9,7 @@ export default defineConfig({
   integrations: [
     tailwind(),
     react(),
-    netlify()
+    netlify({ edge: true })
   ],
   site: 'https://star-trek-timelines.netlify.app',
   vite: {

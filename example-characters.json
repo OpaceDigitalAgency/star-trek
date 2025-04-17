@@ -1,0 +1,130 @@
+[
+  {
+    "uid": "CHMA0000147243",
+    "name": "James T. Kirk",
+    "gender": "M",
+    "yearOfBirth": 2233,
+    "monthOfBirth": null,
+    "dayOfBirth": 22,
+    "placeOfBirth": "Riverside, Iowa, Earth",
+    "yearOfDeath": 2371,
+    "monthOfDeath": null,
+    "dayOfDeath": null,
+    "placeOfDeath": "Veridian III",
+    "height": 175,
+    "weight": null,
+    "deceased": true,
+    "bloodType": null,
+    "maritalStatus": null,
+    "serialNumber": "SC937-0176 CEC",
+    "hologramActivationDate": null,
+    "hologramStatus": null,
+    "hologramDateStatus": null,
+    "hologram": false,
+    "fictionalCharacter": false,
+    "mirror": false,
+    "alternateReality": false,
+    "characterSpecies": [
+      {
+        "uid": "SPMA0000026314",
+        "name": "Human"
+      }
+    ],
+    "species": [
+      {
+        "uid": "SPMA0000026314",
+        "name": "Human"
+      }
+    ],
+    "wikiImage": "/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F98%2FJames_Kirk%252C_2371.jpg%2Frevision%2Flatest%3Fcb%3D20210519003111%26path-prefix%3Den",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/James_T._Kirk"
+  },
+  {
+    "uid": "CHMA0000289509",
+    "name": "Jean-Luc Picard",
+    "gender": "M",
+    "yearOfBirth": 2305,
+    "monthOfBirth": 7,
+    "dayOfBirth": 13,
+    "placeOfBirth": "La Barre, France, Earth",
+    "yearOfDeath": null,
+    "monthOfDeath": null,
+    "dayOfDeath": null,
+    "placeOfDeath": null,
+    "height": null,
+    "weight": null,
+    "deceased": false,
+    "bloodType": null,
+    "maritalStatus": null,
+    "serialNumber": "SP-937-215",
+    "hologramActivationDate": null,
+    "hologramStatus": null,
+    "hologramDateStatus": null,
+    "hologram": false,
+    "fictionalCharacter": false,
+    "mirror": false,
+    "alternateReality": false,
+    "characterSpecies": [
+      {
+        "uid": "SPMA0000026314",
+        "name": "Human"
+      }
+    ],
+    "species": [
+      {
+        "uid": "SPMA0000026314",
+        "name": "Human"
+      }
+    ],
+    "wikiImage": "/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fcc%2FJean-Luc_Picard%252C_2401.jpg%2Frevision%2Flatest%3Fcb%3D20230224174740%26path-prefix%3Den",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard"
+  },
+  {
+    "uid": "CHMA0000202697",
+    "name": "Spock",
+    "gender": "M",
+    "yearOfBirth": 2230,
+    "monthOfBirth": null,
+    "dayOfBirth": null,
+    "placeOfBirth": "ShiKahr, Vulcan",
+    "yearOfDeath": null,
+    "monthOfDeath": null,
+    "dayOfDeath": null,
+    "placeOfDeath": null,
+    "height": null,
+    "weight": null,
+    "deceased": false,
+    "bloodType": "T-negative",
+    "maritalStatus": null,
+    "serialNumber": "S179-276SP",
+    "hologramActivationDate": null,
+    "hologramStatus": null,
+    "hologramDateStatus": null,
+    "hologram": false,
+    "fictionalCharacter": false,
+    "mirror": false,
+    "alternateReality": false,
+    "characterSpecies": [
+      {
+        "uid": "SPMA0000026314",
+        "name": "Human"
+      },
+      {
+        "uid": "SPMA0000001295",
+        "name": "Vulcan"
+      }
+    ],
+    "species": [
+      {
+        "uid": "SPMA0000026314",
+        "name": "Human"
+      },
+      {
+        "uid": "SPMA0000001295",
+        "name": "Vulcan"
+      }
+    ],
+    "wikiImage": "/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fb%2Fb1%2FSpock%252C_2387.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20211211154448%26path-prefix%3Den",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Spock"
+  }
+]
