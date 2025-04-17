@@ -53,7 +53,7 @@ Star Trek Timelines - A chronological guide to the Star Trek universe
 ### Implementation Plan
 1. Create `character-enrichment.js` Netlify function for on-demand enrichment.
 2. Use Netlify's caching/KV store to cache enriched character data.
-3. Update `character-detail.cjs` to:
+3. Update `character-detail.js` to:
    - Check the local cache first.
    - Fallback to the enrichment function if not found.
 4. Optimize Memory Alpha requests (rate limiting, retries, queueing).
