@@ -9,15 +9,16 @@ let totalPages = 1;
 let totalCharacters = 0;
 let allSpecies = []; // For filter dropdown
 
+// Import the local characters data at the top level
+import charactersLocalJson from '../../data/characters-local.json';
+
 // Fetch only the first page of characters for the initial build
 try {
   // Use local characters data directly for the initial build
   import.meta.env.SSR && console.log('Using local characters data for initial build');
   
-  // Import the local characters data
-  import charactersData from '../../data/characters-local.json';
-  
   // Get the first page of characters
+  const charactersData = charactersLocalJson;
   initialCharacters = charactersData.slice(0, PAGE_SIZE);
   totalPages = Math.ceil(charactersData.length / PAGE_SIZE);
   totalCharacters = charactersData.length;
