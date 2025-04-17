@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { stapiService, getStaticImage } from '../../services/stapiService';
 
 // Pagination settings
-const PAGE_SIZE = 100; // Number of characters to display per page
+const PAGE_SIZE = 48; // Number of characters to display per page
 const currentPage = 1; // Default to first page
 
 // Fetch all characters data from STAPI
@@ -237,6 +237,10 @@ const charactersSchema = {
   description="Explore the diverse characters of Star Trek from all series and movies. Learn about captains, officers, aliens, and more from across the Federation and beyond."
   schemaData={charactersSchema}
 >
+  <script id="initial-payload" type="application/json">
+    {JSON.stringify(Object.fromEntries(charactersBySpecies))}
+  </script>
+  
   <div class="container mx-auto px-4 py-12">
     <div class="lcars-header mb-8">
       <div class="lcars-header-content">
@@ -407,18 +411,14 @@ const charactersSchema = {
     
     // Pagination state
     let currentPage = 1;
-    const pageSize = 100; // Should match PAGE_SIZE in Astro
+    const pageSize = 48; // Should match PAGE_SIZE in Astro
     let totalPages = parseInt(totalPagesDisplay.textContent) || 1;
     
-    // Store all character cards by species for pagination
-    const allCharactersBySpecies = {};
-    
-    // Initialize by storing all character cards
-    document.querySelectorAll('.species-section').forEach(section => {
-      const species = section.getAttribute('data-species');
-      const cards = Array.from(section.querySelectorAll('.character-card'));
-      allCharactersBySpecies[species] = cards;
-    });
+    // Get all character cards by species from the JSON payload
+    const allCharactersBySpecies = JSON.parse(
+      document.getElementById('initial-payload').textContent
+    );
+    const flatCharacters = Object.values(allCharactersBySpecies).flat();
     
     // Filter and pagination functionality
     const filterAndPaginateCharacters = () => {
@@ -538,14 +538,10 @@ const charactersSchema = {
       
       // Update pagination
       totalPages = Math.max(1, Math.ceil(filteredCharacters.length / pageSize));
+      if (currentPage > totalPages) currentPage = totalPages;
       totalPagesDisplay.textContent = totalPages;
+      currentPageDisplay.textContent = currentPage;
       console.log(`Pagination: page ${currentPage} of ${totalPages}`);
-      
-      // Ensure current page is valid
-      if (currentPage > totalPages) {
-        currentPage = totalPages;
-        currentPageDisplay.textContent = currentPage;
-      }
       
       // Update pagination button states
       prevPageBtn.disabled = currentPage <= 1;
@@ -570,6 +566,15 @@ const charactersSchema = {
       initLazyLoading();
     };
     
+    // Debounce function to prevent UI flashing
+    const debounce = (func, delay) => {
+      let timeout;
+      return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), delay);
+      };
+    };
+    
     // Pagination event handlers
     prevPageBtn.addEventListener('click', () => {
       if (currentPage > 1) {
@@ -589,26 +594,21 @@ const charactersSchema = {
       }
     });
     
-    // Attach filter event listeners
-    speciesFilter.addEventListener('change', () => {
+    // Debounced filter function
+    const debouncedFilter = debounce(() => {
       currentPage = 1; // Reset to first page on filter change
       currentPageDisplay.textContent = currentPage;
       filterAndPaginateCharacters();
-    });
+    }, 250);
+    
+    // Attach filter event listeners with debounce
+    speciesFilter.addEventListener('change', debouncedFilter);
     
     if (rankFilter) {
-      rankFilter.addEventListener('change', () => {
-        currentPage = 1; // Reset to first page on filter change
-        currentPageDisplay.textContent = currentPage;
-        filterAndPaginateCharacters();
-      });
+      rankFilter.addEventListener('change', debouncedFilter);
     }
     
-    searchInput.addEventListener('input', () => {
-      currentPage = 1; // Reset to first page on search
-      currentPageDisplay.textContent = currentPage;
-      filterAndPaginateCharacters();
-    });
+    searchInput.addEventListener('input', debouncedFilter);
     
     // Improved lazy loading function
     const initLazyLoading = () => {

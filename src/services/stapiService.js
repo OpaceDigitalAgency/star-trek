@@ -378,9 +378,22 @@ export const stapiService = {
       
       const $ = cheerio.load(html);
       
+      // Helper function to check if an image URL is valid (not SVG or placeholder)
+      const isValidImageUrl = (url) => {
+        if (!url) return false;
+        
+        // Skip SVG images
+        if (url.toLowerCase().endsWith('.svg')) return false;
+        
+        // Skip placeholder images
+        if (url.toLowerCase().includes('placeholder')) return false;
+        
+        return true;
+      };
+      
       // Try to find the og:image meta tag first (usually the best quality)
       const ogImage = $('meta[property="og:image"]').attr('content');
-      if (ogImage) {
+      if (ogImage && isValidImageUrl(ogImage)) {
         // Use the proxy for the image
         const cleanedUrl = this.cleanWikiaImageUrl(ogImage);
         return this.proxyImageUrl(cleanedUrl);
@@ -390,7 +403,7 @@ export const stapiService = {
       const infoboxImage = $('.pi-image img').first();
       if (infoboxImage.length) {
         let src = infoboxImage.attr('src');
-        if (src) {
+        if (src && isValidImageUrl(src)) {
           // Use the proxy for the image
           const cleanedUrl = this.cleanWikiaImageUrl(src);
           return this.proxyImageUrl(cleanedUrl);
@@ -401,7 +414,7 @@ export const stapiService = {
       const contentImage = $('.mw-parser-output img').first();
       if (contentImage.length) {
         let src = contentImage.attr('src');
-        if (src) {
+        if (src && isValidImageUrl(src)) {
           // Use the proxy for the image
           const cleanedUrl = this.cleanWikiaImageUrl(src);
           return this.proxyImageUrl(cleanedUrl);
@@ -477,7 +490,12 @@ export const stapiService = {
         });
         
         // Extract the image
-        const imageUrl = this.extractMemoryAlphaImageWithParams(html);
+        let imageUrl = this.extractMemoryAlphaImageWithParams(html);
+        
+        // If no valid image was found, fall back to the static image service
+        if (!imageUrl) {
+          imageUrl = this.getImageUrl(title, 'character');
+        }
         
         return {
           title: title,
@@ -621,9 +639,8 @@ export const stapiService = {
             {
               params: {
                 pageSize,
-                pageNumber,
-                // Request more detailed character data including species
-                includeCharacterSpecies: true
+                pageNumber
+                // includeCharacterSpecies parameter removed (deprecated)
               }
             }
           );
@@ -646,6 +663,8 @@ export const stapiService = {
           
           // Add only unique characters based on UID
           let newCharactersCount = 0;
+          const charactersToFetch = [];
+          
           data.characters.forEach(character => {
             if (!seenUids.has(character.uid)) {
               seenUids.add(character.uid);
@@ -656,6 +675,11 @@ export const stapiService = {
               }
               if (character.species && !Array.isArray(character.species)) {
                 character.species = [character.species];
+              }
+              
+              // If characterSpecies is empty, mark for follow-up fetch
+              if (!character.characterSpecies?.length) {
+                charactersToFetch.push(character);
               }
               
               full.push(character);
@@ -673,6 +697,33 @@ export const stapiService = {
               }
             }
           });
+          
+          // Make follow-up calls for characters with missing species data
+          if (charactersToFetch.length > 0) {
+            console.log(`Making follow-up calls for ${charactersToFetch.length} characters with missing species data`);
+            
+            for (const character of charactersToFetch) {
+              try {
+                const detailResponse = await axios.get(`${BASE_URL}/character?uid=${character.uid}`);
+                const detailData = detailResponse.data.character;
+                
+                if (detailData) {
+                  // Copy species data from detailed response
+                  if (detailData.characterSpecies?.length) {
+                    character.characterSpecies = Array.isArray(detailData.characterSpecies)
+                      ? detailData.characterSpecies
+                      : [detailData.characterSpecies];
+                  } else if (detailData.species?.length) {
+                    character.species = Array.isArray(detailData.species)
+                      ? detailData.species
+                      : [detailData.species];
+                  }
+                }
+              } catch (error) {
+                console.error(`Error fetching details for character ${character.uid}:`, error.message);
+              }
+            }
+          }
           
           console.log(`Added ${newCharactersCount} new unique characters from page ${pageNumber}`);
           
@@ -693,6 +744,32 @@ export const stapiService = {
         }
         
         console.log(`Fetched ${full.length} unique characters from STAPI`);
+        
+        // Normalize and deduplicate species data
+        full.forEach(character => {
+          // Ensure both species arrays exist
+          character.characterSpecies = character.characterSpecies || [];
+          character.species = character.species || [];
+          
+          // Combine both arrays and deduplicate by uid
+          const allSpecies = [...character.characterSpecies, ...character.species];
+          const uniqueSpecies = [];
+          const seenSpeciesUids = new Set();
+          
+          allSpecies.forEach(species => {
+            if (species && species.uid && !seenSpeciesUids.has(species.uid)) {
+              seenSpeciesUids.add(species.uid);
+              uniqueSpecies.push(species);
+            } else if (species && !species.uid) {
+              // Handle species without uid (keep them)
+              uniqueSpecies.push(species);
+            }
+          });
+          
+          // Update both arrays with the deduplicated data
+          character.characterSpecies = uniqueSpecies;
+          character.species = uniqueSpecies;
+        });
         
         // Log species distribution for debugging
         const speciesCount = {};
