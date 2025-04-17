@@ -39,3 +39,8 @@
   from = "/api/memory-alpha/*"
   to = "/.netlify/functions/memory-alpha-search"
   status = 200
+
+# Use Edge Function for character detail pages
+[[edge_functions]]
+  path = "/characters/*"
+  function = "[slug]"
