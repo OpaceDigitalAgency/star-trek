@@ -37,7 +37,8 @@ exports.handler = async function(event, context) {
     'memory-alpha.fandom.com',
     'vignette.wikia.nocookie.net',
     'www.startrek.com',
-    'images.startrek.com'
+    'images.startrek.com',
+    'static.stapi.co'
   ];
 
   const isAllowed = allowedDomains.some(domain => imageUrl.includes(domain));
