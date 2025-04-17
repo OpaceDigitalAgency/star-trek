@@ -11,59 +11,47 @@ try {
 }
 
 // Organize characters by species
-const charactersBySpecies = {};
+const charactersBySpecies = new Map();           // Map<string, Character[]>
+const seen = new Set();                          // uid dedup
 
-characters.forEach(character => {
-  if (character.characterSpecies && character.characterSpecies.length > 0) {
-    character.characterSpecies.forEach(species => {
-      const speciesName = species.name || 'Unknown';
-      if (!charactersBySpecies[speciesName]) {
-        charactersBySpecies[speciesName] = [];
-      }
-      charactersBySpecies[speciesName].push(character);
-    });
-  } else {
-    // For characters without a species, assume Human by default (common in Star Trek)
-    const speciesName = 'Human';
-    if (!charactersBySpecies[speciesName]) {
-      charactersBySpecies[speciesName] = [];
+characters.forEach(c => {
+  // Use the STAPI property name
+  const list = c.characterSpecies?.length ? c.characterSpecies : [{ name: 'Human' }];
+
+  list.forEach(s => {
+    const key = s.name ?? 'Unknown';
+    if (!charactersBySpecies.has(key)) charactersBySpecies.set(key, []);
+
+    if (!seen.has(c.uid)) {
+      charactersBySpecies.get(key).push(c);
+      seen.add(c.uid);
     }
-    charactersBySpecies[speciesName].push(character);
-  }
+  });
 });
 
-// Get array of species names sorted alphabetically
-const speciesNames = Object.keys(charactersBySpecies).sort();
+const speciesNames = [...charactersBySpecies.keys()].sort();
 
-// Enhance character data with Memory Alpha information with a global limit
-const MAX_CHARACTERS_PER_SPECIES = 20; // Limit per species
-const MAX_IMAGES_GLOBAL = 200; // Global limit for all image fetches
-let imagesFetched = 0; // Track total images fetched
+// Enhance character data with Memory Alpha information
+const IMAGE_BUDGET = 400;          // hard stop to stay polite
+let downloaded = 0;
 
-for (const species of speciesNames) {
-  const speciesCharacters = charactersBySpecies[species];
-  if (speciesCharacters && speciesCharacters.length > 0) {
-    for (let i = 0; i < Math.min(speciesCharacters.length, MAX_CHARACTERS_PER_SPECIES); i++) {
-      // Stop if we've reached the global limit
-      if (imagesFetched >= MAX_IMAGES_GLOBAL) break;
-      
-      try {
-        const character = speciesCharacters[i];
-        const wikiData = await stapiService.getMemoryAlphaContent(character.name);
-        if (wikiData.image) {
-          character.wikiImage = wikiData.image;
-          imagesFetched++; // Increment the counter
-        }
-        if (wikiData.wikiUrl) {
-          character.wikiUrl = wikiData.wikiUrl;
-        }
-      } catch (error) {
-        console.error(`Error fetching Memory Alpha data for character:`, error);
-      }
+// Iterate species buckets
+for (const [specie, list] of charactersBySpecies) {
+  for (const char of list) {
+    if (downloaded >= IMAGE_BUDGET) break;
+
+    // Expand abbreviated names (e.g. "J. Kirk" → "James T. Kirk")
+    const queryName = char.name.match(/^[A-Z]\./) ? char.fullName ?? char.name : char.name;
+
+    const wiki = await stapiService.getMemoryAlphaContent(queryName);
+    if (wiki?.image) {
+      char.wikiImage = wiki.image;
+      downloaded++;
     }
     
-    // Break out of the species loop if we've reached the global limit
-    if (imagesFetched >= MAX_IMAGES_GLOBAL) break;
+    if (wiki?.wikiUrl) {
+      char.wikiUrl = wiki.wikiUrl;
+    }
   }
 }
 
@@ -115,9 +103,9 @@ if (speciesNames.length === 0) {
   ];
   
   // Populate charactersBySpecies with fallback data
-  charactersBySpecies["Human"] = fallbackCharacters.filter(c => c.species === "Human");
-  charactersBySpecies["Vulcan/Human"] = fallbackCharacters.filter(c => c.species === "Vulcan/Human");
-  charactersBySpecies["Klingon"] = fallbackCharacters.filter(c => c.species === "Klingon");
+  charactersBySpecies.set("Human", fallbackCharacters.filter(c => c.species === "Human"));
+  charactersBySpecies.set("Vulcan/Human", fallbackCharacters.filter(c => c.species === "Vulcan/Human"));
+  charactersBySpecies.set("Klingon", fallbackCharacters.filter(c => c.species === "Klingon"));
   speciesNames.push("Human", "Vulcan/Human", "Klingon");
 }
 
@@ -148,7 +136,7 @@ const charactersSchema = {
     "name": "Star Trek",
     "description": "Science fiction media franchise created by Gene Roddenberry"
   },
-  "hasPart": Object.entries(charactersBySpecies).slice(0, 5).flatMap(([species, chars]) => {
+  "hasPart": [...charactersBySpecies.entries()].slice(0, 5).flatMap(([species, chars]) => {
     return chars.slice(0, 5).map(char => ({
       "@type": "Person",
       "name": char.name,
@@ -190,30 +178,46 @@ const charactersSchema = {
           <div class="flex flex-wrap gap-4">
             <div class="filter-group">
               <h3 class="text-white text-lg mb-2">Filter by Species</h3>
-              <select id="species-filter" class="lcars-select bg-space-black border border-starfleet-blue text-white p-2 rounded">
+              <select
+                id="species-filter"
+                class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
+              >
                 <option value="all">All Species</option>
                 {speciesNames.map(species => (
                   <option value={species}>{species}</option>
                 ))}
               </select>
+              <!-- chevron -->
+              <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
+                   viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
             </div>
             
             {availableRanks.length > 0 && (
               <div class="filter-group">
                 <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
-                <select id="rank-filter" class="lcars-select bg-space-black border border-starfleet-blue text-white p-2 rounded">
+                <select
+                  id="rank-filter"
+                  class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
+                >
                   <option value="all">All Ranks</option>
                   {availableRanks.map(rank => (
                     <option value={rank}>{rank}</option>
                   ))}
                 </select>
+                <!-- chevron -->
+                <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
+                     viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
               </div>
             )}
             
             <div class="filter-group ml-auto">
               <h3 class="text-white text-lg mb-2">Search</h3>
-              <input type="text" id="search-input" placeholder="Search characters..." 
-                class="lcars-input bg-space-black border border-starfleet-blue text-white p-2 rounded">
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search characters..."
+                class="appearance-none bg-space-black border border-starfleet-blue text-white p-2 rounded"
+              >
             </div>
           </div>
         </div>
@@ -228,12 +232,12 @@ const charactersSchema = {
             <div class="w-4 h-4 bg-starfleet-gold rounded-full mr-3"></div>
             <h2 class="text-2xl text-white">{species}</h2>
             <div class="character-count ml-auto px-3 py-1 bg-space-black rounded-full text-white text-sm">
-              {charactersBySpecies[species]?.length || 0} characters
+              {charactersBySpecies.get(species)?.length || 0} characters
             </div>
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {charactersBySpecies[species]?.map(character => (
+            {charactersBySpecies.get(species)?.map(character => (
               <div class="character-card" data-rank={character.title}>
                 <a href={`/characters/${character.uid}/`} class="block">
                   <div class="lcars-character-container">

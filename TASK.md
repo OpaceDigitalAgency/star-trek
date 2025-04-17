@@ -11,10 +11,20 @@ None currently active.
    - Fix the rank dropdown feature
    - Implement graceful image fallback
 
+2. Apply additional code patches:
+   - Species mapping & deduplication using Map and Set
+   - Improved image enrichment loop with higher budget and smart name handling
+   - Search selector fix verification
+   - Tailwind-friendly select styling with custom SVG chevrons
+
 ## Backlog
 - Implement Fuse.js for fuzzy, accent-insensitive search
 - Use astro:assets to generate optimized WebP placeholders
 - Create on-demand revalidate hook for characters using Netlify Edge Function
+- Performance quick-wins:
+  - Client-side pagination with React-Window (1h)
+  - Move image look-ups to Netlify Background Function (30min)
+  - Add data:image/svg+xml placeholder via astro:assets (15min)
 
 ## Subtasks
 ### Fix Characters Page (COMPLETED)
@@ -24,3 +34,9 @@ None currently active.
 4. ✅ Fix the client-side filter script by updating the selector
 5. ✅ Fix the rank dropdown feature
 6. ✅ Implement graceful image fallback for character cards
+
+### Apply Additional Code Patches (COMPLETED)
+1. ✅ Update species mapping & deduplication using Map and Set
+2. ✅ Improve image enrichment loop with higher budget and better name handling
+3. ✅ Ensure search selector fix is properly implemented
+4. ✅ Implement Tailwind-friendly select styling
