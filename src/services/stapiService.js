@@ -43,7 +43,40 @@ export const stapiService = {
           pageSize: pageSize
         }
       });
-      return response.data;
+      
+      // Enrich character data with wikiImage property
+      const data = response.data;
+      
+      if (data.characters && Array.isArray(data.characters)) {
+        try {
+          // Try to load local characters data for wikiImage enrichment
+          const localCharsPath = charactersLocalJsonPath;
+          if (fs.existsSync(localCharsPath)) {
+            const localChars = JSON.parse(fs.readFileSync(localCharsPath, 'utf8'));
+            
+            // Create a map of uid to wikiImage for faster lookup
+            const wikiImageMap = {};
+            localChars.forEach(c => {
+              if (c.uid && c.wikiImage) {
+                wikiImageMap[c.uid] = c.wikiImage;
+              }
+            });
+            
+            // Add wikiImage to each character
+            data.characters = data.characters.map(char => {
+              if (char.uid && wikiImageMap[char.uid]) {
+                return { ...char, wikiImage: wikiImageMap[char.uid] };
+              }
+              return char;
+            });
+          }
+        } catch (err) {
+          console.error('Failed to enrich characters with wikiImage:', err);
+          // Continue without enrichment if there's an error
+        }
+      }
+      
+      return data;
     } catch (error) {
       console.error('Error fetching characters:', error);
       return { characters: [], page: { totalPages: 1 } };
