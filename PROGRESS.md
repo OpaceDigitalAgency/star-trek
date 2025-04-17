@@ -111,6 +111,19 @@
      - Make pagination search-aware
      - Debounce user input with 250ms delay
 
+- Implemented caching system to fix Netlify build time issues:
+  1. Created a one-off harvest script (scripts/build-characters-cache.mjs) that:
+     - Fetches all characters from STAPI (7,571 characters)
+     - Enriches important characters with Memory Alpha data (800 characters with images)
+     - Saves the data to a JSON file (src/data/characters.json)
+  2. Modified stapiService.js to use the cached JSON file instead of making API calls
+  3. Added title handling to improve Memory Alpha lookups (e.g., "Gul Dukat" → "Dukat")
+  4. Added proxy support for static.stapi.co images
+  5. Tested the system with various characters to ensure proper image URLs
+  6. Committed the changes and pushed to the main branch
+  
+  This solution reduces Netlify build time from 15+ minutes to under a minute by reading the cached JSON file instead of making 7,600+ API calls on every build.
+
 - Completed all fixes for the characters page issues:
   1. Patched the data service (stapiService.js):
      - Removed the deprecated includeCharacterSpecies parameter from the API call
