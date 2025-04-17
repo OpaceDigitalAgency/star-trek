@@ -213,8 +213,12 @@ const charactersSchema = {
   description="Explore the diverse characters of Star Trek from all series and movies. Learn about captains, officers, aliens, and more from across the Federation and beyond."
   schemaData={charactersSchema}
 >
-  <script id="initial-payload" type="application/json">
-{JSON.stringify(Object.fromEntries(charactersBySpecies))}
+  <script>
+    // Pass data directly to the client as a global variable
+    window.characterData = {
+      species: JSON.parse(`${JSON.stringify(speciesNames)}`),
+      characters: JSON.parse(`${JSON.stringify(Object.fromEntries(charactersBySpecies))}`)
+    };
   </script>
   
   <div class="container mx-auto px-4 py-12">
@@ -403,10 +407,9 @@ const charactersSchema = {
     const pageSize = 48; // Should match PAGE_SIZE in Astro
     let totalPages = parseInt(totalPagesDisplay.textContent) || 1;
     
-    // Get all character cards by species from the JSON payload
-    const allCharactersBySpecies = JSON.parse(
-      document.getElementById('initial-payload').textContent
-    );
+    // Get all character data from the global variable
+    const allCharactersBySpecies = window.characterData.characters;
+    const speciesNames = window.characterData.species;
     const flatCharacters = Object.values(allCharactersBySpecies).flat();
     
     // Filter and pagination functionality
