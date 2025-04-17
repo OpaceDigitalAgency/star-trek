@@ -10,7 +10,6 @@ export default defineConfig({
     tailwind(),
     react(),
     netlify({
-      edge: true,
       excludedPath: ['/api/*']
     })
   ],
