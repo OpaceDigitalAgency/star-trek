@@ -23,10 +23,9 @@ exports.handler = async (event) => {
 
     const { pageNumber = 0, pageSize = 20, ...filters } = event.queryStringParameters || {};
     
-    // If any filter/search is present, use local JSON for global search/filter
-    const useLocal = filters.name || filters.species || filters.title || filters.isImportant;
-    
-    if (useLocal) {
+    // Always use local JSON for filtering to support all filter types
+    // This ensures species and isImportant filters work just like name search
+    {
         // Use local JSON for global search/filter
         const fs = require('fs');
         const path = require('path');
@@ -90,88 +89,6 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
-        };
-    }
-    
-    // Otherwise, use STAPI API for normal pagination
-    let apiUrl = `${STAPI_BASE_URL}/character/search`;
-    
-    // Ensure pageNumber and pageSize are integers
-    const pageNum = parseInt(pageNumber, 10) || 0;
-    const pageSz = parseInt(pageSize, 10) || 20;
-    
-    // Only forward supported parameters to STAPI API
-    const params = new URLSearchParams();
-    params.append('pageNumber', pageNum);
-    params.append('pageSize', pageSz);
-    if (filters.name) params.append('name', filters.name);
-    
-    apiUrl += `?${params.toString()}`;
-    
-    console.log(`[ROO-DEBUG-GET] Proxying STAPI request to: ${apiUrl}`);
-    
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET'
-        });
-    
-        const rawText = await response.clone().text();
-        console.log('STAPI raw response:', rawText);
-    
-        if (!response.ok) {
-            console.error(`STAPI Error (${response.status}): ${rawText}`);
-            return {
-                statusCode: response.status,
-                headers,
-                body: JSON.stringify({ error: `STAPI request failed: ${response.statusText}`, details: rawText }),
-            };
-        }
-    
-        let data = await response.json();
-        
-        // Enrich character data with wikiImage property
-        if (data.characters && Array.isArray(data.characters)) {
-            // Load local characters.json to get wikiImage data
-            const fs = require('fs');
-            const path = require('path');
-            const filePath = path.join(__dirname, 'characters.json');
-            let localChars = [];
-            
-            try {
-                localChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-                
-                // Create a map of uid to wikiImage for faster lookup
-                const wikiImageMap = {};
-                localChars.forEach(c => {
-                    if (c.uid && c.wikiImage) {
-                        wikiImageMap[c.uid] = c.wikiImage;
-                    }
-                });
-                
-                // Add wikiImage to each character from STAPI
-                data.characters = data.characters.map(char => {
-                    if (char.uid && wikiImageMap[char.uid]) {
-                        return { ...char, wikiImage: wikiImageMap[char.uid] };
-                    }
-                    return char;
-                });
-            } catch (err) {
-                console.error('Failed to enrich characters with wikiImage:', err);
-                // Continue without enrichment if there's an error
-            }
-        }
-    
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify(data),
-        };
-    } catch (error) {
-        console.error('Proxy Error:', error);
-        return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: 'Internal Server Error in proxy function', details: error.message }),
         };
     }
     };
