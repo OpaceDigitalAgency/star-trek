@@ -23,47 +23,44 @@ exports.handler = async (event) => {
 
     const { pageNumber = 0, pageSize = 20, ...filters } = event.queryStringParameters || {};
     
-    const apiUrl = `${STAPI_BASE_URL}/character/search`;
-    const body = new URLSearchParams();
+    let apiUrl = `${STAPI_BASE_URL}/character/search`;
     
     // Ensure pageNumber and pageSize are integers
     const pageNum = parseInt(pageNumber, 10) || 0;
     const pageSz = parseInt(pageSize, 10) || 20;
     
-    // Append standard pagination parameters
-    body.append('pageNumber', pageNum);
-    body.append('pageSize', pageSz);
-
-    // Append filter parameters dynamically
+    // Build query string for GET request
+    const params = new URLSearchParams();
+    params.append('pageNumber', pageNum);
+    params.append('pageSize', pageSz);
     for (const [key, value] of Object.entries(filters)) {
-        if (value) { // Only add filters that have a value
-            body.append(key, value);
+        if (value) {
+            params.append(key, value);
         }
     }
-
-    console.log(`Proxying STAPI request to: ${apiUrl} with body: ${body.toString()}`);
-
+    apiUrl += `?${params.toString()}`;
+    
+    console.log(`Proxying STAPI request to: ${apiUrl}`);
+    
     try {
         const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: body.toString(),
+            method: 'GET'
         });
-
+    
+        const rawText = await response.clone().text();
+        console.log('STAPI raw response:', rawText);
+    
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`STAPI Error (${response.status}): ${errorText}`);
+            console.error(`STAPI Error (${response.status}): ${rawText}`);
             return {
                 statusCode: response.status,
                 headers,
-                body: JSON.stringify({ error: `STAPI request failed: ${response.statusText}`, details: errorText }),
+                body: JSON.stringify({ error: `STAPI request failed: ${response.statusText}`, details: rawText }),
             };
         }
-
+    
         const data = await response.json();
-
+    
         return {
             statusCode: 200,
             headers,
@@ -77,4 +74,4 @@ exports.handler = async (event) => {
             body: JSON.stringify({ error: 'Internal Server Error in proxy function', details: error.message }),
         };
     }
-};
+    };
