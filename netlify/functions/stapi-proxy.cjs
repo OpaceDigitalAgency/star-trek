@@ -30,7 +30,7 @@ exports.handler = async (event) => {
         // Use local JSON for global search/filter
         const fs = require('fs');
         const path = require('path');
-        const filePath = path.join(__dirname, '../../src/data/characters.json');
+        const filePath = path.join(__dirname, 'characters.json');
         let allChars = [];
         try {
             allChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
