@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "postbuild": "rm -f dist/_redirects"
   },
   "dependencies": {
     "@astrojs/react": "^3.0.10",
