@@ -190,3 +190,18 @@
   - Ensured accessibility by preserving `alt` text and using semantic markup.
   - Documented the new component and approach in `PLANNING.md`.
   - Marked the subtask as complete in `TASK.md`.
+
+## 2025-04-17
+
+- **Netlify Routing and Pagination Debugging**
+ - Issue: API endpoint `/api/characters` returned 404 due to conflicting redirects between Astro-generated `_redirects` and netlify.toml.
+ - Fix: Added a postbuild script to generate a merged `dist/_redirects` file after every build, ensuring API/function routes are listed first and the SSR catch-all is last. This allows both API endpoints and SSR site pages to work correctly on Netlify.
+ - Outcome: API endpoint now works and pagination requests are being made, but each page returns the same results (always page 0).
+ - Next: Fix the serverless function to correctly parse and forward the `pageNumber` parameter as an integer to the STAPI API, so pagination returns the correct results for each page.
+
+## 2025-04-17
+
+- **Redirect Order and Pagination Bug Documentation**
+ - Issue: Pagination on the /characters page was broken because the catch-all redirect in netlify.toml was listed before the API/function redirects. This caused all requests, including /api/characters, to be routed to the frontend instead of the serverless function, resulting in 404s and broken pagination.
+ - Fix: The catch-all redirect was moved to the end of the redirects section in netlify.toml, ensuring that API/function routes are handled first. This restored correct routing for /api/characters and fixed pagination.
+ - Outcome: Pagination now works as expected, and this issue is fully documented for future reference.

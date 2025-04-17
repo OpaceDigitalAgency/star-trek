@@ -50,13 +50,15 @@ exports.handler = async (event) => {
             filtered = filtered.filter(c => c.name && c.name.toLowerCase().includes(nameLower));
         }
         if (filters.species) {
+            const speciesLower = filters.species.toLowerCase();
             filtered = filtered.filter(c =>
-                (c.characterSpecies && c.characterSpecies.some(s => s.name === filters.species)) ||
-                (c.species && c.species.some(s => s.name === filters.species))
+                (Array.isArray(c.characterSpecies) && c.characterSpecies.some(s => s.name && s.name.toLowerCase().includes(speciesLower))) ||
+                (Array.isArray(c.species) && c.species.some(s => s.name && s.name.toLowerCase().includes(speciesLower)))
             );
         }
         if (filters.title) {
-            filtered = filtered.filter(c => c.title && c.title === filters.title);
+            const titleLower = filters.title.toLowerCase();
+            filtered = filtered.filter(c => c.title && c.title.toLowerCase().includes(titleLower));
         }
         if (filters.isImportant === 'true') {
             filtered = filtered.filter(c => c.isImportant === true);
