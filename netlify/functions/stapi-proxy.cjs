@@ -128,6 +128,38 @@ exports.handler = async (event) => {
         }
     
         let data = await response.json();
+        
+        // Enrich character data with wikiImage property
+        if (data.characters && Array.isArray(data.characters)) {
+            // Load local characters.json to get wikiImage data
+            const fs = require('fs');
+            const path = require('path');
+            const filePath = path.join(__dirname, 'characters.json');
+            let localChars = [];
+            
+            try {
+                localChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+                
+                // Create a map of uid to wikiImage for faster lookup
+                const wikiImageMap = {};
+                localChars.forEach(c => {
+                    if (c.uid && c.wikiImage) {
+                        wikiImageMap[c.uid] = c.wikiImage;
+                    }
+                });
+                
+                // Add wikiImage to each character from STAPI
+                data.characters = data.characters.map(char => {
+                    if (char.uid && wikiImageMap[char.uid]) {
+                        return { ...char, wikiImage: wikiImageMap[char.uid] };
+                    }
+                    return char;
+                });
+            } catch (err) {
+                console.error('Failed to enrich characters with wikiImage:', err);
+                // Continue without enrichment if there's an error
+            }
+        }
     
         return {
             statusCode: 200,
