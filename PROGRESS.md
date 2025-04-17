@@ -8,6 +8,20 @@
   3. Search box doesn't work due to incorrect selector (h3 > a > span structure issue)
   4. Rank dropdown is mislabeled and non-functional
 - Examined source code in stapiService.js and characters/index.astro
+
+## 2025-04-17 (continued)
+
+- Investigated issue with blank character images on production site.
+- Root cause: Production build does not always have access to enriched `characters.json` with `wikiImage` fields, so frontend falls back to generic images.
+- Designed and documented a hybrid solution:
+  - Pre-generated cache for important characters.
+  - Netlify function for on-demand enrichment and caching of additional characters.
+- This approach avoids massive build time delays because:
+  - Only a small subset is processed at build time.
+  - The rest is handled on-demand at runtime, distributed across user requests.
+  - Caching ensures subsequent requests are fast.
+- Updated PLANNING.md and TASK.md with new architecture and implementation plan.
+
 - Confirmed the issues match the triage report:
   - Current implementation only fetches first 100 characters alphabetically
   - Memory Alpha image loop is limited to 20 characters per species
@@ -122,7 +136,7 @@
   5. Tested the system with various characters to ensure proper image URLs
   6. Committed the changes and pushed to the main branch
   
-  This solution reduces Netlify build time from 15+ minutes to under a minute by reading the cached JSON file instead of making 7,600+ API calls on every build.
+     This solution reduces Netlify build time from 15+ minutes to under a minute by reading the cached JSON file instead of making 7,600+ API calls on every build.
 
 - Completed all fixes for the characters page issues:
   1. Patched the data service (stapiService.js):
@@ -143,4 +157,17 @@
      - Page loads faster with the reduced initial page size
      - Client-side filtering and pagination work correctly
      - UI controls respond smoothly without flashing
-- Committed all changes and pushed to the main branch
+  - Committed all changes and pushed to the main branch
+
+---
+
+## 2025-04-17
+
+- **Bugfix: Pagination not working on /characters page**
+  - **Issue:** When clicking to page 2 or beyond, no characters were displayed. The client-side code incorrectly assumed `allCharacters` contained all characters for all pages and sliced it for pagination, but in reality, it only contained the current page's data after each fetch.
+  - **Fix:** Updated `src/pages/characters/index.astro` so that:
+    - The `render()` function now displays `allCharacters` directly, with no slicing.
+    - `fetchPageIfNeeded` and `applyFiltersAndFetch` always set `allCharacters` to the current page's data.
+    - All logic assuming `allCharacters` contains all pages has been removed, including the `loadedPages` set and related caching.
+    - Pagination controls and character counts continue to function as expected.
+  - **Outcome:** When a user navigates between pages, the correct characters for the selected page are now displayed. Pagination is fully functional.

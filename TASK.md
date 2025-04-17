@@ -1,6 +1,15 @@
 # Task Management
 
 ## Active Tasks
+
+### Hybrid Character Data Delivery Implementation
+
+1. Create `character-enrichment.js` Netlify function for on-demand enrichment.
+2. Implement caching for enriched character data.
+3. Update `character-detail.cjs` to use the enrichment function as fallback.
+4. Optimize Memory Alpha requests (rate limiting, retries, queueing).
+5. Update frontend for loading/progressive image states and fallbacks.
+
 None currently active.
 
 ## Completed Tasks

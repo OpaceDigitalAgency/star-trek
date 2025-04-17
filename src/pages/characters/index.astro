@@ -267,8 +267,7 @@ const charactersSchema = {
       let currentPage = 1;
       let totalPages = payload.totalPages;
       let totalCharacters = payload.totalCharacters;
-      let allCharacters = [...payload.characters]; // Start with initial characters
-      let loadedPages = new Set([0]); // Keep track of loaded pages (0-indexed)
+      let allCharacters = [...payload.characters]; // Always holds only the current page's characters
       let isLoading = false; // Prevent multiple simultaneous fetches
       let currentFilters = {}; // Initialize current filters
 
@@ -311,10 +310,10 @@ const charactersSchema = {
 
     // Function to fetch a specific page *for the current filters* if not already loaded
     async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
-      const pageIndex = pageNumber - 1; // API is 0-based
-      if (loadedPages.has(pageIndex) || isLoading) {
-        return; // Already loaded for current filter set or already loading
+      if (isLoading) {
+        return; // Prevent multiple simultaneous fetches
       }
+      const pageIndex = pageNumber - 1; // API is 0-based
 
       isLoading = true;
       container.style.opacity = '0.5'; // Indicate loading
@@ -322,23 +321,13 @@ const charactersSchema = {
       try {
         // Fetch using current filters
         const data = await stapiClient.getCharacters(pageIndex, PAGE_SIZE, currentFilters);
-        if (data.characters && data.characters.length > 0) {
-          // Replace the current characters with the new page data
-          allCharacters = data.characters;
-          loadedPages.add(pageIndex);
-
-          // Update totals ONLY if they differ (e.g., first load of a filter set)
-          // Subsequent page loads for the same filter set shouldn't change totals.
-          if (data.page?.totalPages && data.page.totalPages !== totalPages) {
-             totalPages = data.page.totalPages;
-          }
-          if (data.page?.totalElements && data.page.totalElements !== totalCharacters) {
-             totalCharacters = data.page.totalElements;
-          }
-
-        } else {
-          console.warn(`No characters returned for page ${pageIndex} with filters: ${JSON.stringify(currentFilters)}`);
-          loadedPages.add(pageIndex); // Mark as loaded even if empty to prevent re-fetch
+        allCharacters = data.characters || [];
+        // Update totals if provided
+        if (data.page?.totalPages && data.page.totalPages !== totalPages) {
+          totalPages = data.page.totalPages;
+        }
+        if (data.page?.totalElements && data.page.totalElements !== totalCharacters) {
+          totalCharacters = data.page.totalElements;
         }
       } catch (error) {
         console.error(`Failed to fetch page ${pageIndex} with filters:`, error);
@@ -357,7 +346,6 @@ const charactersSchema = {
         currentPage = 1; // Reset to first page
         currentFilters = getCurrentFilters(); // Get latest filters from UI
         allCharacters = []; // Clear existing characters
-        loadedPages = new Set(); // Clear loaded pages tracker
         isLoading = true; // Set loading flag
         container.innerHTML = '<p class="text-center text-white col-span-full">Loading...</p>'; // Show loading message
         noResults.classList.add('hidden'); // Hide no results message
@@ -388,7 +376,7 @@ const charactersSchema = {
     }
 
 
-    // Function to render the current page based *only* on the current slice of `allCharacters`
+    // Function to render the current page based only on the current page's data in `allCharacters`
     function render() {
       // Update total count display based on the overall total for the current filter set
       countBadge.textContent = `${totalCharacters} characters found`;
@@ -401,21 +389,13 @@ const charactersSchema = {
       prevBtn.disabled = currentPage <= 1 || isLoading;
       nextBtn.disabled = currentPage >= totalPages || isLoading;
 
-      // Calculate the slice of `allCharacters` to display for the current page
-      // Note: `allCharacters` might not contain all characters if not all pages are loaded yet,
-      // but we slice based on the assumption it *could* hold everything up to the current page.
-      const start = (currentPage - 1) * PAGE_SIZE;
-      // We need to filter `allCharacters` to get only the items for the current page *index*
-      // This assumes `allCharacters` is populated sequentially by `fetchPageIfNeeded`
-      const pageItems = allCharacters.slice(start, start + PAGE_SIZE);
-
       // Display "No Results" message if totalCharacters is 0 after fetch/filter
       noResults.classList.toggle('hidden', totalCharacters > 0);
       container.classList.toggle('hidden', totalCharacters === 0); // Hide grid if no results
 
-      // Render character cards for the current page's items
+      // Render character cards for the current page's items (allCharacters is always current page)
       if (totalCharacters > 0) {
-          container.innerHTML = pageItems.map(c => {
+          container.innerHTML = allCharacters.map(c => {
              // Use character.wikiImage primarily, fallback to generic
              const imageUrl = c.wikiImage || '/images/generic-character.jpg';
              const slug = c.uid; // Use UID for link
