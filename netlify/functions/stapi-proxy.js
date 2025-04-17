@@ -22,13 +22,17 @@ exports.handler = async (event) => {
     }
 
     const { pageNumber = 0, pageSize = 20, ...filters } = event.queryStringParameters || {};
-
+    
     const apiUrl = `${STAPI_BASE_URL}/character/search`;
     const body = new URLSearchParams();
-
+    
+    // Ensure pageNumber and pageSize are integers
+    const pageNum = parseInt(pageNumber, 10) || 0;
+    const pageSz = parseInt(pageSize, 10) || 20;
+    
     // Append standard pagination parameters
-    body.append('pageNumber', pageNumber);
-    body.append('pageSize', pageSize);
+    body.append('pageNumber', pageNum);
+    body.append('pageSize', pageSz);
 
     // Append filter parameters dynamically
     for (const [key, value] of Object.entries(filters)) {
