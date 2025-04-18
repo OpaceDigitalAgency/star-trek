@@ -4,7 +4,26 @@ import { stapiService } from '../../services/stapiService';
 import { slugify } from '../../utils/slugify.js';
 
 
+export const prerender = false;
+
+export async function get({ params, request }) {
+  const slug = params.slug;
+  const url = new URL(request.url);
+  url.pathname = '/api/characters';
+  url.searchParams.set('slug', slug);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Character not found');
+  const character = await res.json();
+  return { props: { character } };
+}
+
+// Get the character from props
 const { character } = Astro.props;
+
+// Handle case when character is not found
+if (!character) {
+  return Astro.redirect('/characters');
+}
 
 // Create JSON-LD schema for character page
 const characterSchema = {
