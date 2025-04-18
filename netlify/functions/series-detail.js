@@ -21,8 +21,24 @@ function slugify(text) {
 
 exports.handler = async (event) => {
   try {
-    // Get the slug from the path
-    const slug = event.path.split('/').pop();
+    // Get the slug from the query parameters or path
+    let slug;
+    
+    // Check if slug is in query parameters
+    if (event.queryStringParameters && event.queryStringParameters.slug) {
+      slug = event.queryStringParameters.slug;
+    } else {
+      // Fallback to extracting from path
+      const pathParts = event.path.split('/').filter(Boolean);
+      slug = pathParts[pathParts.length - 1];
+    }
+    
+    // Remove trailing slash if present
+    if (slug && slug.endsWith('/')) {
+      slug = slug.slice(0, -1);
+    }
+    
+    console.log(`Processing series detail request for slug: ${slug}, original path: ${event.path}`);
     
     // Load all series data
     let allSeries = [];
@@ -55,16 +71,33 @@ exports.handler = async (event) => {
     
     // If not found, return 404 with more detailed error message
     if (!series) {
-      console.error(`Series not found with slug: ${slug}. Available slugs: ${allSeries.map(s => s.slug || slugify(s.title)).join(', ')}`);
+      // Get a list of available slugs for debugging
+      const availableSlugs = allSeries.map(s => s.slug || slugify(s.title));
+      
+      console.error(`Series not found with slug: ${slug}`);
+      console.error(`Available slugs: ${availableSlugs.join(', ')}`);
+      
+      // Check if there's a close match (for debugging purposes)
+      const possibleMatches = availableSlugs.filter(s =>
+        s.includes(slug) || slug.includes(s) ||
+        s.toLowerCase() === slug.toLowerCase()
+      );
+      
+      if (possibleMatches.length > 0) {
+        console.error(`Possible matches found: ${possibleMatches.join(', ')}`);
+      }
+      
       return {
         statusCode: 404,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache'
         },
         body: JSON.stringify({
           error: 'Series not found',
           message: `No series found with slug or UID: ${slug}`,
-          availableSlugs: allSeries.map(s => s.slug || slugify(s.title))
+          availableSlugs: availableSlugs,
+          possibleMatches: possibleMatches.length > 0 ? possibleMatches : undefined
         })
       };
     }
@@ -81,25 +114,39 @@ exports.handler = async (event) => {
       }
     }
     
-    // Return the series data
+    // Return the series data with appropriate caching headers
     return {
       statusCode: 200,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        'X-Series-Slug': slug,
+        'X-Series-Title': series.title || 'Unknown'
       },
       body: JSON.stringify(series)
     };
   } catch (error) {
     console.error('Error in series detail handler:', error);
+    
+    // Create a more detailed error response
+    const errorResponse = {
+      error: 'Internal Server Error',
+      message: error.message,
+      slug: slug,
+      path: event.path,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Log additional debugging information
+    console.error('Error details:', JSON.stringify(errorResponse));
+    
     return {
       statusCode: 500,
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store'
       },
-      body: JSON.stringify({
-        error: 'Internal Server Error',
-        message: error.message
-      })
+      body: JSON.stringify(errorResponse)
     };
   }
 };

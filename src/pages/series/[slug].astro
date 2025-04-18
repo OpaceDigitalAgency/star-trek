@@ -178,20 +178,37 @@ const seriesSchema = {
 <script is:load>
   // Client-side script to fetch and display series data
   async function fetchSeriesData() {
-    const slug = window.location.pathname.split('/').pop();
-    if (!slug) {
-      console.error("Slug not found in URL");
-      // Redirect to series list or show error
-      window.location.href = '/series/';
+    // Handle URLs with or without trailing slashes
+    const path = window.location.pathname.endsWith('/')
+      ? window.location.pathname.slice(0, -1) // Remove trailing slash
+      : window.location.pathname;
+    
+    const pathParts = path.split('/').filter(Boolean);
+    const slug = pathParts[pathParts.length - 1];
+    
+    console.log(`Fetching series data for slug: ${slug} from path: ${path}`);
+    
+    if (!slug || slug === 'series') {
+      console.error("Invalid slug found in URL:", slug);
+      // Only redirect if we're not already on the series index page
+      if (window.location.pathname !== '/series/' && window.location.pathname !== '/series') {
+        window.location.href = '/series/';
+      }
       return;
     }
 
     try {
-      const response = await fetch(`/netlify/functions/series-detail.js?slug=${slug}`);
+      console.log(`Making request to: /.netlify/functions/series-detail?slug=${slug}`);
+      const response = await fetch(`/.netlify/functions/series-detail?slug=${slug}`);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`HTTP error! status: ${response.status}, response:`, errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const series = await response.json();
+      console.log("Series data received:", series);
 
       // Update DOM with series data
       document.getElementById('series-title').textContent = series.title;
@@ -237,9 +254,24 @@ const seriesSchema = {
 
     } catch (error) {
       console.error("Failed to fetch series data:", error);
-      // Display error message or redirect
-      document.getElementById('series-title').textContent = "Error loading series data.";
-      document.getElementById('series-description').textContent = "Could not load series information. Please try again later.";
+      
+      // Create a more detailed error message for debugging
+      const errorDetails = `
+        Error: ${error.message}
+        URL: ${window.location.href}
+        Slug: ${slug}
+        Time: ${new Date().toISOString()}
+      `;
+      console.error(errorDetails);
+      
+      // Display error message to the user
+      document.getElementById('series-title').textContent = "Error loading series data";
+      document.getElementById('series-description').innerHTML = `
+        <p>Could not load series information. Please try again later.</p>
+        <p class="text-sm text-red-500 mt-2">Error: ${error.message}</p>
+        <p class="text-sm mt-4">If this problem persists, please try returning to the <a href="/series/" class="text-starfleet-gold hover:underline">series list</a> and selecting the series again.</p>
+      `;
+      
       // Hide other elements or show a specific error state
       document.getElementById('series-image').classList.add('hidden');
       document.querySelector('.series-meta').classList.add('hidden');

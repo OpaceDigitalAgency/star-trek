@@ -37,12 +37,7 @@
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
 
-[[redirects]]
-  from = "/series/:slug"
-  to = "/.netlify/functions/series-detail"
-  status = 200
-
-
+# API and function redirects - these need to be before the catch-all redirects
 [[redirects]]
   from = "/api/memory-alpha/*"
   to = "/.netlify/functions/memory-alpha-search"
@@ -63,6 +58,22 @@
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
 
+# Series detail page redirects - these need to be before the catch-all series redirect
+# Handle URLs with trailing slashes
+[[redirects]]
+  from = "/series/:slug/"
+  to = "/.netlify/functions/series-detail"
+  status = 200
+  force = true
+
+# Handle URLs without trailing slashes
+[[redirects]]
+  from = "/series/:slug"
+  to = "/.netlify/functions/series-detail"
+  status = 200
+  force = true
+
+# This is a more general redirect and should come after the specific ones
 [[redirects]]
   from = "/series/*"
   to = "/series/:splat"

@@ -277,3 +277,31 @@
 - Astro pages (`index.astro`, `[slug].astro`) render the list and detail views, importing or fetching data as needed.
 - Memory Alpha integration provides images and summaries.
 - Architecture is modular, performant, and well-documented.
+
+## 2025-04-18
+
+- **Fixed Series Detail Pages Redirect Issue**
+  - **Issue:** Series detail pages (e.g., `/series/star-trek-deep-space-nine`) were briefly flashing and then redirecting back to the series index page.
+  - **Root causes:**
+    1. Incorrect API endpoint URL in client-side script (`/netlify/functions/series-detail.js` instead of `/.netlify/functions/series-detail`)
+    2. Conflicting redirect rules in netlify.toml (the more general `/series/*` rule was taking precedence)
+    3. Incorrect slug extraction in the series-detail.js function (not checking query parameters)
+  - **Fixes:**
+    1. Updated the client-side script in `[slug].astro` to use the correct API endpoint URL
+    2. Reordered and improved the redirect rules in netlify.toml, adding `force = true` to the series detail rule
+    3. Enhanced the series-detail.js function to extract the slug from query parameters
+    4. Added comprehensive error handling and logging throughout the series detail flow
+    5. Improved caching headers and response formatting
+  - **Outcome:** Series detail pages now load correctly and display the appropriate content without redirecting back to the index page.
+
+## 2025-04-18
+
+- **Fixed Series Detail Pages 404 Error**
+  - **Issue:** Series detail pages were showing a 404 error with the message "Error loading series data" and "Could not load series information. Please try again later."
+  - **Root cause:** The postbuild script in package.json was generating a dist/_redirects file that was overriding the redirects in netlify.toml. The _redirects file had a catch-all rule that was redirecting all requests to /.netlify/functions/entry, but it was missing the specific rules for series detail pages.
+  - **Fix:** Updated the postbuild script to include the series detail page redirects before the catch-all rule:
+    ```
+    /series/:slug      /.netlify/functions/series-detail    200
+    /series/:slug/     /.netlify/functions/series-detail    200
+    ```
+  - **Outcome:** Series detail pages now load correctly without 404 errors, displaying the appropriate content for each series.
