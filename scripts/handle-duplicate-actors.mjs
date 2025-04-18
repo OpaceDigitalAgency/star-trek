@@ -17,20 +17,38 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const charactersJsonPath = path.join(__dirname, '..', 'src', 'data', 'characters.json');
 const charactersLocalJsonPath = path.join(__dirname, '..', 'src', 'data', 'characters-local.json');
 
-// Helper function to count non-null fields in a character object
-function countPopulatedFields(character) {
-  let count = 0;
+// Helper function to score a character's completeness
+function scoreCharacterCompleteness(character) {
+  let score = 0;
+  
+  // Base score is the number of populated fields
   for (const key in character) {
     if (character[key] !== null && character[key] !== undefined) {
       // For arrays, check if they have content
       if (Array.isArray(character[key])) {
-        if (character[key].length > 0) count++;
+        if (character[key].length > 0) score += 1;
       } else {
-        count++;
+        score += 1;
       }
     }
   }
-  return count;
+  
+  // Give extra weight to important biographical fields
+  const importantFields = ['gender', 'yearOfBirth', 'yearOfDeath', 'height', 'weight', 'status'];
+  for (const field of importantFields) {
+    if (character[field] !== null && character[field] !== undefined) {
+      score += 5; // Give significant extra points for these fields
+    }
+  }
+  
+  // Give extra weight to species information
+  if (Array.isArray(character.characterSpecies) && character.characterSpecies.length > 0) {
+    score += 3;
+  } else if (Array.isArray(character.species) && character.species.length > 0) {
+    score += 3;
+  }
+  
+  return score;
 }
 
 // Helper function to identify potential actor names
@@ -140,14 +158,14 @@ async function handleDuplicateActors() {
     for (const [name, entries] of duplicates.entries()) {
       console.log(`Processing duplicates for: ${name} (${entries.length} entries)`);
       
-      // Find the most complete record
+      // Find the most complete record using our scoring system
       let mostComplete = entries[0];
-      let maxFieldCount = countPopulatedFields(mostComplete);
+      let maxScore = scoreCharacterCompleteness(mostComplete);
       
       for (let i = 1; i < entries.length; i++) {
-        const fieldCount = countPopulatedFields(entries[i]);
-        if (fieldCount > maxFieldCount) {
-          maxFieldCount = fieldCount;
+        const score = scoreCharacterCompleteness(entries[i]);
+        if (score > maxScore) {
+          maxScore = score;
           mostComplete = entries[i];
         }
       }
@@ -157,7 +175,7 @@ async function handleDuplicateActors() {
       keepCount++;
       
       // Log the result
-      console.log(`  Selected entry with UID ${mostComplete.uid} as the most complete (${maxFieldCount} populated fields)`);
+      console.log(`  Selected entry with UID ${mostComplete.uid} as the most complete (score: ${maxScore})`);
     }
     
     console.log(`Added "keep" flag to ${keepCount} records`);

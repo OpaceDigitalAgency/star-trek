@@ -62,6 +62,9 @@ exports.handler = async (event) => {
         if (filters.isImportant === 'true' || filters.important === 'true') {
             filtered = filtered.filter(c => c.important === true || c.isImportant === true);
         }
+        if (filters.keep === 'true') {
+            filtered = filtered.filter(c => c.keep === true);
+        }
     
         // Paginate
         const pageNum = parseInt(pageNumber, 10) || 0;
