@@ -2,6 +2,7 @@
 import Layout from '../../layouts/Layout.astro';
 import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
 import ProgressiveImage from '../../components/ProgressiveImage.js';
+import { slugify } from '../../utils/slugify.js';
 
 // SEO metadata for pagination
 const currentPage = 1; // Initial page is always 1 for SSR
@@ -147,7 +148,7 @@ try {
       years: extractYears(series),
       stardate: extractStardateYears(series),
       image: stapiService.getImageUrl(series.title, 'series'),
-      slug: series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+      slug: slugify(series.title)
     }));
     
     // Enhance with Memory Alpha data for each series
@@ -398,7 +399,7 @@ const seriesListSchema = {
         // Use wikiImage, image, or fallback
         const imageUrl = series.wikiImage || series.image || '/images/stars-placeholder.jpg';
         // Slug for link
-        const slug = series.slug || series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        const slug = series.slug || series.uid || slugify(series.title);
         // Dates
         const stardate = series.stardate || '';
         const years = series.years || '';
@@ -608,6 +609,20 @@ const seriesListSchema = {
   };
   
   document.addEventListener('DOMContentLoaded', () => {
+    // Client-side slugify function to match server-side implementation
+    function slugify(text) {
+      return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')        // Replace spaces with -
+        .replace(/&/g, '-and-')      // Replace & with 'and'
+        .replace(/[^\w\-]+/g, '')    // Remove all non-word characters
+        .replace(/\-\-+/g, '-')      // Replace multiple - with single -
+        .replace(/^-+/, '')          // Trim - from start of text
+        .replace(/-+$/, '');         // Trim - from end of text
+    }
+    
     const payload = JSON.parse(document.getElementById('initial-payload').textContent);
     const PAGE_SIZE = payload.pageSize;
     let currentPage = 1;
@@ -641,306 +656,138 @@ const seriesListSchema = {
       };
     };
     
-    // Function to get current filter values from UI elements
-    function getCurrentFilters() {
-      const filters = {};
+    // Simplified filter function that works directly with the DOM
+    function applyFilters() {
+      if (isLoading) return; // Don't apply if already loading
+      
+      // Get current filter values
       const companyVal = companyFilter?.value;
       const networkVal = networkFilter?.value;
       const decadeVal = decadeFilter?.value;
-      const searchTerm = searchInput.value.trim();
+      const searchTerm = searchInput.value.trim().toLowerCase();
       
-      if (companyVal && companyVal !== 'all') filters.productionCompany = companyVal;
-      if (networkVal && networkVal !== 'all') filters.originalNetwork = networkVal;
-      if (decadeVal && decadeVal !== 'all') filters.decade = decadeVal;
-      if (searchTerm) filters.title = searchTerm;
+      // Get all series cards
+      const seriesCards = document.querySelectorAll('.timeline-row');
+      let visibleCount = 0;
       
-      return filters;
-    }
-    
-    // Function to fetch a specific page *for the current filters* if not already loaded
-    async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
-      if (isLoading) {
-        return; // Prevent multiple simultaneous fetches
-      }
-      const pageIndex = pageNumber - 1; // API is 0-based
-      
-      isLoading = true;
-      container.style.opacity = '0.5'; // Indicate loading
-      
-      try {
-        // Fetch using current filters
-        const data = await stapiClient.getSeries(pageIndex, PAGE_SIZE, currentFilters);
-        allSeries = data.series || [];
-        // Update totals if provided
-        if (data.page?.totalPages && data.page.totalPages !== totalPages) {
-          totalPages = data.page.totalPages;
+      // Loop through each card and check if it matches the filters
+      seriesCards.forEach(card => {
+        let shouldShow = true;
+        
+        // Get the series data from the card
+        const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
+        const network = card.querySelector('.card-meta')?.textContent?.toLowerCase() || '';
+        const company = card.querySelector('.card-description')?.textContent?.toLowerCase() || '';
+        const yearText = card.querySelector('.card-date-badge')?.textContent || '';
+        const decade = yearText ? Math.floor(parseInt(yearText) / 10) * 10 : null;
+        
+        // Apply company filter
+        if (companyVal && companyVal !== 'all' && !company.includes(companyVal.toLowerCase())) {
+          shouldShow = false;
         }
-        if (data.page?.totalElements && data.page.totalElements !== totalSeries) {
-          totalSeries = data.page.totalElements;
+        
+        // Apply network filter
+        if (networkVal && networkVal !== 'all' && !network.includes(networkVal.toLowerCase())) {
+          shouldShow = false;
         }
-      } catch (error) {
-        console.error(`Failed to fetch page ${pageIndex} with filters:`, error);
-        // Handle error display if needed
-      } finally {
-        isLoading = false;
-        container.style.opacity = '1';
-        render(); // Re-render with potentially new data or updated totals
+        
+        // Apply decade filter
+        if (decadeVal && decadeVal !== 'all' && decade !== parseInt(decadeVal)) {
+          shouldShow = false;
+        }
+        
+        // Apply search filter
+        if (searchTerm && !title.includes(searchTerm) &&
+            !company.includes(searchTerm) &&
+            !network.includes(searchTerm)) {
+          shouldShow = false;
+        }
+        
+        // Show or hide the card
+        if (shouldShow) {
+          card.style.display = '';
+          visibleCount++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Update the count badge
+      countBadge.textContent = `${visibleCount} series found`;
+      
+      // Show/hide no results message
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
+        container.classList.add('hidden');
+      } else {
+        noResults.classList.add('hidden');
+        container.classList.remove('hidden');
       }
-    }
-    
-    // Function to apply filters, fetch the first page, and update state
-    async function applyFiltersAndFetch() {
-      if (isLoading) return; // Don't apply if already loading
       
-      currentPage = 1; // Reset to first page
-      currentFilters = getCurrentFilters(); // Get latest filters from UI
-      allSeries = []; // Clear existing series
-      isLoading = true; // Set loading flag
-      container.innerHTML = '<p class="text-center text-white col-span-full">Loading...</p>'; // Show loading message
-      noResults.classList.add('hidden'); // Hide no results message
-      countBadge.textContent = `Loading...`;
-      pageNum.textContent = '1';
-      totalNum.textContent = '?'; // Indicate total pages unknown
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
-      
-      try {
-        const data = await stapiClient.getSeries(0, PAGE_SIZE, currentFilters); // Fetch page 0 (first page)
-        allSeries = data.series || [];
-        totalPages = data.page?.totalPages || 1;
-        totalSeries = data.page?.totalElements || allSeries.length;
-      } catch (error) {
-        console.error("Error applying filters and fetching initial data:", error);
-        allSeries = [];
-        totalPages = 1;
-        totalSeries = 0;
-        // Optionally display an error message in the container
-        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading series. Please try again.</p>';
-      } finally {
-        isLoading = false;
-        render(); // Render the newly fetched data (or empty state/error)
+      // Announce to screen readers
+      const ariaLive = document.getElementById('aria-live-region');
+      if (ariaLive) {
+        ariaLive.textContent = `Filtered to ${visibleCount} series.`;
       }
     }
     
-    // Function to render the current page based only on the current page's data in `allSeries`
-    function render() {
-      try {
-        console.log("Render called - current page:", currentPage, "total pages:", totalPages, "total series:", totalSeries);
+    // Function to sort the timeline cards based on view mode
+    function sortTimelineCards() {
+      const rows = Array.from(document.querySelectorAll('.timeline-row'));
+      
+      // Sort the rows based on view mode
+      rows.sort((a, b) => {
+        const aCard = a.querySelector('.series-card');
+        const bCard = b.querySelector('.series-card');
         
-        // Update total count display based on the overall total for the current filter set
-        countBadge.textContent = `${totalSeries} series found`;
+        if (!aCard || !bCard) return 0;
         
-        // Update pagination display (uses overall totalPages for the current filter set)
-        pageNum.textContent = currentPage;
-        totalNum.textContent = totalPages; // Display the overall total pages
+        const aYear = viewMode === 'chronology'
+          ? parseInt(aCard.querySelector('.card-date-badge')?.textContent || '0')
+          : parseInt(aCard.querySelector('.card-meta')?.textContent?.match(/\d{4}/) || '0');
+          
+        const bYear = viewMode === 'chronology'
+          ? parseInt(bCard.querySelector('.card-date-badge')?.textContent || '0')
+          : parseInt(bCard.querySelector('.card-meta')?.textContent?.match(/\d{4}/) || '0');
+          
+        return aYear - bYear;
+      });
+      
+      // Remove all rows from container
+      rows.forEach(row => row.remove());
+      
+      // Re-add rows in sorted order
+      rows.forEach((row, idx) => {
+        // Update alignment based on new order
+        row.classList.remove('left', 'right');
+        row.classList.add(idx % 2 === 0 ? 'left' : 'right');
         
-        // Enable/disable pagination buttons based on overall totalPages
-        prevBtn.disabled = currentPage <= 1 || isLoading;
-        nextBtn.disabled = currentPage >= totalPages || isLoading;
-        
-        // Display "No Results" message if totalSeries is 0 after fetch/filter
-        noResults.classList.toggle('hidden', totalSeries > 0);
-        container.classList.toggle('hidden', totalSeries === 0); // Hide grid if no results
-        
-        // Render series cards for the current page's items (allSeries is always current page)
-        if (totalSeries > 0) {
-          try {
-            console.log("Rendering series:", allSeries.length);
-            
-            // Sort the series based on view mode
-            const seriesToRender = [...allSeries];
-            
-            if (viewMode === 'chronology') {
-              // Sort by in-universe chronology (stardate)
-              seriesToRender.sort((a, b) => {
-                const aYear = a.stardate ? parseInt(a.stardate.split('-')[0]) : 0;
-                const bYear = b.stardate ? parseInt(b.stardate.split('-')[0]) : 0;
-                return aYear - bYear;
-              });
-            } else {
-              // Sort by release date
-              seriesToRender.sort((a, b) => {
-                const aYear = a.productionStartYear || 0;
-                const bYear = b.productionStartYear || 0;
-                return aYear - bYear;
-              });
-            }
-            
-            // Clear the container first
-            container.innerHTML = '';
-            
-            // Create a document fragment to improve performance
-            const fragment = document.createDocumentFragment();
-            
-            // Extract years for timeline markers
-            const years = [];
-            seriesToRender.forEach(series => {
-              const year = viewMode === 'chronology'
-                ? (series.stardate ? parseInt(series.stardate.split('-')[0]) : 0)
-                : (series.productionStartYear || 0);
-              
-              if (year > 0 && !years.includes(year)) {
-                years.push(year);
-              }
-            });
-            
-            // Sort years and add markers (limit to avoid overcrowding)
-            years.sort((a, b) => a - b);
-            const yearStep = years.length > 8 ? Math.ceil(years.length / 8) : 1;
-            const filteredYears = years.filter((_, index) => index % yearStep === 0);
-            
-            // Add year markers to the timeline
-            filteredYears.forEach(year => {
-              const yearMarker = document.createElement('div');
-              yearMarker.className = 'year-marker';
-              yearMarker.textContent = viewMode === 'chronology' ? `${year}` : `${year}`;
-              
-              // Calculate position based on the range of years
-              const minYear = Math.min(...years);
-              const maxYear = Math.max(...years);
-              const range = maxYear - minYear;
-              const position = range > 0
-                ? ((year - minYear) / range) * 80 + 10 // 10-90% of container height
-                : 50; // Default to middle if all same year
-              
-              yearMarker.style.top = `${position}%`;
-              fragment.appendChild(yearMarker);
-            });
-            
-            // Create and append each series card
-            // Alternate left/right columns for timeline layout
-            seriesToRender.forEach((series, idx) => {
-              if (!series || !series.title) {
-                console.error("Invalid series data:", series);
-                return; // Skip invalid series
-              }
-
-              const alignment = idx % 2 === 0 ? 'left' : 'right';
-              const imageUrl = series.wikiImage || series.image || '/images/stars-placeholder.jpg';
-              const slug = series.slug || series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-              const primaryDate = viewMode === 'chronology' ? series.stardate : series.years;
-              const secondaryDate = viewMode === 'chronology' ? series.years : series.stardate;
-              const primaryColor = viewMode === 'chronology' ? 'starfleet-blue' : 'starfleet-red';
-              const secondaryColor = viewMode === 'chronology' ? 'console-green' : 'console-blue';
-
-              // Create the timeline row container
-              const row = document.createElement('div');
-              row.className = `timeline-row ${alignment} relative`;
-
-              // Timeline node
-              const node = document.createElement('div');
-              node.className = 'timeline-node absolute left-1/2 transform -translate-x-1/2';
-              node.setAttribute('aria-hidden', 'true');
-              row.appendChild(node);
-
-              // Connector
-              const connector = document.createElement('div');
-              connector.className = `connector absolute top-16 ${alignment === 'left' ? 'right-0' : 'left-0'} w-12 h-0.5 bg-starfleet-gold transform -translate-y-1/2`;
-              connector.setAttribute('aria-hidden', 'true');
-              row.appendChild(connector);
-
-              // Card
-              const card = document.createElement('a');
-              card.href = `/series/${slug}/`;
-              card.className = 'series-card';
-              card.innerHTML = `
-                <div class="lcars-card-header flex">
-                  <div class="w-16 h-8 bg-starfleet-gold rounded-tl-lg"></div>
-                  <div class="flex-1 h-8 bg-${primaryColor} flex items-center justify-center">
-                    <span class="text-sm font-bold tracking-wider">${series.abbreviation || "ST"}</span>
-                  </div>
-                </div>
-                <div class="card-body bg-space-black bg-opacity-90 p-4 border-x border-${primaryColor}">
-                  <div class="card-date-badge">${primaryDate || "Unknown"}</div>
-                  <div class="relative aspect-video mb-4 overflow-hidden rounded-lg shadow-lg card-image-container">
-                    <img
-                      src="${imageUrl}"
-                      alt="${series.title}"
-                      class="w-full h-full object-cover card-image"
-                      loading="lazy"
-                      onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
-                    />
-                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-3">
-                      <span class="text-${secondaryColor} text-sm font-mono font-bold">${secondaryDate || "Unknown"}</span>
-                    </div>
-                  </div>
-                  <h2 class="text-xl text-white font-semibold mb-3 border-b border-${primaryColor} pb-2 card-title">${series.title}</h2>
-                  <div class="flex justify-between text-gray-300 text-sm mb-3 bg-space-deep p-2 rounded card-meta">
-                    <span class="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-${secondaryColor}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      ${secondaryDate || "Unknown"}
-                    </span>
-                    <span class="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-${secondaryColor}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                      </svg>
-                      ${series.seasons || series.seasonsCount || "?"} seasons
-                    </span>
-                  </div>
-                  <p class="text-gray-300 text-sm leading-relaxed card-description">${series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : (series.description || `Star Trek series that aired on ${series.originalNetwork || "television"}.`)}</p>
-                  ${series.wikiUrl ? `
-                    <div class="mt-4 pt-2 border-t border-gray-700 card-links">
-                      <a href="${series.wikiUrl}" target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center bg-space-deep px-2 py-1 rounded" onclick="event.stopPropagation()">
-                        Memory Alpha
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
-                          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
-                          <path d="M15 3h6v6"></path>
-                          <path d="M10 14L21 3"></path>
-                        </svg>
-                      </a>
-                    </div>
-                  ` : ''}
-                </div>
-                <div class="lcars-card-footer flex">
-                  <div class="w-10 h-8 bg-starfleet-${viewMode === 'chronology' ? 'red' : 'blue'}"></div>
-                  <div class="flex-1 h-8 bg-console-blue"></div>
-                  <div class="w-24 h-8 bg-starfleet-gold rounded-br-lg"></div>
-                </div>
-              `;
-
-              // Add a data attribute for the year to help with timeline visualization
-              const year = viewMode === 'chronology'
-                ? (series.stardate ? parseInt(series.stardate.split('-')[0]) : 0)
-                : (series.productionStartYear || 0);
-              card.dataset.year = year;
-
-              // Append the card to the timeline row
-              row.appendChild(card);
-
-              // Append the row to the fragment
-              fragment.appendChild(row);
-            });
-            
-            // Append all cards to the container at once
-            container.appendChild(fragment);
-            
-            // Add a clearfix element to ensure the container expands to contain all floating elements
-            const clearfix = document.createElement('div');
-            clearfix.style.clear = 'both';
-            container.appendChild(clearfix);
-          } catch (error) {
-            console.error("Error in render function:", error);
-            container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering series. Please check the console for details.</p>';
-          }
-        } else if (!isLoading) {
-          // Ensure loading message is removed if there are truly no results
-          container.innerHTML = '';
+        // Update connector position
+        const connector = row.querySelector('.connector');
+        if (connector) {
+          connector.classList.remove('left-0', 'right-0');
+          connector.classList.add(idx % 2 === 0 ? 'right-0' : 'left-0');
         }
-      } catch (error) {
-        console.error("Error in main render function:", error);
-        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering page. Please check the console for details.</p>';
-      }
+        
+        container.appendChild(row);
+      });
+      
+      // Add a clearfix element
+      const clearfix = document.createElement('div');
+      clearfix.style.clear = 'both';
+      container.appendChild(clearfix);
+      
+      // Apply filters to the newly sorted cards
+      applyFilters();
     }
     
     // Debounced version of applying filters for search input
-    const debouncedApplyFilters = debounce(applyFiltersAndFetch, 500);
+    const debouncedApplyFilters = debounce(applyFilters, 300);
     
     // Event Listeners - Trigger filter application
-    companyFilter?.addEventListener('change', applyFiltersAndFetch);
-    networkFilter?.addEventListener('change', applyFiltersAndFetch);
-    decadeFilter?.addEventListener('change', applyFiltersAndFetch);
+    companyFilter?.addEventListener('change', applyFilters);
+    networkFilter?.addEventListener('change', applyFilters);
+    decadeFilter?.addEventListener('change', applyFilters);
     searchInput.addEventListener('input', debouncedApplyFilters); // Use debounced version for search
     
     // View toggle
@@ -948,54 +795,132 @@ const seriesListSchema = {
       viewMode = 'chronology';
       chronologyBtn.classList.add('active');
       releaseBtn.classList.remove('active');
-      render(); // Re-render with new view mode
+      
+      // Update the cards with chronology view styling
+      document.querySelectorAll('.series-card').forEach(card => {
+        // Update color scheme for chronology view
+        const header = card.querySelector('.lcars-card-header div:nth-child(2)');
+        if (header) header.className = header.className.replace(/bg-[^\\s]+/, 'bg-starfleet-blue');
+        
+        // Update other elements as needed
+        const cardBody = card.querySelector('.card-body');
+        if (cardBody) cardBody.className = cardBody.className.replace(/border-[^\\s]+/, 'border-starfleet-blue');
+      });
+      
+      // Sort the cards based on chronological order
+      sortTimelineCards();
     });
     
     releaseBtn.addEventListener('click', () => {
       viewMode = 'release';
       releaseBtn.classList.add('active');
       chronologyBtn.classList.remove('active');
-      render(); // Re-render with new view mode
+      
+      // Update the cards with release view styling
+      document.querySelectorAll('.series-card').forEach(card => {
+        // Update color scheme for release view
+        const header = card.querySelector('.lcars-card-header div:nth-child(2)');
+        if (header) header.className = header.className.replace(/bg-[^\\s]+/, 'bg-starfleet-red');
+        
+        // Update other elements as needed
+        const cardBody = card.querySelector('.card-body');
+        if (cardBody) cardBody.className = cardBody.className.replace(/border-[^\\s]+/, 'border-starfleet-red');
+      });
+      
+      // Sort the cards based on release order
+      sortTimelineCards();
     });
     
-    prevBtn.addEventListener('click', async () => {
-      if (currentPage > 1 && !isLoading) {
-        const prevPageNum = currentPage - 1;
-        // Fetch the previous page data before decrementing currentPage
-        await fetchPageIfNeeded(prevPageNum);
-        // Only decrement if fetch didn't fail
+    // Simplified pagination that works with the visible cards
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
         currentPage--;
-        render();
+        updatePagination();
       }
     });
     
-    nextBtn.addEventListener('click', async () => {
-       if (currentPage < totalPages && !isLoading) {
-           const nextPageNum = currentPage + 1;
-           // Fetch if needed *before* incrementing currentPage visually
-           await fetchPageIfNeeded(nextPageNum);
-           // Only increment if fetch didn't fail catastrophically and page exists
-           if (currentPage < totalPages) { // Check totalPages again in case fetch failed
-               currentPage++;
-               render(); // Render the new page slice
-           }
-       }
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        updatePagination();
+      }
     });
     
-    // Initial Render on Load
-    render(); // Render the initial data passed from the server
+    // Function to update pagination display and visible cards
+    function updatePagination() {
+      // Update page number display
+      pageNum.textContent = currentPage;
+      
+      // Enable/disable pagination buttons
+      prevBtn.disabled = currentPage <= 1;
+      nextBtn.disabled = currentPage >= totalPages;
+      
+      // Get all visible cards (those that match current filters)
+      const visibleCards = Array.from(document.querySelectorAll('.timeline-row'))
+        .filter(card => card.style.display !== 'none');
+      
+      // Calculate pagination
+      const startIndex = (currentPage - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      
+      // Show/hide cards based on pagination
+      visibleCards.forEach((card, index) => {
+        if (index >= startIndex && index < endIndex) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      
+      // Update total pages based on visible cards
+      totalPages = Math.ceil(visibleCards.length / PAGE_SIZE);
+      totalNum.textContent = totalPages;
+      
+      // Announce to screen readers
+      const ariaLive = document.getElementById('aria-live-region');
+      if (ariaLive) {
+        ariaLive.textContent = `Page ${currentPage} of ${totalPages}.`;
+      }
+    }
+    
+    // Initial setup
+    sortTimelineCards(); // Sort cards based on initial view mode
+    applyFilters(); // Apply any initial filters
   });
 </script>
 
 <style>
-  /* TEMP: Force mobile layout for responsive testing */
-  @media (max-width: 6000px) {
+  /* Timeline layout styles - properly implemented two-column layout */
+  .timeline-container {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 0;
+  }
+  
+  .timeline-row {
+    position: relative;
+    margin-bottom: 40px;
+  }
+  
+  .timeline-row.left .series-card {
+    float: left;
+    margin-right: 60px;
+  }
+  
+  .timeline-row.right .series-card {
+    float: right;
+    margin-left: 60px;
+  }
+  
+  /* Only apply single-column layout on mobile */
+  @media (max-width: 768px) {
     .timeline-container, .timeline-row, .series-card {
-      max-width: 100vw !important;
-      width: 100% !important;
-      float: none !important;
-      display: block !important;
-      margin: 0 auto !important;
+      max-width: 100vw;
+      width: 100%;
+      float: none;
+      display: block;
+      margin: 0 auto;
     }
   }
   /* Filter and Button Styles */
