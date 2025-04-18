@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
+import { slugify } from '../../utils/slugify.js';
 
 // Pagination settings
 const PAGE_SIZE = 48; // Number of characters to display per page
@@ -405,7 +406,9 @@ const charactersSchema = {
           container.innerHTML = allCharacters.map(c => {
              // Try to use local cached image first, then wikiImage, then fallback to generic
              const imageUrl = c.wikiImage || '/images/generic-character.jpg';
-             const slug = c.uid; // Use UID for link
+             // Create a slug that includes both the character name and UID
+             const nameSlug = slugify(c.name);
+             const slug = `${nameSlug}-${c.uid}`; // Combine name slug and UID
 
              return `
                <div class="character-card bg-space-black border border-starfleet-blue rounded-lg overflow-hidden transition-transform hover:scale-105">
