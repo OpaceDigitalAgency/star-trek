@@ -3,6 +3,10 @@ import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
 import { slugify } from '../../utils/slugify.js';
 
+// SEO metadata for pagination
+const currentPage = 1; // Initial page is always 1 for SSR
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
+
 // Pagination settings
 const PAGE_SIZE = 48; // Number of characters to display per page
 let initialCharacters = [];
@@ -386,8 +390,11 @@ const charactersSchema = {
 
     // Function to render the current page based only on the current page's data in `allCharacters`
     function render() {
-      // Update total count display based on the overall total for the current filter set
-      countBadge.textContent = `${totalCharacters} characters found`;
+      try {
+        console.log("Render called - current page:", currentPage, "total pages:", totalPages, "total characters:", totalCharacters);
+        
+        // Update total count display based on the overall total for the current filter set
+        countBadge.textContent = `${totalCharacters} characters found`;
 
       // Update pagination display (uses overall totalPages for the current filter set)
       pageNum.textContent = currentPage;
@@ -403,12 +410,21 @@ const charactersSchema = {
 
       // Render character cards for the current page's items (allCharacters is always current page)
       if (totalCharacters > 0) {
-          container.innerHTML = allCharacters.map(c => {
-             // Try to use local cached image first, then wikiImage, then fallback to generic
-             const imageUrl = c.wikiImage || '/images/generic-character.jpg';
-             // Create a slug that includes both the character name and UID
-             const nameSlug = slugify(c.name);
-             const slug = `${nameSlug}-${c.uid}`; // Combine name slug and UID
+          try {
+              console.log("Rendering characters:", allCharacters.length);
+              
+              container.innerHTML = allCharacters.map(c => {
+                  if (!c || !c.name) {
+                      console.error("Invalid character data:", c);
+                      return ''; // Skip invalid characters
+                  }
+                  
+                  // Try to use local cached image first, then wikiImage, then fallback to generic
+                  const imageUrl = c.wikiImage || '/images/generic-character.jpg';
+                  
+                  // Create a slug that includes both the character name and UID
+                  const nameSlug = c.name ? slugify(c.name) : 'unknown';
+                  const slug = c.uid ? `${nameSlug}-${c.uid}` : nameSlug; // Combine name slug and UID
 
              return `
                <div class="character-card bg-space-black border border-starfleet-blue rounded-lg overflow-hidden transition-transform hover:scale-105">
@@ -434,6 +450,10 @@ const charactersSchema = {
           container.innerHTML = '';
       }
       // Removed Memory Alpha image fetching logic
+      } catch (error) {
+        console.error("Error in render function:", error);
+        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering characters. Please check the console for details.</p>';
+      }
     }
 
     // Debounced version of applying filters for search input
