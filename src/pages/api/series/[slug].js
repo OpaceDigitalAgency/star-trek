@@ -43,118 +43,111 @@ export async function GET({ params }) {
     try {
       const castMembers = [];
 
-      // Data
-      const dataChar = charactersData.find(c => c.name === 'Data');
-      if (dataChar?.wikiImage) {
-        castMembers.push({
-          name: 'Data',
-          image: dataChar.wikiImage,
-          url: dataChar.wikiUrl,
-          performer: 'Brent Spiner'
-        });
-        console.log('Added Data to cast list');
-      }
+      // Define cast members for each series
+      const seriesCast = {
+        'star-trek-the-next-generation': [
+          { name: 'Data', performer: 'Brent Spiner', search: c => c.name === 'Data' },
+          { name: 'William Riker', performer: 'Jonathan Frakes', search: c => {
+            const name = c.name.toLowerCase();
+            return name.includes('william') && name.includes('riker') && !name.includes('thomas');
+          }},
+          { name: 'Jean-Luc Picard', performer: 'Patrick Stewart', search: c => c.name === 'Jean-Luc Picard' },
+          { name: 'Geordi La Forge', performer: 'LeVar Burton', search: c => c.name.toLowerCase().includes('geordi') },
+          { name: 'Worf', performer: 'Michael Dorn', search: c => c.name === 'Worf' },
+          { name: 'Deanna Troi', performer: 'Marina Sirtis', search: c => c.name.toLowerCase().includes('troi') },
+          { name: 'Beverly Crusher', performer: 'Gates McFadden', search: c => c.name === 'Beverly Crusher' },
+          { name: 'Wesley Crusher', performer: 'Wil Wheaton', search: c => c.name === 'Wesley Crusher' },
+          { name: 'Tasha Yar', performer: 'Denise Crosby', search: c => {
+            const name = c.name.toLowerCase();
+            return name.includes('natasha') || name.includes('tasha');
+          }}
+        ],
+        'star-trek-deep-space-nine': [
+          { name: 'Benjamin Sisko', performer: 'Avery Brooks', search: c => c.name.toLowerCase().includes('sisko') },
+          { name: 'Kira Nerys', performer: 'Nana Visitor', search: c => c.name.toLowerCase().includes('kira') },
+          { name: 'Odo', performer: 'René Auberjonois', search: c => c.name === 'Odo' },
+          { name: 'Jadzia Dax', performer: 'Terry Farrell', search: c => c.name.toLowerCase().includes('jadzia') },
+          { name: 'Julian Bashir', performer: 'Alexander Siddig', search: c => c.name.toLowerCase().includes('bashir') },
+          { name: 'Miles O\'Brien', performer: 'Colm Meaney', search: c => c.name.toLowerCase().includes('o\'brien') },
+          { name: 'Quark', performer: 'Armin Shimerman', search: c => c.name === 'Quark' },
+          { name: 'Worf', performer: 'Michael Dorn', search: c => c.name === 'Worf' }
+        ],
+        'star-trek-voyager': [
+          { name: 'Kathryn Janeway', performer: 'Kate Mulgrew', search: c => c.name.toLowerCase().includes('janeway') },
+          { name: 'Chakotay', performer: 'Robert Beltran', search: c => c.name === 'Chakotay' },
+          { name: 'Tuvok', performer: 'Tim Russ', search: c => c.name === 'Tuvok' },
+          { name: 'B\'Elanna Torres', performer: 'Roxann Dawson', search: c => c.name.toLowerCase().includes('torres') },
+          { name: 'Tom Paris', performer: 'Robert Duncan McNeill', search: c => c.name.toLowerCase().includes('paris') },
+          { name: 'Harry Kim', performer: 'Garrett Wang', search: c => c.name.toLowerCase().includes('kim') },
+          { name: 'The Doctor', performer: 'Robert Picardo', search: c => c.name === 'The Doctor' || c.name === 'Emergency Medical Hologram' },
+          { name: 'Seven of Nine', performer: 'Jeri Ryan', search: c => c.name.toLowerCase().includes('seven') }
+        ],
+        'star-trek-enterprise': [
+          { name: 'Jonathan Archer', performer: 'Scott Bakula', search: c => c.name.toLowerCase().includes('archer') },
+          { name: 'T\'Pol', performer: 'Jolene Blalock', search: c => c.name.toLowerCase().includes('t\'pol') },
+          { name: 'Charles Tucker III', performer: 'Connor Trinneer', search: c => c.name.toLowerCase().includes('tucker') },
+          { name: 'Malcolm Reed', performer: 'Dominic Keating', search: c => c.name.toLowerCase().includes('reed') },
+          { name: 'Hoshi Sato', performer: 'Linda Park', search: c => c.name.toLowerCase().includes('sato') },
+          { name: 'Travis Mayweather', performer: 'Anthony Montgomery', search: c => c.name.toLowerCase().includes('mayweather') },
+          { name: 'Phlox', performer: 'John Billingsley', search: c => c.name === 'Phlox' }
+        ],
+        'star-trek-discovery': [
+          { name: 'Michael Burnham', performer: 'Sonequa Martin-Green', search: c => c.name.toLowerCase().includes('burnham') },
+          { name: 'Saru', performer: 'Doug Jones', search: c => c.name === 'Saru' },
+          { name: 'Paul Stamets', performer: 'Anthony Rapp', search: c => c.name.toLowerCase().includes('stamets') },
+          { name: 'Sylvia Tilly', performer: 'Mary Wiseman', search: c => c.name.toLowerCase().includes('tilly') }
+        ],
+        'star-trek-picard': [
+          { name: 'Jean-Luc Picard', performer: 'Patrick Stewart', search: c => c.name === 'Jean-Luc Picard' },
+          { name: 'Raffi Musiker', performer: 'Michelle Hurd', search: c => c.name.toLowerCase().includes('raffi') },
+          { name: 'Cristóbal Rios', performer: 'Santiago Cabrera', search: c => c.name.toLowerCase().includes('rios') },
+          { name: 'Agnes Jurati', performer: 'Alison Pill', search: c => c.name.toLowerCase().includes('jurati') },
+          { name: 'Elnor', performer: 'Evan Evagora', search: c => c.name === 'Elnor' },
+          { name: 'Seven of Nine', performer: 'Jeri Ryan', search: c => c.name.toLowerCase().includes('seven') }
+        ],
+        'star-trek-lower-decks': [
+          { name: 'Beckett Mariner', performer: 'Tawny Newsome', search: c => c.name.toLowerCase().includes('mariner') },
+          { name: 'Brad Boimler', performer: 'Jack Quaid', search: c => c.name.toLowerCase().includes('boimler') },
+          { name: 'D\'Vana Tendi', performer: 'Noël Wells', search: c => c.name.toLowerCase().includes('tendi') },
+          { name: 'Sam Rutherford', performer: 'Eugene Cordero', search: c => c.name.toLowerCase().includes('rutherford') },
+          { name: 'Carol Freeman', performer: 'Dawnn Lewis', search: c => c.name.toLowerCase().includes('freeman') },
+          { name: 'Jack Ransom', performer: 'Jerry O\'Connell', search: c => c.name.toLowerCase().includes('ransom') }
+        ]
+      };
+
+      // Get cast for the current series
+      const seriesCastMembers = seriesCast[slug] || [];
       
-      // William Riker
-      const rikerChar = charactersData.find(c => {
-        const name = c.name.toLowerCase();
-        return name.includes('william') && name.includes('riker') && !name.includes('thomas');
-      });
-      if (rikerChar?.wikiImage) {
-        castMembers.push({
-          name: 'William Riker',
-          image: rikerChar.wikiImage,
-          url: rikerChar.wikiUrl,
-          performer: 'Jonathan Frakes'
-        });
-        console.log('Added William Riker to cast list');
+      // Find character data for each cast member
+      for (const castMember of seriesCastMembers) {
+        const char = charactersData.find(castMember.search);
+        if (char?.wikiImage) {
+          castMembers.push({
+            name: castMember.name,
+            image: char.wikiImage,
+            url: char.wikiUrl,
+            performer: castMember.performer
+          });
+          console.log(`Added ${castMember.name} to cast list`);
+        }
       }
-      
-      // Jean-Luc Picard
-      const picardChar = charactersData.find(c => c.name === 'Jean-Luc Picard');
-      if (picardChar?.wikiImage) {
-        castMembers.push({
-          name: 'Jean-Luc Picard',
-          image: picardChar.wikiImage,
-          url: picardChar.wikiUrl,
-          performer: 'Patrick Stewart'
-        });
-        console.log('Added Jean-Luc Picard to cast list');
-      }
-      
-      // Geordi La Forge
-      const geordiChar = charactersData.find(c => c.name.toLowerCase().includes('geordi'));
-      if (geordiChar?.wikiImage) {
-        castMembers.push({
-          name: 'Geordi La Forge',
-          image: geordiChar.wikiImage,
-          url: geordiChar.wikiUrl,
-          performer: 'LeVar Burton'
-        });
-        console.log('Added Geordi La Forge to cast list');
-      }
-      
-      // Worf
-      const worfChar = charactersData.find(c => c.name === 'Worf');
-      if (worfChar?.wikiImage) {
-        castMembers.push({
-          name: 'Worf',
-          image: worfChar.wikiImage,
-          url: worfChar.wikiUrl,
-          performer: 'Michael Dorn'
-        });
-        console.log('Added Worf to cast list');
-      }
-      
-      // Deanna Troi
-      const troiChar = charactersData.find(c => c.name.toLowerCase().includes('troi'));
-      if (troiChar?.wikiImage) {
-        castMembers.push({
-          name: 'Deanna Troi',
-          image: troiChar.wikiImage,
-          url: troiChar.wikiUrl,
-          performer: 'Marina Sirtis'
-        });
-        console.log('Added Deanna Troi to cast list');
-      }
-      
-      // Beverly Crusher
-      const bevChar = charactersData.find(c => c.name === 'Beverly Crusher');
-      if (bevChar?.wikiImage) {
-        castMembers.push({
-          name: 'Beverly Crusher',
-          image: bevChar.wikiImage,
-          url: bevChar.wikiUrl,
-          performer: 'Gates McFadden'
-        });
-        console.log('Added Beverly Crusher to cast list');
-      }
-      
-      // Wesley Crusher
-      const wesleyChar = charactersData.find(c => c.name === 'Wesley Crusher');
-      if (wesleyChar?.wikiImage) {
-        castMembers.push({
-          name: 'Wesley Crusher',
-          image: wesleyChar.wikiImage,
-          url: wesleyChar.wikiUrl,
-          performer: 'Wil Wheaton'
-        });
-        console.log('Added Wesley Crusher to cast list');
-      }
-      
-      // Tasha Yar
-      const tashaChar = charactersData.find(c => {
-        const name = c.name.toLowerCase();
-        return name.includes('natasha') || name.includes('tasha');
-      });
-      if (tashaChar?.wikiImage) {
-        castMembers.push({
-          name: 'Tasha Yar',
-          image: tashaChar.wikiImage,
-          url: tashaChar.wikiUrl,
-          performer: 'Denise Crosby'
-        });
-        console.log('Added Tasha Yar to cast list');
+
+      // If no cast members were found, add some generic ones
+      if (castMembers.length === 0 && series.title) {
+        // Try to find characters with the series name in their description
+        const seriesChars = charactersData.filter(c =>
+          c.description && c.description.toLowerCase().includes(series.title.toLowerCase()) && c.wikiImage
+        ).slice(0, 10); // Limit to 10 characters
+        
+        for (const char of seriesChars) {
+          castMembers.push({
+            name: char.name,
+            image: char.wikiImage,
+            url: char.wikiUrl,
+            performer: 'Unknown'
+          });
+          console.log(`Added ${char.name} to cast list (generic)`);
+        }
       }
 
       // Sort by performer name
