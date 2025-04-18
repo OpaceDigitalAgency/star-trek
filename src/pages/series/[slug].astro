@@ -43,16 +43,14 @@ export async function getStaticPaths() {
       props: { series, __allSlugs: allSlugs }
     };
   });
-  console.log('[series/[slug].astro] getStaticPaths slugs:', paths.map(p => p.params.slug));
+  // Return all paths for static generation
   return paths;
 }
 
 // Get the series from props
 const { series } = Astro.props;
 
-console.log('[series/[slug].astro] Rendering slug:', Astro.params.slug, 'Series:', series ? series.title : 'NOT FOUND');
-
- // Handle case when series is not found
+// Handle case when series is not found
 if (!series) {
   return Astro.redirect('/series');
 }
@@ -73,34 +71,15 @@ const seriesSchema = {
   "countryOfOrigin": "United States",
   "inLanguage": "English"
 };
+// Create structured data for the series page
 ---
-let debugSlugs = [];
-if (typeof globalThis !== "undefined") {
-  // Store slugs in a global variable for debugging (client-side)
-  globalThis.__seriesSlugs = globalThis.__seriesSlugs || [];
-}
-if (typeof Astro !== "undefined" && Astro.props && Astro.props.__allSlugs) {
-  debugSlugs = Astro.props.__allSlugs;
-  if (typeof globalThis !== "undefined") {
-    globalThis.__seriesSlugs = debugSlugs;
-  }
-}
-
 <Layout
   title={`${series.title} | Star Trek Series Profile`}
   description={`Learn about ${series.title}, a Star Trek series that aired from ${series.years}.`}
   schemaData={seriesSchema}
 >
   <div class="container mx-auto px-4 py-12">
-    <div class="debug-panel bg-space-black text-starfleet-gold p-4 mb-6 rounded-lg border border-starfleet-gold">
-      <div><strong>DEBUG:</strong></div>
-      <div>Current slug: <span class="text-console-green">{Astro.params.slug}</span></div>
-      <div>Series found: <span class="text-console-green">{series ? series.title : "NOT FOUND"}</span></div>
-      <div>All available slugs: <span class="text-console-green">{Array.isArray(debugSlugs) && debugSlugs.length > 0 ? debugSlugs.join(", ") : "Unavailable"}</span></div>
-      {!series && (
-        <div class="text-red-500 font-bold mt-2">WARNING: Series not found for this slug. You will be redirected to /series.</div>
-      )}
-    </div>
+    <!-- Main content container -->
     <div class="lcars-header mb-8">
       <div class="lcars-header-content">
         <h1 class="text-3xl">{series.title}</h1>
@@ -184,18 +163,24 @@ if (typeof Astro !== "undefined" && Astro.props && Astro.props.__allSlugs) {
               )}
             </div>
             
+            <!-- Timeline Placement Section -->
+            <!-- This section displays where the series fits in the Star Trek chronology -->
             <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
             <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
               <p class="text-gray-300">
+                {/* Dynamic timeline text that adapts based on the series */}
+                {/* Uses stardate information and adds contextual era description */}
                 {series.title} is set in the years {series.stardate}, {
-                  series.title.includes("Discovery") && series.stardate.includes("3188") ? 
-                  "initially during the 2250s before the crew time-traveled to the 32nd century." : 
-                  `during the ${series.title.includes("Original") ? "Five-Year Mission" : 
-                    series.title.includes("Next Generation") ? "24th century" : 
-                    series.title.includes("Deep Space Nine") ? "Dominion War era" : 
-                    series.title.includes("Voyager") ? "Delta Quadrant expedition" : 
-                    series.title.includes("Enterprise") ? "early days of Starfleet" : 
-                    series.title.includes("Picard") ? "post-Dominion War era" : 
+                  /* Special case for Discovery which spans multiple time periods */
+                  series.title.includes("Discovery") && series.stardate.includes("3188") ?
+                  "initially during the 2250s before the crew time-traveled to the 32nd century." :
+                  /* For other series, provide era-specific context */
+                  `during the ${series.title.includes("Original") ? "Five-Year Mission" :
+                    series.title.includes("Next Generation") ? "24th century" :
+                    series.title.includes("Deep Space Nine") ? "Dominion War era" :
+                    series.title.includes("Voyager") ? "Delta Quadrant expedition" :
+                    series.title.includes("Enterprise") ? "early days of Starfleet" :
+                    series.title.includes("Picard") ? "post-Dominion War era" :
                     "Star Trek timeline"}.`
                 }
               </p>
@@ -226,10 +211,14 @@ if (typeof Astro !== "undefined" && Astro.props && Astro.props.__allSlugs) {
     padding-top: 1rem;
   }
   
+  /* Timeline info styling */
+  /* Creates a container for the timeline information with relative positioning for the pattern overlay */
   .timeline-info {
     position: relative;
   }
   
+  /* Adds a decorative diagonal striped pattern overlay to the timeline info section */
+  /* This creates a subtle LCARS-inspired background pattern */
   .timeline-info::before {
     content: '';
     position: absolute;
@@ -244,6 +233,6 @@ if (typeof Astro !== "undefined" && Astro.props && Astro.props.__allSlugs) {
       rgba(0, 0, 0, 0) 10px,
       rgba(0, 0, 0, 0) 20px
     );
-    pointer-events: none;
+    pointer-events: none; /* Ensures the pattern doesn't interfere with interactions */
   }
 </style>

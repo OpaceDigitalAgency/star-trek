@@ -246,6 +246,10 @@ const seriesListSchema = {
   description="Explore all Star Trek series from The Original Series to Discovery, Picard and beyond. Get episode guides, character information, and timeline placement."
   schemaData={seriesListSchema}
 >
+  <!-- TEMP: ARIA live region for dynamic updates -->
+  <div id="aria-live-region" aria-live="polite" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
+    Timeline updated.
+  </div>
   <div class="container mx-auto px-4 py-12">
       <div class="debug-panel bg-space-black text-starfleet-gold p-4 mb-6 rounded-lg border border-starfleet-gold">
         <div><strong>DEBUG:</strong></div>
@@ -374,7 +378,7 @@ const seriesListSchema = {
     </div>
     
     <!-- Series container with enhanced timeline style -->
-    <div class="timeline-container" id="series-container" aria-label="Star Trek Series Timeline">
+    <div class="timeline-container" id="series-container" aria-label="Star Trek Series Timeline" role="list">
       <!-- Timeline legend -->
       <div class="timeline-legend">
         <div class="legend-item">
@@ -414,13 +418,13 @@ const seriesListSchema = {
         const secondaryColor = 'console-green';
 
         return (
-          <div class={`timeline-row ${alignment} relative`} key={series.uid || series.slug || idx}>
+          <div class={`timeline-row ${alignment} relative`} key={series.uid || series.slug || idx} role="listitem" tabindex="-1">
             {/* Timeline node */}
             <div class="timeline-node absolute left-1/2 transform -translate-x-1/2" aria-hidden="true"></div>
             {/* Connector */}
             <div class={`connector absolute top-16 ${alignment === 'left' ? 'right-0' : 'left-0'} w-12 h-0.5 bg-starfleet-gold transform -translate-y-1/2`} aria-hidden="true"></div>
             {/* Card */}
-            <a href={`/series/${slug}/`} class="series-card" aria-label={`View details for ${series.title}`}>
+            <a href={`/series/${slug}/`} class="series-card" aria-label={`View details for ${series.title}`} tabindex="0">
               <div class="lcars-card-header flex">
                 <div class="w-16 h-8 bg-starfleet-gold rounded-tl-lg"></div>
                 <div class="flex-1 h-8 bg-starfleet-blue flex items-center justify-center">
@@ -528,6 +532,41 @@ const seriesListSchema = {
 />
 
 <script>
+  // TEMP: Add focus outline to all focusable elements for accessibility testing
+  document.addEventListener('DOMContentLoaded', () => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      a:focus, button:focus, select:focus, input:focus, [tabindex]:focus {
+        outline: 3px solid #FFD700 !important;
+        outline-offset: 2px !important;
+        z-index: 9999 !important;
+      }
+    `;
+    document.head.appendChild(style);
+
+    // TEMP: Log focus events for timeline cards and buttons
+    document.body.addEventListener('focusin', (e) => {
+      if (e.target.classList.contains('series-card') || e.target.tagName === 'BUTTON') {
+        console.log('[ACCESSIBILITY] Focused:', e.target);
+      }
+    });
+
+    // TEMP: Announce updates to ARIA live region after filtering/pagination
+    const ariaLive = document.getElementById('aria-live-region');
+    const announce = (msg) => {
+      if (ariaLive) {
+        ariaLive.textContent = msg;
+        setTimeout(() => { ariaLive.textContent = ''; }, 1000);
+      }
+    };
+    // Patch render to announce updates
+    const origRender = window.render;
+    window.render = function(...args) {
+      if (typeof origRender === 'function') origRender.apply(this, args);
+      announce('Timeline updated.');
+    };
+  });
+
   // Client-side STAPI client using the Netlify proxy
   const stapiClient = {
     PROXY_URL: '/api/series', // Use the proxy endpoint
@@ -949,6 +988,16 @@ const seriesListSchema = {
 </script>
 
 <style>
+  /* TEMP: Force mobile layout for responsive testing */
+  @media (max-width: 6000px) {
+    .timeline-container, .timeline-row, .series-card {
+      max-width: 100vw !important;
+      width: 100% !important;
+      float: none !important;
+      display: block !important;
+      margin: 0 auto !important;
+    }
+  }
   /* Filter and Button Styles */
   .trek-button {
     background-color: var(--space-black);
