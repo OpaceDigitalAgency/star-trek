@@ -123,3 +123,6 @@ None currently active.
 5. ✅ Fix character detail pages "Not found" error:
    - Replaced Astro module import with direct HTML template
    - Maintained same layout and functionality
+6. ✅ Fix character detail pages with direct UID URLs:
+   - Modified character-detail.cjs to first try finding characters by UID
+   - Added fallback to slugified name if not found by UID

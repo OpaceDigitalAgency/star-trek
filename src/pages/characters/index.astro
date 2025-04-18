@@ -156,13 +156,23 @@ const charactersSchema = {
             
             <div class="filter-group ml-4">
               <h3 class="text-white text-lg mb-2">Show Only</h3>
-              <div class="flex items-center">
-                <input
-                  type="checkbox"
-                  id="important-filter"
-                  class="mr-2"
-                >
-                <label for="important-filter" class="text-white">Important Characters</label>
+              <div class="flex flex-col gap-2">
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="important-filter"
+                    class="mr-2"
+                  >
+                  <label for="important-filter" class="text-white">Important Characters</label>
+                </div>
+                <div class="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="keep-filter"
+                    class="mr-2"
+                  >
+                  <label for="keep-filter" class="text-white">Primary Actor Records</label>
+                </div>
               </div>
             </div>
             
@@ -301,6 +311,7 @@ const charactersSchema = {
     const speciesFilter = document.getElementById('species-filter');
     const rankFilter = document.getElementById('rank-filter'); // Assuming rank filter exists
     const importantBox = document.getElementById('important-filter');
+    const keepBox = document.getElementById('keep-filter');
     const searchInput = document.getElementById('search-input');
     const prevBtn = document.getElementById('prev-page');
     const nextBtn = document.getElementById('next-page');
@@ -318,17 +329,78 @@ const charactersSchema = {
       };
     };
 
+    // --- Species Dropdown Dynamic Update ---
+    // Fetch all matching characters (with current filters except species) and update the species dropdown
+    async function updateSpeciesDropdown() {
+      // Build filters excluding species
+      const filters = getCurrentFilters();
+      delete filters.species; // Remove species filter to get all possible species for current search/rank/important
+
+      // Fetch all matching characters (up to 2000)
+      let data;
+      try {
+        data = await stapiClient.getCharacters(0, 2000, filters);
+      } catch (e) {
+        console.error("Failed to fetch all characters for species dropdown:", e);
+        return;
+      }
+      const chars = data.characters || [];
+      // Build a set of species with at least one matching character
+      const speciesSet = new Set();
+      for (const c of chars) {
+        // Try both characterSpecies and species arrays
+        if (Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
+          c.characterSpecies.forEach(s => s?.name && speciesSet.add(s.name));
+        } else if (Array.isArray(c.species) && c.species.length > 0) {
+          c.species.forEach(s => s?.name && speciesSet.add(s.name));
+        }
+      }
+      // Always include "All Species" as the first option
+      const sortedSpecies = Array.from(speciesSet).sort((a, b) => {
+        if (a === 'Human') return -1;
+        if (b === 'Human') return 1;
+        if (a === 'Unknown') return -1;
+        if (b === 'Unknown') return 1;
+        return a.localeCompare(b);
+      });
+
+      // Save current selection
+      const prevValue = speciesFilter.value;
+
+      // Clear and repopulate the dropdown
+      speciesFilter.innerHTML = '';
+      const allOpt = document.createElement('option');
+      allOpt.value = 'all';
+      allOpt.textContent = 'All Species';
+      speciesFilter.appendChild(allOpt);
+      for (const s of sortedSpecies) {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        speciesFilter.appendChild(opt);
+      }
+
+      // Restore previous selection if still present, else default to "all"
+      if (prevValue && (prevValue === 'all' || speciesSet.has(prevValue))) {
+        speciesFilter.value = prevValue;
+      } else {
+        speciesFilter.value = 'all';
+      }
+    }
+
     // Function to get current filter values from UI elements
     function getCurrentFilters() {
         const filters = {};
         const speciesVal = speciesFilter.value;
         const rankVal = rankFilter ? rankFilter.value : 'all';
-        const importantOnly = importantBox.checked; // Assuming you'll add a filter param like 'isImportant' if needed by API
+        const importantOnly = importantBox.checked;
+        const keepOnly = keepBox.checked;
         const searchTerm = searchInput.value.trim();
 
         if (speciesVal !== 'all') filters.species = speciesVal; // Assuming API filter key is 'species'
         if (rankVal !== 'all') filters.title = rankVal; // Assuming API filter key is 'title' for rank
         if (importantOnly) filters.important = 'true'; // Using the correct property name from the JSON file
+        if (keepOnly) filters.keep = 'true'; // Filter by the "keep" flag for primary actor records
         if (searchTerm) filters.name = searchTerm; // Assuming API filter key is 'name'
 
         return filters;
@@ -381,6 +453,8 @@ const charactersSchema = {
         prevBtn.disabled = true;
         nextBtn.disabled = true;
 
+        // Update species dropdown before fetching page (so user sees correct options)
+        await updateSpeciesDropdown();
 
         try {
             const data = await stapiClient.getCharacters(0, PAGE_SIZE, currentFilters); // Fetch page 0 (first page)
@@ -493,7 +567,11 @@ const charactersSchema = {
     speciesFilter.addEventListener('change', applyFiltersAndFetch);
     if (rankFilter) rankFilter.addEventListener('change', applyFiltersAndFetch);
     importantBox.addEventListener('change', applyFiltersAndFetch);
+    keepBox.addEventListener('change', applyFiltersAndFetch);
     searchInput.addEventListener('input', debouncedApplyFilters); // Use debounced version for search
+
+    // On initial load, update the species dropdown to match the initial filter state
+    updateSpeciesDropdown();
 
     prevBtn.addEventListener('click', async () => {
       if (currentPage > 1 && !isLoading) {

@@ -229,4 +229,8 @@
     - **Root cause:** The character-detail.cjs function was trying to import the Astro page module, but this was failing because the Astro page is an ES module.
     - **Fix:** Replaced the Astro module import with a direct HTML template in the character-detail.cjs file, maintaining the same layout and functionality.
 
-  - **Outcome:** All character images now display correctly on all pages, the "important" checkbox filter works correctly, and character detail pages load without errors.
+  - **Issue 6:** Character detail pages with direct UID URLs were still showing "Not found" error.
+    - **Root cause:** The character-detail.cjs function was only looking for characters by slugified name, but the URLs were using direct UIDs (e.g., /characters/CHMA0000283851/).
+    - **Fix:** Modified the character-detail.cjs function to first try finding characters by UID, and then fall back to slugified name if not found.
+
+  - **Outcome:** All character images now display correctly on all pages, the "important" checkbox filter works correctly, and character detail pages load without errors with both slugified names and direct UIDs.
