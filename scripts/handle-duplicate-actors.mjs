@@ -153,8 +153,15 @@ async function handleDuplicateActors() {
     const duplicates = findPotentialDuplicates(characters);
     console.log(`Found ${duplicates.size} potential duplicate actor sets`);
     
-    // Process each set of duplicates
+    // First, mark all characters as "keep: false" by default
+    for (const character of characters) {
+      character.keep = false;
+    }
+    
+    // Process each set of duplicates - mark the most complete as "keep: true"
     let keepCount = 0;
+    
+    // For duplicate sets, find the most complete record
     for (const [name, entries] of duplicates.entries()) {
       console.log(`Processing duplicates for: ${name} (${entries.length} entries)`);
       
@@ -178,7 +185,19 @@ async function handleDuplicateActors() {
       console.log(`  Selected entry with UID ${mostComplete.uid} as the most complete (score: ${maxScore})`);
     }
     
-    console.log(`Added "keep" flag to ${keepCount} records`);
+    // Now mark all non-duplicate characters as "keep: true" as well
+    let uniqueCount = 0;
+    for (const character of characters) {
+      // If character doesn't have a keep flag yet (not part of a duplicate set)
+      if (character.keep !== true) {
+        character.keep = true;
+        uniqueCount++;
+      }
+    }
+    
+    console.log(`Added "keep" flag to ${keepCount} records from duplicate sets`);
+    console.log(`Added "keep" flag to ${uniqueCount} unique records`);
+    console.log(`Total records marked as "keep": ${keepCount + uniqueCount}`);
     
     // Write the updated data back to the files
     console.log('Writing updated data to characters.json...');
