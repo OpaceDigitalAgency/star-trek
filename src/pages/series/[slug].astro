@@ -1,75 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
-import { slugify } from '../../utils/slugify.js';
+import { slugify } from '../../utils/slugify.js'; // Keep slugify if needed elsewhere or for client-side logic
 
-export const prerender = true;
-
-export async function getStaticPaths() {
-  // Fetch all series data
-  let allSeries = [];
-  
-  try {
-    // Try to import the local series data
-    allSeries = await import('../../data/series.json').then(m => m.default);
-  } catch (error) {
-    console.error('Failed to import local series data, fetching from STAPI:', error);
-    
-    // Fallback to STAPI API if local data is not available
-    allSeries = await stapiService.getSeries();
-    
-    // Filter out irrelevant entries and ensure we have the main series
-    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine",
-                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery",
-                        "Star Trek: Picard", "Star Trek: The Animated Series"];
-    
-    allSeries = allSeries.filter(series => mainSeries.includes(series.title));
-    
-    // Map STAPI data to our format
-    allSeries = allSeries.map(series => ({
-      ...series,
-      years: extractYears(series),
-      stardate: extractStardateYears(series),
-      image: stapiService.getImageUrl(series.title, 'series'),
-      slug: series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
-    }));
-  }
-  
-  // Create paths for each series
-  const allSlugs = allSeries.map(series => series.slug || slugify(series.title));
-  const paths = allSeries.map(series => {
-    // Ensure we're using the same slug format consistently
-    const slug = series.slug || slugify(series.title);
-    return {
-      params: { slug },
-      props: { series, __allSlugs: allSlugs }
-    };
-  });
-  // Return all paths for static generation
-  return paths;
-}
-
-// Get the series from props
-const { series } = Astro.props;
-
-// Handle case when series is not found
-if (!series) {
-  return Astro.redirect('/series');
-}
-
-// Create JSON-LD schema for series page
+// Create JSON-LD schema for series page (will be updated client-side)
 const seriesSchema = {
   "@context": "https://schema.org",
   "@type": "TVSeries",
-  "name": series.title,
-  "alternateName": series.abbreviation,
-  "description": series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '') : `Star Trek series that aired from ${series.years}.`,
-  "url": `https://star-trek-timelines.netlify.app/series/${series.slug}/`,
-  "image": series.wikiImage || series.image || "/images/stars-placeholder.jpg",
-  "temporalCoverage": series.years,
-  "numberOfEpisodes": series.episodes || series.episodesCount,
-  "numberOfSeasons": series.seasons || series.seasonsCount,
-  "productionCompany": series.productionCompany,
+  "name": "Loading...", // Placeholder
+  "alternateName": "", // Placeholder
+  "description": "Loading series information...", // Placeholder
+  "url": "", // Placeholder
+  "image": "/images/stars-placeholder.jpg", // Placeholder
+  "temporalCoverage": "", // Placeholder
+  "numberOfEpisodes": "?", // Placeholder
+  "numberOfSeasons": "?", // Placeholder
+  "productionCompany": "", // Placeholder
   "countryOfOrigin": "United States",
   "inLanguage": "English"
 };
@@ -238,3 +183,79 @@ const seriesSchema = {
     pointer-events: none; /* Ensures the pattern doesn't interfere with interactions */
   }
 </style>
+
+<script is:load>
+  // Client-side script to fetch and display series data
+  async function fetchSeriesData() {
+    const slug = window.location.pathname.split('/').pop();
+    if (!slug) {
+      console.error("Slug not found in URL");
+      // Redirect to series list or show error
+      window.location.href = '/series/';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/netlify/functions/series-detail.js?slug=${slug}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const series = await response.json();
+
+      // Update DOM with series data
+      document.getElementById('series-title').textContent = series.title;
+      document.getElementById('series-image').src = series.wikiImage || series.image || "/images/stars-placeholder.jpg";
+      document.getElementById('series-image').alt = series.title;
+      document.getElementById('series-abbreviation').textContent = series.abbreviation || "N/A";
+      document.getElementById('series-years').textContent = series.years;
+      document.getElementById('series-stardate').textContent = series.stardate;
+      document.getElementById('series-seasons').textContent = series.seasons || series.seasonsCount || "?";
+      document.getElementById('series-episodes').textContent = series.episodes || series.episodesCount || "?";
+      document.getElementById('series-network').textContent = series.originalNetwork || "Various";
+      document.getElementById('series-production').textContent = series.productionCompany || "Paramount";
+      document.getElementById('series-description').innerHTML = series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years}.`;
+
+      // Update timeline info
+      let timelineText = `${series.title} is set in the years ${series.stardate}, `;
+      if (series.title.includes("Discovery") && series.stardate.includes("3188")) {
+        timelineText += "initially during the 2250s before the crew time-traveled to the 32nd century."
+      } else {
+        const era = series.title.includes("Original") ? "Five-Year Mission" :
+                    series.title.includes("Next Generation") ? "24th century" :
+                    series.title.includes("Deep Space Nine") ? "Dominion War era" :
+                    series.title.includes("Voyager") ? "Delta Quadrant expedition" :
+                    series.title.includes("Enterprise") ? "early days of Starfleet" :
+                    series.title.includes("Picard") ? "post-Dominion War era" :
+                    "Star Trek timeline";
+        timelineText += `during the ${era}.`;
+      }
+      document.getElementById('series-timeline-info').textContent = timelineText;
+
+      // Update wiki link
+      const wikiLink = document.getElementById('series-wiki-link');
+      if (series.wikiUrl) {
+        wikiLink.href = series.wikiUrl;
+        wikiLink.classList.remove('hidden');
+      } else {
+        wikiLink.classList.add('hidden');
+      }
+
+      // Update page title and description in the Layout component (requires accessing Astro.props or similar if possible, or updating meta tags directly)
+      // For now, the Layout title and description will remain placeholders set in the frontmatter.
+      // A more robust solution might involve a client-side framework component or updating meta tags with JavaScript.
+
+    } catch (error) {
+      console.error("Failed to fetch series data:", error);
+      // Display error message or redirect
+      document.getElementById('series-title').textContent = "Error loading series data.";
+      document.getElementById('series-description').textContent = "Could not load series information. Please try again later.";
+      // Hide other elements or show a specific error state
+      document.getElementById('series-image').classList.add('hidden');
+      document.querySelector('.series-meta').classList.add('hidden');
+      document.querySelector('.timeline-info').classList.add('hidden');
+      document.getElementById('series-wiki-link').classList.add('hidden');
+    }
+  }
+
+  fetchSeriesData();
+</script>
