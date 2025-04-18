@@ -1,4 +1,6 @@
 import { stapiService } from './stapiService';
+import { slugify } from '../utils/slugify.js';
+import charactersData from '../data/characters-local.json';
 
 // Get all series for the sitemap
 export async function getAllSeries() {
@@ -32,27 +34,32 @@ export async function getAllSeries() {
 // Get all characters for the sitemap
 export async function getAllCharacters() {
   try {
-    // Fetch a reasonable number of characters for the sitemap
-    const response = await stapiService.getCharacters(0, 50);
+    // Use the local characters data file instead of making API calls
+    // This allows us to include ALL characters in the sitemap
+    const characters = charactersData;
+    
+    // Filter out characters without a name or UID
+    const validCharacters = characters.filter(char => char.name && char.uid);
     
     // Map to the format we need for the sitemap
-    return response.characters.map(character => ({
-      slug: character.uid || makeSlug(character.name),
+    // Use the same slug format as in the character pages (name-UID)
+    return validCharacters.map(character => ({
+      slug: `${slugify(character.name)}-${character.uid}`,
       name: character.name,
       lastmod: new Date().toISOString().split('T')[0] // Today's date for lastmod
     }));
   } catch (error) {
-    console.error('Error fetching characters for sitemap:', error);
+    console.error('Error processing characters for sitemap:', error);
     
     // Return fallback data for main characters
     return [
-      { slug: 'james-kirk', name: 'James T. Kirk', lastmod: new Date().toISOString().split('T')[0] },
-      { slug: 'jean-luc-picard', name: 'Jean-Luc Picard', lastmod: new Date().toISOString().split('T')[0] },
-      { slug: 'benjamin-sisko', name: 'Benjamin Sisko', lastmod: new Date().toISOString().split('T')[0] },
-      { slug: 'kathryn-janeway', name: 'Kathryn Janeway', lastmod: new Date().toISOString().split('T')[0] },
-      { slug: 'spock', name: 'Spock', lastmod: new Date().toISOString().split('T')[0] },
-      { slug: 'data', name: 'Data', lastmod: new Date().toISOString().split('T')[0] },
-      { slug: 'worf', name: 'Worf', lastmod: new Date().toISOString().split('T')[0] }
+      { slug: 'james-t-kirk-CHMA0000001234', name: 'James T. Kirk', lastmod: new Date().toISOString().split('T')[0] },
+      { slug: 'jean-luc-picard-CHMA0000005678', name: 'Jean-Luc Picard', lastmod: new Date().toISOString().split('T')[0] },
+      { slug: 'benjamin-sisko-CHMA0000009012', name: 'Benjamin Sisko', lastmod: new Date().toISOString().split('T')[0] },
+      { slug: 'kathryn-janeway-CHMA0000003456', name: 'Kathryn Janeway', lastmod: new Date().toISOString().split('T')[0] },
+      { slug: 'spock-CHMA0000007890', name: 'Spock', lastmod: new Date().toISOString().split('T')[0] },
+      { slug: 'data-CHMA0000002345', name: 'Data', lastmod: new Date().toISOString().split('T')[0] },
+      { slug: 'worf-CHMA0000006789', name: 'Worf', lastmod: new Date().toISOString().split('T')[0] }
     ];
   }
 }

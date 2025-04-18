@@ -13,31 +13,39 @@ export async function get() {
 }
 
 function generateSitemap(series, characters) {
+  const baseUrl = 'https://star-trek-timelines.netlify.app';
+  const today = new Date().toISOString().split('T')[0];
+  
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main pages -->
   <url>
-    <loc>https://star-trek-timelines.netlify.app/</loc>
+    <loc>${baseUrl}/</loc>
+    <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://star-trek-timelines.netlify.app/series/</loc>
+    <loc>${baseUrl}/series/</loc>
+    <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://star-trek-timelines.netlify.app/timeline/</loc>
+    <loc>${baseUrl}/timeline/</loc>
+    <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://star-trek-timelines.netlify.app/characters/</loc>
+    <loc>${baseUrl}/characters/</loc>
+    <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://star-trek-timelines.netlify.app/about/</loc>
+    <loc>${baseUrl}/about/</loc>
+    <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -45,7 +53,8 @@ function generateSitemap(series, characters) {
   <!-- Series pages -->
   ${series.map(s => `
   <url>
-    <loc>https://star-trek-timelines.netlify.app/series/${s.slug}/</loc>
+    <loc>${baseUrl}/series/${s.slug}/</loc>
+    <lastmod>${s.lastmod || today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>`).join('')}
@@ -53,9 +62,10 @@ function generateSitemap(series, characters) {
   <!-- Character pages -->
   ${characters.map(c => `
   <url>
-    <loc>https://star-trek-timelines.netlify.app/characters/${c.slug}/</loc>
+    <loc>${baseUrl}/characters/${c.slug}/</loc>
+    <lastmod>${c.lastmod || today}</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>`).join('')}
 </urlset>`;
 }
