@@ -234,3 +234,21 @@
     - **Fix:** Modified the character-detail.cjs function to first try finding characters by UID, and then fall back to slugified name if not found.
 
   - **Outcome:** All character images now display correctly on all pages, the "important" checkbox filter works correctly, and character detail pages load without errors with both slugified names and direct UIDs.
+## 2025-04-18
+
+- **Implemented Series Page with Filtering, Pagination, and Image Handling**
+  - Created a Netlify function (`stapi-series-proxy.js`) to proxy requests to the STAPI API for series data
+  - Developed a script (`build-series-cache.mjs`) to fetch and cache series data in `src/data/series.json`
+  - Enhanced the series listing page with:
+    - Filtering by production company, original network, and decade/era
+    - Search functionality with debouncing
+    - Pagination with proper navigation
+    - Progressive image loading with fallbacks
+    - Toggle between in-universe chronology and release order views
+  - Created a detailed series page template with:
+    - Series metadata (years, stardate, seasons, episodes, etc.)
+    - Memory Alpha integration for images and descriptions
+    - Timeline placement information
+    - Responsive layout for all screen sizes
+  - Updated netlify.toml to add the redirect for the series API endpoint
+  - Fixed character deduplication for Spock entries

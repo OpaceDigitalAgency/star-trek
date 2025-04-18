@@ -93,11 +93,38 @@ function isActorName(name) {
   return false;
 }
 
+// Helper function to normalize character names for better matching
+function normalizeCharacterName(name) {
+  if (!name) return '';
+  
+  // Convert to lowercase
+  let normalized = name.toLowerCase();
+  
+  // Remove common prefixes
+  const prefixes = ["admiral", "captain", "commander", "lieutenant", "ensign", "doctor", "dr.", "gul", "legate", "kai", "mr.", "mrs.", "ms.", "professor", "prof."];
+  for (const prefix of prefixes) {
+    if (normalized.startsWith(prefix + " ")) {
+      normalized = normalized.substring(prefix.length + 1);
+    }
+  }
+  
+  // Remove suffixes like "Jr." or "III"
+  normalized = normalized.replace(/\s+(jr\.?|sr\.?|i{1,3}|iv|v)$/i, '');
+  
+  // Remove middle initials (like "James T. Kirk" -> "james kirk")
+  normalized = normalized.replace(/\b[a-z]\.\s+/g, ' ');
+  
+  // Trim and remove extra spaces
+  normalized = normalized.trim().replace(/\s+/g, ' ');
+  
+  return normalized;
+}
+
 // Helper function to identify potential character duplicates
 function findPotentialDuplicates(characters) {
   // Map to store character names and their corresponding entries
   const characterMap = new Map();
-  const actorMap = new Map();
+  const normalizedCharacterMap = new Map(); // For normalized character names
   
   // Populate the maps
   for (const character of characters) {
@@ -105,37 +132,51 @@ function findPotentialDuplicates(characters) {
     
     if (!name) continue;
     
-    // Check if it's likely an actor name
-    if (isActorName(name)) {
-      if (!actorMap.has(name)) {
-        actorMap.set(name, []);
+    // Store all characters by their exact name
+    if (!characterMap.has(name)) {
+      characterMap.set(name, []);
+    }
+    characterMap.get(name).push(character);
+    
+    // Also store with normalized name for fuzzy matching
+    const normalizedName = normalizeCharacterName(name);
+    if (normalizedName && normalizedName !== name.toLowerCase()) {
+      if (!normalizedCharacterMap.has(normalizedName)) {
+        normalizedCharacterMap.set(normalizedName, []);
       }
-      actorMap.get(name).push(character);
-    } else {
-      // It's a character name
-      if (!characterMap.has(name)) {
-        characterMap.set(name, []);
-      }
-      characterMap.get(name).push(character);
+      normalizedCharacterMap.get(normalizedName).push(character);
     }
   }
   
   // Find duplicates (entries with more than one character)
   const duplicates = new Map();
   
-  // Check actor duplicates
-  for (const [name, entries] of actorMap.entries()) {
+  // Check exact name duplicates
+  for (const [name, entries] of characterMap.entries()) {
     if (entries.length > 1) {
       duplicates.set(name, entries);
     }
   }
   
-  // Check character duplicates that might be the same actor
-  for (const [name, entries] of characterMap.entries()) {
+  // Check normalized character name duplicates
+  for (const [normalizedName, entries] of normalizedCharacterMap.entries()) {
     if (entries.length > 1) {
-      // Additional logic could be added here to identify if these are truly duplicates
-      // For now, we'll focus on the actor duplicates
+      // For normalized names, use the normalized name as the key with a prefix
+      // to avoid conflicts with exact name matches
+      duplicates.set(`normalized:${normalizedName}`, entries);
     }
+  }
+  
+  // Special case for Spock - manually group all Spock entries
+  const spockEntries = [];
+  for (const character of characters) {
+    if (character.name && character.name.toLowerCase().includes('spock')) {
+      spockEntries.push(character);
+    }
+  }
+  
+  if (spockEntries.length > 1) {
+    duplicates.set('Spock (all variations)', spockEntries);
   }
   
   return duplicates;
@@ -159,6 +200,36 @@ async function handleDuplicateActors() {
     // First, mark all characters as "keep: false" by default
     for (const character of characters) {
       character.keep = false;
+    }
+    
+    // Special handling for Spock - directly find and mark the best Spock entry
+    const spockEntries = characters.filter(c => c.name === 'Spock');
+    console.log(`Found ${spockEntries.length} entries with exact name 'Spock'`);
+    
+    if (spockEntries.length > 1) {
+      // Find the most complete Spock entry
+      let bestSpock = spockEntries[0];
+      let maxScore = scoreCharacterCompleteness(bestSpock);
+      
+      for (let i = 1; i < spockEntries.length; i++) {
+        const score = scoreCharacterCompleteness(spockEntries[i]);
+        console.log(`Spock entry ${i+1} (${spockEntries[i].uid}) has score ${score}`);
+        if (score > maxScore) {
+          maxScore = score;
+          bestSpock = spockEntries[i];
+        }
+      }
+      
+      // Mark the best Spock as keep: true
+      bestSpock.keep = true;
+      console.log(`Directly selected Spock entry with UID ${bestSpock.uid} as the most complete (score: ${maxScore})`);
+      
+      // Add all Spock UIDs to the duplicateUIDs set
+      for (const spock of spockEntries) {
+        if (spock.uid) {
+          duplicateUIDs.add(spock.uid);
+        }
+      }
     }
     
     // Process each set of duplicates - mark the most complete as "keep: true"
@@ -208,6 +279,14 @@ async function handleDuplicateActors() {
     console.log(`Added "keep" flag to ${keepCount} records from duplicate sets`);
     console.log(`Added "keep" flag to ${uniqueCount} unique records`);
     console.log(`Total records marked as "keep": ${keepCount + uniqueCount}`);
+    
+    // Final check for Spock entries
+    const finalSpockEntries = characters.filter(c => c.name === 'Spock');
+    console.log(`\nFinal check for Spock entries:`);
+    console.log(`Found ${finalSpockEntries.length} entries with exact name 'Spock'`);
+    finalSpockEntries.forEach((spock, i) => {
+      console.log(`Spock ${i+1}: UID=${spock.uid}, keep=${spock.keep}, score=${scoreCharacterCompleteness(spock)}`);
+    });
     
     // Write the updated data back to the files
     console.log('Writing updated data to characters.json...');

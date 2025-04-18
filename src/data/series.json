@@ -1,0 +1,190 @@
+[
+  {
+    "uid": "SEMA0000073238",
+    "title": "Star Trek: Deep Space Nine",
+    "abbreviation": "DS9",
+    "productionStartYear": 1992,
+    "productionEndYear": 1999,
+    "originalRunStartDate": "1993-01-03",
+    "originalRunEndDate": "1999-06-02",
+    "seasonsCount": 7,
+    "episodesCount": 173,
+    "featureLengthEpisodesCount": 3,
+    "productionCompany": {
+      "uid": "COMA0000001845",
+      "name": "Paramount Pictures"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000052430",
+      "name": "CBS Studios"
+    },
+    "years": "1992-1999",
+    "stardate": "2369-2375",
+    "image": "/images/placeholder-ds9.jpg",
+    "slug": "SEMA0000073238",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F39%2FSite-community-image%2Frevision%2Flatest%3Fcb%3D20241212154521%26path-prefix%3Den",
+    "wikiSummary": "Aside from the series, <i><a href=\"/wiki/Star_Trek:_Deep_Space_Nine\" title=\"Star Trek: Deep Space Nine\">Star Trek: Deep Space Nine</a></i>, <b>Deep Space Nine</b> may refer to:\n",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Deep%20Space%20Nine"
+  },
+  {
+    "uid": "SEMA0000201665",
+    "title": "Star Trek: Discovery",
+    "abbreviation": "DIS",
+    "productionStartYear": 2017,
+    "productionEndYear": null,
+    "originalRunStartDate": "2017-09-24",
+    "originalRunEndDate": null,
+    "seasonsCount": 4,
+    "episodesCount": 55,
+    "featureLengthEpisodesCount": 0,
+    "productionCompany": {
+      "uid": "COMA0000052430",
+      "name": "CBS Studios"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000201662",
+      "name": "Paramount+"
+    },
+    "years": "2017-Present",
+    "stardate": "2255-2258",
+    "image": "/images/placeholder-disco.jpg",
+    "slug": "SEMA0000201665",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F48%2FUSS_Discovery_in_Klingon_space.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20180221180657%26path-prefix%3Den",
+    "wikiSummary": "<i><b>Star Trek: Discovery</b></i> is the seventh series set in the <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> universe. Created by <a href=\"/wiki/Bryan_Fuller\" title=\"Bryan Fuller\">Bryan Fuller</a> and <a href=\"/wiki/Alex_Kurtzman\" title=\"Alex Kurtzman\">Alex Kurtzman</a>, <i>Discovery</i> was originally set roughly a decade before <i><a href=\"/wiki/Star_Trek:_The_Original_Series\" title=\"Star Trek: The Original Series\">Star Trek: The Original Series</a></i>, set primarily aboard the <a href=\"/wiki/Starship\" title=\"Starship\">starship</a> <a href=\"/wiki/USS_Discovery\" title=\"USS Discovery\">USS <i>Discovery</i></a>, before jumping from the <a href=\"/wiki/23rd_century\" title=\"23rd century\">23rd century</a> to the <a href=\"/wiki/32nd_century\" title=\"32nd century\">32nd century</a>. \n",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Discovery"
+  },
+  {
+    "uid": "SEMA0000103435",
+    "title": "Star Trek: Enterprise",
+    "abbreviation": "ENT",
+    "productionStartYear": 2001,
+    "productionEndYear": 2005,
+    "originalRunStartDate": "2001-09-26",
+    "originalRunEndDate": "2005-05-13",
+    "seasonsCount": 4,
+    "episodesCount": 97,
+    "featureLengthEpisodesCount": 1,
+    "productionCompany": {
+      "uid": "COMA0000001845",
+      "name": "Paramount Pictures"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000021844",
+      "name": "UPN"
+    },
+    "years": "2001-2005",
+    "stardate": "2151-2155",
+    "image": "/images/placeholder-ent.jpg",
+    "slug": "SEMA0000103435",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F39%2FSite-community-image%2Frevision%2Flatest%3Fcb%3D20241212154521%26path-prefix%3Den",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Enterprise"
+  },
+  {
+    "uid": "SEMA0000238047",
+    "title": "Star Trek: Picard",
+    "abbreviation": "PIC",
+    "productionStartYear": 2019,
+    "productionEndYear": 2022,
+    "originalRunStartDate": "2020-01-23",
+    "originalRunEndDate": "2023-04-20",
+    "seasonsCount": 3,
+    "episodesCount": 30,
+    "featureLengthEpisodesCount": 0,
+    "productionCompany": {
+      "uid": "COMA0000052430",
+      "name": "CBS Studios"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000201662",
+      "name": "Paramount+"
+    },
+    "years": "2019-2022",
+    "stardate": "2399-2401",
+    "image": "/images/placeholder-picard.jpg",
+    "slug": "SEMA0000238047",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F1%2F1c%2FLa_Sirena%252C_fore.png%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20200229160032%26path-prefix%3Den",
+    "wikiSummary": "<i><b>Star Trek: Picard</b></i> is the eighth main series set in the <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> universe, the ninth including the companion series <i><a href=\"/wiki/Star_Trek:_Short_Treks\" title=\"Star Trek: Short Treks\">Star Trek: Short Treks</a></i>, and the eleventh <i>Star Trek</i> series overall. <i>Picard</i> is produced by <a href=\"/wiki/CBS_Studios\" title=\"CBS Studios\">CBS Studios</a> and stars <a href=\"/wiki/Patrick_Stewart\" title=\"Patrick Stewart\">Patrick Stewart</a>, reprising the role of <a href=\"/wiki/Jean-Luc_Picard\" title=\"Jean-Luc Picard\">Jean-Luc Picard</a> from <i><a href=\"/wiki/Star_Trek:_The_Next_Generation\" title=\"Star Trek: The Next Generation\">Star Trek: The Next Generation</a></i>. <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://x.com/startrekcbs/status/1025841138022805506\">[1]</a> The new series is set twenty years after the events of <a href=\"/wiki/Star_Trek_Nemesis\" title=\"Star Trek Nemesis\"><span style=\"cursor:help;\" title=\"Star Trek Nemesis (FLM 10, TNG 4)\"><i>Star Trek Nemesis</i></span></a>, <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://x.com/TrekCore/status/1025842567168974848\">[2]</a> dealing with \"the new chapter in Picard's life.\"\n",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Picard"
+  },
+  {
+    "uid": "SEMA0000034504",
+    "title": "Star Trek: The Animated Series",
+    "abbreviation": "TAS",
+    "productionStartYear": 1973,
+    "productionEndYear": 1974,
+    "originalRunStartDate": "1973-09-08",
+    "originalRunEndDate": "1974-10-12",
+    "seasonsCount": 2,
+    "episodesCount": 22,
+    "featureLengthEpisodesCount": 0,
+    "productionCompany": {
+      "uid": "COMA0000026671",
+      "name": "Filmation"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000006521",
+      "name": "NBC"
+    },
+    "years": "1973-1974",
+    "stardate": "2269-2270",
+    "image": "/images/placeholder-tas.jpg",
+    "slug": "SEMA0000034504",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F04%2FUSS_Enterprise%252C_2270.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20061126015151%26path-prefix%3Den",
+    "wikiSummary": "<i><b>Star Trek: The Animated Series</b></i>, originally and formally titled <i><b>Star Trek</b></i>, also known as <i><b>The Animated Adventures of <a href=\"/wiki/Gene_Roddenberry\" title=\"Gene Roddenberry\">Gene Roddenberry</a>'s Star Trek</b></i> and <i><b>The Cartoon Adventures of Gene Roddenberry's Star Trek</b></i>, was a continuation of the voyages of the <a href=\"/wiki/USS_Enterprise_(NCC-1701)\" title=\"USS Enterprise (NCC-1701)\">USS <i>Enterprise</i></a>, previously featured in <i><a href=\"/wiki/Star_Trek:_The_Original_Series\" title=\"Star Trek: The Original Series\">Star Trek: The Original Series</a></i>, and showed the fourth and fifth years of its five year voyage.\n",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/The%20Animated%20Series"
+  },
+  {
+    "uid": "SEMA0000062876",
+    "title": "Star Trek: The Next Generation",
+    "abbreviation": "TNG",
+    "productionStartYear": 1987,
+    "productionEndYear": 1994,
+    "originalRunStartDate": "1987-09-28",
+    "originalRunEndDate": "1994-05-23",
+    "seasonsCount": 7,
+    "episodesCount": 176,
+    "featureLengthEpisodesCount": 2,
+    "productionCompany": {
+      "uid": "COMA0000001845",
+      "name": "Paramount Pictures"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000052430",
+      "name": "CBS Studios"
+    },
+    "years": "1987-1994",
+    "stardate": "2364-2370",
+    "image": "/images/placeholder-tng.jpg",
+    "slug": "SEMA0000062876",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F4b%2FUSS_Enterprise-D%252C_These_Are_the_Voyages.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20190727031723%26path-prefix%3Den",
+    "wikiSummary": "<i><b>Star Trek: The Next Generation</b></i>, often abbreviated to <b>TNG</b>, is the second live-action <i>Star Trek</i> television series, and the first set in the <a href=\"/wiki/24th_century\" title=\"24th century\">24th century</a>. Like its predecessors, it was created by <a href=\"/wiki/Gene_Roddenberry\" title=\"Gene Roddenberry\">Gene Roddenberry</a>. Produced at <a href=\"/wiki/Paramount_Pictures\" title=\"Paramount Pictures\">Paramount Pictures</a>, it aired in first-run <a href=\"/wiki/Syndication\" title=\"Syndication\">syndication</a>, by <a href=\"/wiki/Paramount_Television\" class=\"mw-redirect\" title=\"Paramount Television\">Paramount Television</a> in the US, from <a href=\"/wiki/September_1987\" class=\"mw-redirect\" title=\"September 1987\">September 1987</a> to <a href=\"/wiki/May_1994\" class=\"mw-redirect\" title=\"May 1994\">May 1994</a>. The series was set in the 24th century and featured the voyages of the <a href=\"/wiki/Starship\" title=\"Starship\">starship</a> <a href=\"/wiki/USS_Enterprise_(NCC-1701-D)\" title=\"USS Enterprise (NCC-1701-D)\">USS <i>Enterprise</i>-D</a> under <a href=\"/wiki/Captain\" title=\"Captain\">Captain</a> <a href=\"/wiki/Jean-Luc_Picard\" title=\"Jean-Luc Picard\">Jean-Luc Picard</a>. \n",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/The%20Next%20Generation"
+  },
+  {
+    "uid": "SEMA0000000029",
+    "title": "Star Trek: Voyager",
+    "abbreviation": "VOY",
+    "productionStartYear": 1994,
+    "productionEndYear": 2001,
+    "originalRunStartDate": "1995-01-16",
+    "originalRunEndDate": "2001-05-23",
+    "seasonsCount": 7,
+    "episodesCount": 168,
+    "featureLengthEpisodesCount": 4,
+    "productionCompany": {
+      "uid": "COMA0000001845",
+      "name": "Paramount Pictures"
+    },
+    "originalBroadcaster": {
+      "uid": "COMA0000021844",
+      "name": "UPN"
+    },
+    "years": "1994-2001",
+    "stardate": "2371-2378",
+    "image": "/images/placeholder-voy.jpg",
+    "slug": "SEMA0000000029",
+    "wikiImage": "https://star-trek-timelines.netlify.app/.netlify/functions/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F9f%2FIntrepid_class_top_quarter_aft.jpg%2Frevision%2Flatest%3Fcb%3D20070320211144%26path-prefix%3Den",
+    "wikiSummary": "<i><b>Star Trek: Voyager</b></i> is the fifth <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> series. It was created by <a href=\"/wiki/Rick_Berman\" title=\"Rick Berman\">Rick Berman</a>, <a href=\"/wiki/Michael_Piller\" title=\"Michael Piller\">Michael Piller</a>, and <a href=\"/wiki/Jeri_Taylor\" title=\"Jeri Taylor\">Jeri Taylor</a>, and ran on <a href=\"/wiki/UPN\" title=\"UPN\">UPN</a>, as the network's first-ever series, for seven seasons in the <a href=\"/wiki/USA\" class=\"mw-redirect\" title=\"USA\">USA</a>, from <a href=\"/wiki/1995_(production)\" title=\"1995 (production)\">1995</a> to <a href=\"/wiki/2001_(production)\" title=\"2001 (production)\">2001</a>. In some areas without local access to UPN, it was offered to independent stations through <a href=\"/wiki/Paramount_Pictures\" title=\"Paramount Pictures\">Paramount Pictures</a>, for its first six seasons. The series is best known for its familial crew, science fiction-based plots, engaging action sequences, and light humor. The writers often noted that many episodes had underlying themes and messages or were metaphors for current social issues. This is the first <i>Star Trek</i> series to feature a <a href=\"/wiki/Kathryn_Janeway\" title=\"Kathryn Janeway\">female captain</a> in a leading role. However, <a href=\"/wiki/Kathryn_Janeway\" title=\"Kathryn Janeway\">Kathryn Janeway</a> herself is not the first female captain to be seen within Star Trek as a whole. Additionally, the show gained in popularity for its storylines which frequently featured the <a href=\"/wiki/Borg\" title=\"Borg\">Borg</a>. <i>Voyager</i> follows the events of <i><a href=\"/wiki/Star_Trek:_The_Next_Generation\" title=\"Star Trek: The Next Generation\">Star Trek: The Next Generation</a></i> and ran alongside <i><a href=\"/wiki/Star_Trek:_Deep_Space_Nine\" title=\"Star Trek: Deep Space Nine\">Star Trek: Deep Space Nine</a></i> during its first five seasons.\n",
+    "wikiUrl": "https://memory-alpha.fandom.com/wiki/Voyager"
+  }
+]

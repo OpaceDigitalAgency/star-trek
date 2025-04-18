@@ -1,0 +1,216 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
+import { slugify } from '../../utils/slugify.js';
+
+export async function getStaticPaths() {
+  // Fetch all series data
+  let allSeries = [];
+  
+  try {
+    // Try to import the local series data
+    allSeries = await import('../../data/series.json').then(m => m.default);
+  } catch (error) {
+    console.error('Failed to import local series data, fetching from STAPI:', error);
+    
+    // Fallback to STAPI API if local data is not available
+    allSeries = await stapiService.getSeries();
+    
+    // Filter out irrelevant entries and ensure we have the main series
+    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
+                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
+                        "Star Trek: Picard", "Star Trek: The Animated Series"];
+    
+    allSeries = allSeries.filter(series => mainSeries.includes(series.title));
+    
+    // Map STAPI data to our format
+    allSeries = allSeries.map(series => ({
+      ...series,
+      years: extractYears(series),
+      stardate: extractStardateYears(series),
+      image: stapiService.getImageUrl(series.title, 'series'),
+      slug: series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    }));
+  }
+  
+  // Create paths for each series
+  return allSeries.map(series => {
+    return {
+      params: { slug: series.slug || slugify(series.title) },
+      props: { series }
+    };
+  });
+}
+
+const { series } = Astro.props;
+
+// Create JSON-LD schema for series page
+const seriesSchema = {
+  "@context": "https://schema.org",
+  "@type": "TVSeries",
+  "name": series.title,
+  "alternateName": series.abbreviation,
+  "description": series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '') : `Star Trek series that aired from ${series.years}.`,
+  "url": `https://star-trek-timelines.netlify.app/series/${series.slug}/`,
+  "image": series.wikiImage || series.image || "/images/stars-placeholder.jpg",
+  "temporalCoverage": series.years,
+  "numberOfEpisodes": series.episodes || series.episodesCount,
+  "numberOfSeasons": series.seasons || series.seasonsCount,
+  "productionCompany": series.productionCompany,
+  "countryOfOrigin": "United States",
+  "inLanguage": "English"
+};
+---
+
+<Layout 
+  title={`${series.title} | Star Trek Series Profile`}
+  description={`Learn about ${series.title}, a Star Trek series that aired from ${series.years}.`}
+  schemaData={seriesSchema}
+>
+  <div class="container mx-auto px-4 py-12">
+    <div class="lcars-header mb-8">
+      <div class="lcars-header-content">
+        <h1 class="text-3xl">{series.title}</h1>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="md:col-span-1">
+        <div class="lcars-panel">
+          <div class="lcars-top-bar flex">
+            <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+            <div class="flex-1 h-8 bg-starfleet-blue"></div>
+          </div>
+          
+          <div class="panel-content p-6">
+            <div class="series-image aspect-video overflow-hidden mb-4">
+              <img
+                src={series.wikiImage || series.image || "/images/stars-placeholder.jpg"}
+                alt={series.title}
+                class="w-full h-full object-cover"
+                onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
+              />
+            </div>
+            
+            <div class="series-meta space-y-2 mt-6">
+              <div class="flex justify-between">
+                <span class="text-gray-400">Abbreviation:</span>
+                <span class="text-white">{series.abbreviation || "N/A"}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Air Date:</span>
+                <span class="text-white">{series.years}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Stardate:</span>
+                <span class="text-white">{series.stardate}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Seasons:</span>
+                <span class="text-white">{series.seasons || series.seasonsCount || "?"}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Episodes:</span>
+                <span class="text-white">{series.episodes || series.episodesCount || "?"}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Network:</span>
+                <span class="text-white">{series.originalNetwork || "Various"}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-400">Production:</span>
+                <span class="text-white">{series.productionCompany || "Paramount"}</span>
+              </div>
+            </div>
+            
+            {series.wikiUrl && (
+              <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4">
+                View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+      
+      <div class="md:col-span-2">
+        <div class="lcars-panel">
+          <div class="lcars-top-bar flex">
+            <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+            <div class="flex-1 h-8 bg-starfleet-blue"></div>
+            <div class="w-16 h-8 bg-starfleet-red"></div>
+          </div>
+          
+          <div class="panel-content p-6">
+            <h2 class="text-2xl text-starfleet-gold mb-4">Series Overview</h2>
+            
+            <div class="series-description text-gray-300 mb-6 space-y-4">
+              {series.wikiSummary ? (
+                <div set:html={series.wikiSummary} />
+              ) : (
+                <p>{series.description || `${series.title} is a Star Trek series that aired from ${series.years}.`}</p>
+              )}
+            </div>
+            
+            <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
+            <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
+              <p class="text-gray-300">
+                {series.title} is set in the years {series.stardate}, {
+                  series.title.includes("Discovery") && series.stardate.includes("3188") ? 
+                  "initially during the 2250s before the crew time-traveled to the 32nd century." : 
+                  `during the ${series.title.includes("Original") ? "Five-Year Mission" : 
+                    series.title.includes("Next Generation") ? "24th century" : 
+                    series.title.includes("Deep Space Nine") ? "Dominion War era" : 
+                    series.title.includes("Voyager") ? "Delta Quadrant expedition" : 
+                    series.title.includes("Enterprise") ? "early days of Starfleet" : 
+                    series.title.includes("Picard") ? "post-Dominion War era" : 
+                    "Star Trek timeline"}.`
+                }
+              </p>
+            </div>
+            
+            <div class="mt-8">
+              <a href="/series/" class="inline-flex items-center text-starfleet-gold hover:underline">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to Series
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .series-image {
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  }
+  
+  .series-meta {
+    border-top: 1px solid rgba(0, 178, 255, 0.3);
+    padding-top: 1rem;
+  }
+  
+  .timeline-info {
+    position: relative;
+  }
+  
+  .timeline-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(0, 178, 255, 0.05),
+      rgba(0, 178, 255, 0.05) 10px,
+      rgba(0, 0, 0, 0) 10px,
+      rgba(0, 0, 0, 0) 20px
+    );
+    pointer-events: none;
+  }
+</style>

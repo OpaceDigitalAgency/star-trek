@@ -1,159 +1,205 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
+import ProgressiveImage from '../../components/ProgressiveImage.js';
 
-// Fetch data from STAPI
-let allSeries = await stapiService.getSeries();
+// SEO metadata for pagination
+const currentPage = 1; // Initial page is always 1 for SSR
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
 
-// Map STAPI data to our format
-allSeries = allSeries.map(series => ({
-  title: series.title,
-  slug: series.uid,
-  abbreviation: series.abbreviation || "ST",
-  years: extractYears(series),
-  stardate: extractStardateYears(series),
-  seasons: series.seasonsCount || "?",
-  episodes: series.episodesCount || "?",
-  image: stapiService.getImageUrl(series.title, 'series'),
-  description: series.productionEndYear 
-    ? `${series.abbreviation || "Star Trek"} series that ran from ${series.productionStartYear} to ${series.productionEndYear}.` 
-    : `${series.abbreviation || "Star Trek"} series that started in ${series.productionStartYear}.`
-}));
+// Pagination settings
+const PAGE_SIZE = 12; // Number of series to display per page
+let initialSeries = [];
+let totalPages = 1;
+let totalSeries = 0;
 
-// Filter out irrelevant entries and ensure we have the main series
-const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
-                    "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
-                    "Star Trek: Picard", "Star Trek: The Animated Series"];
-
-allSeries = allSeries.filter(series => mainSeries.includes(series.title));
-
-// If STAPI fails or returns insufficient data, use fallback
-if (allSeries.length < 5) {
-  allSeries = [
-    {
-      title: "Star Trek: The Original Series",
-      slug: "the-original-series",
-      abbreviation: "TOS",
-      years: "1966-1969",
-      stardate: "2265-2269",
-      seasons: 3,
-      episodes: 79,
-      image: stapiService.getImageUrl("The Original Series", 'series'),
-      description: "The adventures of the USS Enterprise under the command of Captain James T. Kirk."
-    },
-    {
-      title: "Star Trek: The Animated Series",
-      slug: "the-animated-series",
-      abbreviation: "TAS",
-      years: "1973-1974",
-      stardate: "2269-2270",
-      seasons: 2,
-      episodes: 22,
-      image: stapiService.getImageUrl("The Animated Series", 'series'),
-      description: "Continuing the five-year mission of the USS Enterprise in animated form."
-    },
-    {
-      title: "Star Trek: The Next Generation",
-      slug: "the-next-generation",
-      abbreviation: "TNG",
-      years: "1987-1994",
-      stardate: "2364-2370",
-      seasons: 7,
-      episodes: 178,
-      image: stapiService.getImageUrl("The Next Generation", 'series'),
-      description: "Set almost 100 years after the original series, it follows a new crew aboard the Enterprise-D."
-    },
-    {
-      title: "Star Trek: Deep Space Nine",
-      slug: "deep-space-nine",
-      abbreviation: "DS9",
-      years: "1993-1999",
-      stardate: "2369-2375",
-      seasons: 7,
-      episodes: 176,
-      image: stapiService.getImageUrl("Deep Space Nine", 'series'),
-      description: "Set on a space station near the newly discovered Bajoran wormhole."
-    },
-    {
-      title: "Star Trek: Voyager",
-      slug: "voyager",
-      abbreviation: "VOY",
-      years: "1995-2001",
-      stardate: "2371-2378",
-      seasons: 7,
-      episodes: 172,
-      image: stapiService.getImageUrl("Voyager", 'series'),
-      description: "Following the USS Voyager, stranded 70,000 light-years from Earth."
-    },
-    {
-      title: "Star Trek: Enterprise",
-      slug: "enterprise",
-      abbreviation: "ENT",
-      years: "2001-2005",
-      stardate: "2151-2155",
-      seasons: 4,
-      episodes: 98,
-      image: stapiService.getImageUrl("Enterprise", 'series'),
-      description: "Set before the founding of the Federation, following Earth's first deep space explorers."
-    },
-    {
-      title: "Star Trek: Discovery",
-      slug: "discovery",
-      abbreviation: "DISC",
-      years: "2017-2024",
-      stardate: "2255-2258, 3188-3190",
-      seasons: 5,
-      episodes: 65,
-      image: stapiService.getImageUrl("Discovery", 'series'),
-      description: "Following the adventures of the USS Discovery and later 32nd century exploration."
-    },
-    {
-      title: "Star Trek: Picard",
-      slug: "picard",
-      abbreviation: "PIC",
-      years: "2020-2023",
-      stardate: "2399-2401",
-      seasons: 3,
-      episodes: 30,
-      image: stapiService.getImageUrl("Picard", 'series'),
-      description: "Following the later life of Jean-Luc Picard, decades after his retirement from Starfleet."
-    }
-  ];
+// Import the local series data at the top level
+let seriesLocalJson = [];
+try {
+  // Try to import the local series data
+  seriesLocalJson = await import('../../data/series.json').then(m => m.default);
+} catch (error) {
+  console.error('Failed to import local series data:', error);
+  // Will fall back to STAPI API below
 }
 
-// Sort by in-universe chronology (stardate)
-const seriesByChronology = [...allSeries].sort((a, b) => {
-  const aYear = parseInt(a.stardate.split('-')[0]);
-  const bYear = parseInt(b.stardate.split('-')[0]);
-  return aYear - bYear;
-});
-
-// Sort by release date
-const seriesByRelease = [...allSeries].sort((a, b) => {
-  const aYear = parseInt(a.years.split('-')[0]);
-  const bYear = parseInt(b.years.split('-')[0]);
-  return aYear - bYear;
-});
-
-// Enhance with Memory Alpha data for each series
-for (let i = 0; i < seriesByChronology.length; i++) {
-  try {
-    const series = seriesByChronology[i];
-    const wikiTitle = series.title.replace('Star Trek: ', '');
-    const wikiData = await stapiService.getMemoryAlphaContent(wikiTitle);
+// Fetch only the first page of series for the initial build
+try {
+  // Use local series data directly for the initial build if available
+  if (seriesLocalJson && seriesLocalJson.length > 0) {
+    import.meta.env.SSR && console.log('Using local series data for initial build');
     
-    // Enhance both arrays since they share the same underlying objects
-    if (wikiData.image) {
-      series.wikiImage = wikiData.image;
+    // Get the first page of series
+    initialSeries = seriesLocalJson.slice(0, PAGE_SIZE);
+    totalPages = Math.ceil(seriesLocalJson.length / PAGE_SIZE);
+    totalSeries = seriesLocalJson.length;
+  } else {
+    // Fallback to STAPI API if local data is not available
+    import.meta.env.SSR && console.log('Local series data not available, fetching from STAPI');
+    
+    // Fetch all series from STAPI
+    let allSeries = await stapiService.getSeries();
+    
+    // Filter out irrelevant entries and ensure we have the main series
+    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
+                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
+                        "Star Trek: Picard", "Star Trek: The Animated Series"];
+    
+    allSeries = allSeries.filter(series => mainSeries.includes(series.title));
+    
+    // If STAPI fails or returns insufficient data, use fallback
+    if (allSeries.length < 5) {
+      allSeries = [
+        {
+          title: "Star Trek: The Original Series",
+          uid: "SRMA0000001", // Made-up UID
+          abbreviation: "TOS",
+          productionStartYear: 1966,
+          productionEndYear: 1969,
+          seasonsCount: 3,
+          episodesCount: 79,
+          originalNetwork: "NBC",
+          productionCompany: "Desilu Productions"
+        },
+        {
+          title: "Star Trek: The Animated Series",
+          uid: "SRMA0000002", // Made-up UID
+          abbreviation: "TAS",
+          productionStartYear: 1973,
+          productionEndYear: 1974,
+          seasonsCount: 2,
+          episodesCount: 22,
+          originalNetwork: "NBC",
+          productionCompany: "Filmation"
+        },
+        {
+          title: "Star Trek: The Next Generation",
+          uid: "SRMA0000003", // Made-up UID
+          abbreviation: "TNG",
+          productionStartYear: 1987,
+          productionEndYear: 1994,
+          seasonsCount: 7,
+          episodesCount: 178,
+          originalNetwork: "Syndication",
+          productionCompany: "Paramount Television"
+        },
+        {
+          title: "Star Trek: Deep Space Nine",
+          uid: "SRMA0000004", // Made-up UID
+          abbreviation: "DS9",
+          productionStartYear: 1993,
+          productionEndYear: 1999,
+          seasonsCount: 7,
+          episodesCount: 176,
+          originalNetwork: "Syndication",
+          productionCompany: "Paramount Television"
+        },
+        {
+          title: "Star Trek: Voyager",
+          uid: "SRMA0000005", // Made-up UID
+          abbreviation: "VOY",
+          productionStartYear: 1995,
+          productionEndYear: 2001,
+          seasonsCount: 7,
+          episodesCount: 172,
+          originalNetwork: "UPN",
+          productionCompany: "Paramount Television"
+        },
+        {
+          title: "Star Trek: Enterprise",
+          uid: "SRMA0000006", // Made-up UID
+          abbreviation: "ENT",
+          productionStartYear: 2001,
+          productionEndYear: 2005,
+          seasonsCount: 4,
+          episodesCount: 98,
+          originalNetwork: "UPN",
+          productionCompany: "Paramount Television"
+        },
+        {
+          title: "Star Trek: Discovery",
+          uid: "SRMA0000007", // Made-up UID
+          abbreviation: "DISC",
+          productionStartYear: 2017,
+          productionEndYear: 2024,
+          seasonsCount: 5,
+          episodesCount: 65,
+          originalNetwork: "CBS All Access/Paramount+",
+          productionCompany: "CBS Studios"
+        },
+        {
+          title: "Star Trek: Picard",
+          uid: "SRMA0000008", // Made-up UID
+          abbreviation: "PIC",
+          productionStartYear: 2020,
+          productionEndYear: 2023,
+          seasonsCount: 3,
+          episodesCount: 30,
+          originalNetwork: "CBS All Access/Paramount+",
+          productionCompany: "CBS Studios"
+        }
+      ];
     }
-    if (wikiData.summary) {
-      series.wikiSummary = wikiData.summary;
+    
+    // Map STAPI data to our format
+    allSeries = allSeries.map(series => ({
+      ...series,
+      years: extractYears(series),
+      stardate: extractStardateYears(series),
+      image: stapiService.getImageUrl(series.title, 'series'),
+      slug: series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+    }));
+    
+    // Enhance with Memory Alpha data for each series
+    for (let i = 0; i < allSeries.length; i++) {
+      try {
+        const series = allSeries[i];
+        const wikiTitle = series.title.replace('Star Trek: ', '');
+        const wikiData = await stapiService.getMemoryAlphaContent(wikiTitle);
+        
+        if (wikiData.image) {
+          series.wikiImage = wikiData.image;
+        }
+        if (wikiData.summary) {
+          series.wikiSummary = wikiData.summary;
+        }
+        series.wikiUrl = wikiData.wikiUrl;
+      } catch (error) {
+        console.error(`Error fetching Memory Alpha data for series:`, error);
+      }
     }
-    series.wikiUrl = wikiData.wikiUrl;
-  } catch (error) {
-    console.error(`Error fetching Memory Alpha data for series:`, error);
+    
+    initialSeries = allSeries.slice(0, PAGE_SIZE);
+    totalPages = Math.ceil(allSeries.length / PAGE_SIZE);
+    totalSeries = allSeries.length;
   }
+  
+  console.log(`Initial build: Fetched ${initialSeries.length} series. Total series: ${totalSeries}, Total pages: ${totalPages}.`);
+  
+} catch (error) {
+  console.error('Error fetching initial series data:', error);
+  // Add fallback data if needed
+  initialSeries = [ /* Add fallback series objects here if API fails */ ];
+  totalSeries = initialSeries.length;
+  totalPages = 1;
 }
+
+// Extract production companies and networks for filter dropdowns
+const productionCompanies = [...new Set(initialSeries
+  .map(s => s.productionCompany)
+  .filter(Boolean)
+)].sort();
+
+const networks = [...new Set(initialSeries
+  .map(s => s.originalNetwork)
+  .filter(Boolean)
+)].sort();
+
+// Extract decades for filter dropdown
+const decades = [...new Set(initialSeries
+  .map(s => s.productionStartYear ? Math.floor(s.productionStartYear / 10) * 10 : null)
+  .filter(Boolean)
+)].sort();
 
 // Create JSON-LD schema for the series list page
 const seriesListSchema = {
@@ -172,14 +218,14 @@ const seriesListSchema = {
     "name": "Star Trek",
     "description": "Science fiction media franchise created by Gene Roddenberry"
   },
-  "hasPart": allSeries.map(series => ({
+  "hasPart": initialSeries.map(series => ({
     "@type": "TVSeries",
     "name": series.title,
     "alternateName": series.abbreviation,
     "url": `https://star-trek-timelines.netlify.app/series/${series.slug}/`,
     "temporalCoverage": series.years,
-    "numberOfEpisodes": series.episodes,
-    "numberOfSeasons": series.seasons
+    "numberOfEpisodes": series.episodes || series.episodesCount,
+    "numberOfSeasons": series.seasons || series.seasonsCount
   }))
 };
 ---
@@ -204,168 +250,494 @@ const seriesListSchema = {
       </div>
       
       <div class="panel-content p-6">
-        <p class="text-gray-300 mb-4">
+        <p class="text-gray-300 mb-6">
           Accessing Federation archives... Displaying all Star Trek television series spanning from the 1960s to today. 
           Each series expands the rich tapestry of the Star Trek universe, introducing new characters, 
           technologies, and interstellar civilizations.
         </p>
         
-        <div class="flex gap-4 my-6">
-          <button id="view-chronology" class="trek-button active">In-Universe Chronology</button>
-          <button id="view-release" class="trek-button">Release Order</button>
+        <div class="filters mb-8">
+          <div class="flex flex-wrap gap-4">
+            <!-- Production Company Filter -->
+            {productionCompanies.length > 0 && (
+              <div class="filter-group">
+                <h3 class="text-white text-lg mb-2">Production Company</h3>
+                <select
+                  id="company-filter"
+                  class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
+                >
+                  <option value="all">All Companies</option>
+                  {productionCompanies.map(company => (
+                    <option value={company}>{company}</option>
+                  ))}
+                </select>
+                <!-- chevron -->
+                <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
+                     viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
+              </div>
+            )}
+            
+            <!-- Network Filter -->
+            {networks.length > 0 && (
+              <div class="filter-group">
+                <h3 class="text-white text-lg mb-2">Original Network</h3>
+                <select
+                  id="network-filter"
+                  class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
+                >
+                  <option value="all">All Networks</option>
+                  {networks.map(network => (
+                    <option value={network}>{network}</option>
+                  ))}
+                </select>
+                <!-- chevron -->
+                <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
+                     viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
+              </div>
+            )}
+            
+            <!-- Decade Filter -->
+            {decades.length > 0 && (
+              <div class="filter-group">
+                <h3 class="text-white text-lg mb-2">Decade</h3>
+                <select
+                  id="decade-filter"
+                  class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
+                >
+                  <option value="all">All Decades</option>
+                  {decades.map(decade => (
+                    <option value={decade}>{decade}s</option>
+                  ))}
+                </select>
+                <!-- chevron -->
+                <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
+                     viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
+              </div>
+            )}
+            
+            <!-- View Toggle -->
+            <div class="filter-group ml-4">
+              <h3 class="text-white text-lg mb-2">View</h3>
+              <div class="flex gap-4">
+                <button id="view-chronology" class="trek-button active">In-Universe</button>
+                <button id="view-release" class="trek-button">Release Order</button>
+              </div>
+            </div>
+            
+            <!-- Search -->
+            <div class="filter-group ml-auto">
+              <h3 class="text-white text-lg mb-2">Search</h3>
+              <input
+                type="text"
+                id="search-input"
+                placeholder="Search series..."
+                class="appearance-none bg-space-black border border-starfleet-blue text-white p-2 rounded"
+              >
+            </div>
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- Series grid - chronological view (default) -->
-    <div id="chronology-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {seriesByChronology.map((series) => (
-        <a href={`/series/${series.slug}/`} class="series-card">
-          <div class="lcars-card-header flex">
-            <div class="w-16 h-6 bg-starfleet-gold rounded-tl-lg"></div>
-            <div class="flex-1 h-6 bg-starfleet-blue flex items-center justify-center">
-              <span class="text-sm font-bold">{series.abbreviation}</span>
-            </div>
+    <!-- Series container -->
+    <div
+      id="series-container"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+    />
+    
+    <!-- Pagination controls -->
+    <div class="flex justify-between items-center my-8">
+      <div class="series-count px-3 py-1 bg-space-black rounded-full text-white text-sm" id="series-count">
+        {totalSeries} series
+      </div>
+      
+      <div id="pagination-controls" class="flex justify-center items-center">
+        <div class="lcars-pagination flex items-center bg-space-black border border-starfleet-blue rounded-lg overflow-hidden">
+          <button id="prev-page" class="px-4 py-2 bg-starfleet-blue text-white hover:bg-starfleet-gold hover:text-space-black transition-colors">
+            Previous
+          </button>
+          <div class="px-4 py-2 text-white">
+            Page <span id="current-page-num">1</span> of <span id="total-pages">{totalPages}</span>
           </div>
-          
-          <div class="card-body bg-space-black bg-opacity-80 p-4 border-x border-starfleet-blue">
-            <div class="relative aspect-video mb-4 overflow-hidden">
-              <img 
-                src={series.wikiImage || series.image} 
-                alt={series.title} 
-                class="w-full h-full object-cover"
-                loading="lazy"
-                onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
-              />
-              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-2">
-                <span class="text-console-green text-sm font-mono">{series.stardate}</span>
-              </div>
-            </div>
-            
-            <h2 class="text-xl text-white font-semibold mb-2">{series.title}</h2>
-            
-            <div class="flex justify-between text-gray-400 text-sm mb-3">
-              <span>Aired: {series.years}</span>
-              <span>{series.seasons} seasons</span>
-            </div>
-            
-            <p class="text-gray-300 text-sm">{series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : series.description}</p>
-            
-            {series.wikiUrl && (
-              <div class="mt-3">
-                <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center" onclick="event.stopPropagation()">
-                  Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
-                </a>
-              </div>
-            )}
-          </div>
-          
-          <div class="lcars-card-footer flex">
-            <div class="w-10 h-6 bg-starfleet-red"></div>
-            <div class="flex-1 h-6 bg-console-blue"></div>
-            <div class="w-24 h-6 bg-starfleet-gold rounded-br-lg"></div>
-          </div>
-        </a>
-      ))}
+          <button id="next-page" class="px-4 py-2 bg-starfleet-blue text-white hover:bg-starfleet-gold hover:text-space-black transition-colors">
+            Next
+          </button>
+        </div>
+      </div>
     </div>
     
-    <!-- Series grid - release order view (hidden by default) -->
-    <div id="release-view" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden">
-      {seriesByRelease.map((series) => (
-        <a href={`/series/${series.slug}/`} class="series-card">
-          <div class="lcars-card-header flex">
-            <div class="w-16 h-6 bg-starfleet-gold rounded-tl-lg"></div>
-            <div class="flex-1 h-6 bg-starfleet-red flex items-center justify-center">
-              <span class="text-sm font-bold">{series.abbreviation}</span>
-            </div>
-          </div>
-          
-          <div class="card-body bg-space-black bg-opacity-80 p-4 border-x border-starfleet-red">
-            <div class="relative aspect-video mb-4 overflow-hidden">
-              <img 
-                src={series.wikiImage || series.image} 
-                alt={series.title} 
-                class="w-full h-full object-cover"
-                loading="lazy"
-                onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
-              />
-              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-2">
-                <span class="text-console-blue text-sm font-mono">{series.years}</span>
-              </div>
-            </div>
-            
-            <h2 class="text-xl text-white font-semibold mb-2">{series.title}</h2>
-            
-            <div class="flex justify-between text-gray-400 text-sm mb-3">
-              <span>In-Universe: {series.stardate}</span>
-              <span>{series.episodes} episodes</span>
-            </div>
-            
-            <p class="text-gray-300 text-sm">{series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : series.description}</p>
-            
-            {series.wikiUrl && (
-              <div class="mt-3">
-                <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center" onclick="event.stopPropagation()">
-                  Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
-                </a>
-              </div>
-            )}
-          </div>
-          
-          <div class="lcars-card-footer flex">
-            <div class="w-10 h-6 bg-starfleet-blue"></div>
-            <div class="flex-1 h-6 bg-console-blue"></div>
-            <div class="w-24 h-6 bg-starfleet-gold rounded-br-lg"></div>
-          </div>
-        </a>
-      ))}
+    <!-- No results message (hidden by default) -->
+    <div id="no-results" class="hidden text-center py-8">
+      <div class="lcars-panel p-6 inline-block">
+        <p class="text-console-blue text-xl">No series match your search criteria.</p>
+        <p class="text-white mt-2">Please adjust your filters or try a different search term.</p>
+      </div>
     </div>
   </div>
 </Layout>
 
+<script
+  id="initial-payload"
+  type="application/json"
+  set:html={JSON.stringify({
+    series: initialSeries,
+    totalPages: totalPages,
+    totalSeries: totalSeries,
+    pageSize: PAGE_SIZE,
+    productionCompanies: productionCompanies,
+    networks: networks,
+    decades: decades
+  })}
+/>
+
 <script>
-  // Toggle between chronology and release order views
-  const chronologyView = document.getElementById('chronology-view');
-  const releaseView = document.getElementById('release-view');
-  const chronologyBtn = document.getElementById('view-chronology');
-  const releaseBtn = document.getElementById('view-release');
-  
-  chronologyBtn.addEventListener('click', () => {
-    chronologyView.classList.remove('hidden');
-    releaseView.classList.add('hidden');
-    chronologyBtn.classList.add('active');
-    releaseBtn.classList.remove('active');
-  });
-  
-  releaseBtn.addEventListener('click', () => {
-    releaseView.classList.remove('hidden');
-    chronologyView.classList.add('hidden');
-    releaseBtn.classList.add('active');
-    chronologyBtn.classList.remove('active');
-  });
-  
-  // Lazy load images as they come into view
-  if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const lazyImage = entry.target;
-          if (lazyImage.dataset.src) {
-            lazyImage.src = lazyImage.dataset.src;
-            lazyImage.removeAttribute('data-src');
+  // Client-side STAPI client using the Netlify proxy
+  const stapiClient = {
+    PROXY_URL: '/api/series', // Use the proxy endpoint
+    
+    async getSeries(page = 0, pageSize = 12, filters = {}) {
+      try {
+        const params = new URLSearchParams({
+          pageNumber: page.toString(),
+          pageSize: pageSize.toString(),
+        });
+        
+        // Add filter parameters
+        for (const [key, value] of Object.entries(filters)) {
+          if (value && value !== 'all') { // Only add active filters
+            params.append(key, value);
           }
-          imageObserver.unobserve(lazyImage);
         }
-      });
+        
+        const url = `${this.PROXY_URL}?${params.toString()}`;
+        console.log(`Fetching via proxy: ${url}`); // Log URL
+        
+        const response = await fetch(url); // Fetch from the proxy
+        
+        if (!response.ok) {
+           const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
+           console.error(`Proxy fetch error! Status: ${response.status}`, errorData);
+           throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.error || response.statusText}`);
+        }
+        
+        const data = await response.json();
+        console.log(`Received page ${page} (filtered: ${JSON.stringify(filters)}):`, data); // Log received data
+        return data; // Should contain { series: [], page: { totalPages, totalElements } }
+      } catch (error) {
+        console.error('Error fetching series via proxy:', error);
+        // Return an empty structure on error to prevent crashes
+        return { series: [], page: { totalPages: 1, totalElements: 0 } };
+      }
+    }
+  };
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const payload = JSON.parse(document.getElementById('initial-payload').textContent);
+    const PAGE_SIZE = payload.pageSize;
+    let currentPage = 1;
+    let totalPages = payload.totalPages;
+    let totalSeries = payload.totalSeries;
+    let allSeries = [...payload.series]; // Always holds only the current page's series
+    let isLoading = false; // Prevent multiple simultaneous fetches
+    let currentFilters = {}; // Initialize current filters
+    let viewMode = 'chronology'; // Default view mode
+    
+    // DOM Elements
+    const companyFilter = document.getElementById('company-filter');
+    const networkFilter = document.getElementById('network-filter');
+    const decadeFilter = document.getElementById('decade-filter');
+    const searchInput = document.getElementById('search-input');
+    const chronologyBtn = document.getElementById('view-chronology');
+    const releaseBtn = document.getElementById('view-release');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageNum = document.getElementById('current-page-num');
+    const totalNum = document.getElementById('total-pages');
+    const countBadge = document.getElementById('series-count');
+    const container = document.getElementById('series-container');
+    const noResults = document.getElementById('no-results');
+    
+    const debounce = (fn, ms = 300) => {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    };
+    
+    // Function to get current filter values from UI elements
+    function getCurrentFilters() {
+      const filters = {};
+      const companyVal = companyFilter?.value;
+      const networkVal = networkFilter?.value;
+      const decadeVal = decadeFilter?.value;
+      const searchTerm = searchInput.value.trim();
+      
+      if (companyVal && companyVal !== 'all') filters.productionCompany = companyVal;
+      if (networkVal && networkVal !== 'all') filters.originalNetwork = networkVal;
+      if (decadeVal && decadeVal !== 'all') filters.decade = decadeVal;
+      if (searchTerm) filters.title = searchTerm;
+      
+      return filters;
+    }
+    
+    // Function to fetch a specific page *for the current filters* if not already loaded
+    async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
+      if (isLoading) {
+        return; // Prevent multiple simultaneous fetches
+      }
+      const pageIndex = pageNumber - 1; // API is 0-based
+      
+      isLoading = true;
+      container.style.opacity = '0.5'; // Indicate loading
+      
+      try {
+        // Fetch using current filters
+        const data = await stapiClient.getSeries(pageIndex, PAGE_SIZE, currentFilters);
+        allSeries = data.series || [];
+        // Update totals if provided
+        if (data.page?.totalPages && data.page.totalPages !== totalPages) {
+          totalPages = data.page.totalPages;
+        }
+        if (data.page?.totalElements && data.page.totalElements !== totalSeries) {
+          totalSeries = data.page.totalElements;
+        }
+      } catch (error) {
+        console.error(`Failed to fetch page ${pageIndex} with filters:`, error);
+        // Handle error display if needed
+      } finally {
+        isLoading = false;
+        container.style.opacity = '1';
+        render(); // Re-render with potentially new data or updated totals
+      }
+    }
+    
+    // Function to apply filters, fetch the first page, and update state
+    async function applyFiltersAndFetch() {
+      if (isLoading) return; // Don't apply if already loading
+      
+      currentPage = 1; // Reset to first page
+      currentFilters = getCurrentFilters(); // Get latest filters from UI
+      allSeries = []; // Clear existing series
+      isLoading = true; // Set loading flag
+      container.innerHTML = '<p class="text-center text-white col-span-full">Loading...</p>'; // Show loading message
+      noResults.classList.add('hidden'); // Hide no results message
+      countBadge.textContent = `Loading...`;
+      pageNum.textContent = '1';
+      totalNum.textContent = '?'; // Indicate total pages unknown
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
+      
+      try {
+        const data = await stapiClient.getSeries(0, PAGE_SIZE, currentFilters); // Fetch page 0 (first page)
+        allSeries = data.series || [];
+        totalPages = data.page?.totalPages || 1;
+        totalSeries = data.page?.totalElements || allSeries.length;
+      } catch (error) {
+        console.error("Error applying filters and fetching initial data:", error);
+        allSeries = [];
+        totalPages = 1;
+        totalSeries = 0;
+        // Optionally display an error message in the container
+        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading series. Please try again.</p>';
+      } finally {
+        isLoading = false;
+        render(); // Render the newly fetched data (or empty state/error)
+      }
+    }
+    
+    // Function to render the current page based only on the current page's data in `allSeries`
+    function render() {
+      try {
+        console.log("Render called - current page:", currentPage, "total pages:", totalPages, "total series:", totalSeries);
+        
+        // Update total count display based on the overall total for the current filter set
+        countBadge.textContent = `${totalSeries} series found`;
+        
+        // Update pagination display (uses overall totalPages for the current filter set)
+        pageNum.textContent = currentPage;
+        totalNum.textContent = totalPages; // Display the overall total pages
+        
+        // Enable/disable pagination buttons based on overall totalPages
+        prevBtn.disabled = currentPage <= 1 || isLoading;
+        nextBtn.disabled = currentPage >= totalPages || isLoading;
+        
+        // Display "No Results" message if totalSeries is 0 after fetch/filter
+        noResults.classList.toggle('hidden', totalSeries > 0);
+        container.classList.toggle('hidden', totalSeries === 0); // Hide grid if no results
+        
+        // Render series cards for the current page's items (allSeries is always current page)
+        if (totalSeries > 0) {
+          try {
+            console.log("Rendering series:", allSeries.length);
+            
+            // Sort series based on view mode
+            let sortedSeries = [...allSeries];
+            if (viewMode === 'chronology') {
+              // Sort by in-universe chronology (stardate)
+              sortedSeries.sort((a, b) => {
+                const aYear = a.stardate ? parseInt(a.stardate.split('-')[0]) : 0;
+                const bYear = b.stardate ? parseInt(b.stardate.split('-')[0]) : 0;
+                return aYear - bYear;
+              });
+            } else {
+              // Sort by release date
+              sortedSeries.sort((a, b) => {
+                const aYear = a.years ? parseInt(a.years.split('-')[0]) : 0;
+                const bYear = b.years ? parseInt(b.years.split('-')[0]) : 0;
+                return aYear - bYear;
+              });
+            }
+            
+            container.innerHTML = sortedSeries.map(series => {
+              if (!series || !series.title) {
+                console.error("Invalid series data:", series);
+                return ''; // Skip invalid series
+              }
+              
+              // Try to use wikiImage first, then image, then fallback
+              const imageUrl = series.wikiImage || series.image || '/images/stars-placeholder.jpg';
+              
+              // Create a slug if not already present
+              const slug = series.slug || series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+              
+              // Determine which data to show based on view mode
+              const primaryDate = viewMode === 'chronology' ? series.stardate : series.years;
+              const secondaryDate = viewMode === 'chronology' ? series.years : series.stardate;
+              const primaryColor = viewMode === 'chronology' ? 'starfleet-blue' : 'starfleet-red';
+              const secondaryColor = viewMode === 'chronology' ? 'console-green' : 'console-blue';
+              
+              return `
+                <a href="/series/${slug}/" class="series-card">
+                  <div class="lcars-card-header flex">
+                    <div class="w-16 h-6 bg-starfleet-gold rounded-tl-lg"></div>
+                    <div class="flex-1 h-6 bg-${primaryColor} flex items-center justify-center">
+                      <span class="text-sm font-bold">${series.abbreviation || "ST"}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="card-body bg-space-black bg-opacity-80 p-4 border-x border-${primaryColor}">
+                    <div class="relative aspect-video mb-4 overflow-hidden">
+                      <img 
+                        src="${imageUrl}" 
+                        alt="${series.title}" 
+                        class="w-full h-full object-cover"
+                        loading="lazy"
+                        onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
+                      />
+                      <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-2">
+                        <span class="text-${secondaryColor} text-sm font-mono">${primaryDate || "Unknown"}</span>
+                      </div>
+                    </div>
+                    
+                    <h2 class="text-xl text-white font-semibold mb-2">${series.title}</h2>
+                    
+                    <div class="flex justify-between text-gray-400 text-sm mb-3">
+                      <span>${secondaryDate || "Unknown"}</span>
+                      <span>${series.seasons || series.seasonsCount || "?"} seasons</span>
+                    </div>
+                    
+                    <p class="text-gray-300 text-sm">${series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : (series.description || `Star Trek series that aired on ${series.originalNetwork || "television"}.`)}</p>
+                    
+                    ${series.wikiUrl ? `
+                      <div class="mt-3">
+                        <a href="${series.wikiUrl}" target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center" onclick="event.stopPropagation()">
+                          Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+                        </a>
+                      </div>
+                    ` : ''}
+                  </div>
+                  
+                  <div class="lcars-card-footer flex">
+                    <div class="w-10 h-6 bg-starfleet-${viewMode === 'chronology' ? 'red' : 'blue'}"></div>
+                    <div class="flex-1 h-6 bg-console-blue"></div>
+                    <div class="w-24 h-6 bg-starfleet-gold rounded-br-lg"></div>
+                  </div>
+                </a>
+              `;
+            }).join('');
+          } catch (error) {
+            console.error("Error in render function:", error);
+            container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering series. Please check the console for details.</p>';
+          }
+        } else if (!isLoading) {
+          // Ensure loading message is removed if there are truly no results
+          container.innerHTML = '';
+        }
+      } catch (error) {
+        console.error("Error in main render function:", error);
+        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering page. Please check the console for details.</p>';
+      }
+    }
+    
+    // Debounced version of applying filters for search input
+    const debouncedApplyFilters = debounce(applyFiltersAndFetch, 500);
+    
+    // Event Listeners - Trigger filter application
+    companyFilter?.addEventListener('change', applyFiltersAndFetch);
+    networkFilter?.addEventListener('change', applyFiltersAndFetch);
+    decadeFilter?.addEventListener('change', applyFiltersAndFetch);
+    searchInput.addEventListener('input', debouncedApplyFilters); // Use debounced version for search
+    
+    // View toggle
+    chronologyBtn.addEventListener('click', () => {
+      viewMode = 'chronology';
+      chronologyBtn.classList.add('active');
+      releaseBtn.classList.remove('active');
+      render(); // Re-render with new view mode
     });
     
-    document.querySelectorAll('img[loading="lazy"]').forEach(img => {
-      imageObserver.observe(img);
+    releaseBtn.addEventListener('click', () => {
+      viewMode = 'release';
+      releaseBtn.classList.add('active');
+      chronologyBtn.classList.remove('active');
+      render(); // Re-render with new view mode
     });
-  }
+    
+    prevBtn.addEventListener('click', async () => {
+      if (currentPage > 1 && !isLoading) {
+        const prevPageNum = currentPage - 1;
+        // Fetch the previous page data before decrementing currentPage
+        await fetchPageIfNeeded(prevPageNum);
+        // Only decrement if fetch didn't fail
+        currentPage--;
+        render();
+      }
+    });
+    
+    nextBtn.addEventListener('click', async () => {
+       if (currentPage < totalPages && !isLoading) {
+           const nextPageNum = currentPage + 1;
+           // Fetch if needed *before* incrementing currentPage visually
+           await fetchPageIfNeeded(nextPageNum);
+           // Only increment if fetch didn't fail catastrophically and page exists
+           if (currentPage < totalPages) { // Check totalPages again in case fetch failed
+               currentPage++;
+               render(); // Render the new page slice
+           }
+       }
+    });
+    
+    // Initial Render on Load
+    render(); // Render the initial data passed from the server
+  });
 </script>
 
 <style>
+  .trek-button {
+    background-color: var(--space-black);
+    color: var(--starfleet-gold);
+    border: 1px solid var(--starfleet-blue);
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+  }
+  
+  .trek-button:hover {
+    background-color: var(--starfleet-blue);
+    color: white;
+  }
+  
   .trek-button.active {
     background-color: var(--console-blue);
     box-shadow: 0 0 10px var(--console-blue);
@@ -400,5 +772,44 @@ const seriesListSchema = {
   
   img {
     transition: transform 0.5s ease;
+  }
+  
+  /* Pagination styles */
+  .lcars-pagination {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .lcars-pagination button {
+    position: relative;
+    z-index: 2;
+    transition: all 0.2s ease;
+  }
+  
+  .lcars-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .lcars-pagination::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 204, 0, 0.1), transparent);
+    animation: sweep 2s infinite;
+    z-index: 1;
+  }
+  
+  @keyframes sweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  .filter-group {
+    position: relative;
   }
 </style>
