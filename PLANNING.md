@@ -74,3 +74,34 @@ A reusable `ProgressiveImage` web component is used for all character images on 
 - Is loaded as a native web component and used in place of `<img>` tags.
 
 This approach ensures a smooth, accessible, and robust image experience for all users.
+
+---
+
+## Module Compatibility in Netlify Functions
+
+### Rationale
+- Netlify Functions can be written in either CommonJS or ES Modules format, but mixing the two can cause compatibility issues.
+- Some dependencies (like node-fetch) are ES Modules, while others use CommonJS.
+- The project uses a mix of module formats, which can lead to runtime errors in the deployed functions.
+
+### Solution: Consistent Module Handling
+- **CommonJS for Netlify Functions:** All Netlify function files use the `.cjs` extension to explicitly indicate CommonJS format.
+- **Dynamic Imports for ES Module Dependencies:** When a Netlify function needs to use an ES Module dependency (like node-fetch), it uses dynamic imports:
+  ```js
+  const { default: fetch } = await import('node-fetch');
+  ```
+- **Duplicate Utility Files:** For utility functions needed by both frontend (ES Modules) and Netlify functions (CommonJS), we maintain two versions:
+  - `slugify.js` - ES Module version for frontend use
+  - `slugify.cjs` - CommonJS version for Netlify function use
+
+This approach ensures compatibility across the entire application while allowing us to use modern dependencies regardless of their module format.
+
+### Direct HTML Templates for Netlify Functions
+For character detail pages, we use a direct HTML template approach in the Netlify function instead of trying to import and render the Astro component. This approach:
+
+1. Avoids module compatibility issues between CommonJS (Netlify functions) and ES Modules (Astro components)
+2. Reduces dependencies and complexity in the serverless function
+3. Maintains the same visual design and functionality as the Astro component
+4. Improves reliability by eliminating potential runtime errors from module imports
+
+The HTML template is embedded directly in the function code and populated with character data before being sent to the client. This ensures character detail pages work reliably in the production environment.

@@ -106,3 +106,20 @@ None currently active.
    - Updated currentPage if needed
 6. ✅ Debounce user input:
    - Wrapped search and select listeners in a 250ms debounce
+
+### Fix Character Image and Detail Page Issues (COMPLETED)
+1. ✅ Fix build-time first page results showing generic images:
+   - Modified characters index page to directly import and use local characters data
+   - Ensured character images are displayed correctly on first page load
+2. ✅ Fix "important" checkbox filter:
+   - Updated stapi-proxy.cjs to check for both property names (important and isImportant)
+   - Updated characters index page to use the correct property name
+3. ✅ Fix character detail pages "Unexpected token 'export'" error:
+   - Created CommonJS version of the slugify function (slugify.cjs)
+   - Updated character-detail.cjs to use the CommonJS version
+4. ✅ Fix character detail pages "require() of ES Module" error:
+   - Updated character-detail.cjs to use dynamic import for node-fetch
+   - Added better error handling for fetch operations
+5. ✅ Fix character detail pages "Not found" error:
+   - Replaced Astro module import with direct HTML template
+   - Maintained same layout and functionality

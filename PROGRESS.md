@@ -205,3 +205,28 @@
  - Issue: Pagination on the /characters page was broken because the catch-all redirect in netlify.toml was listed before the API/function redirects. This caused all requests, including /api/characters, to be routed to the frontend instead of the serverless function, resulting in 404s and broken pagination.
  - Fix: The catch-all redirect was moved to the end of the redirects section in netlify.toml, ensuring that API/function routes are handled first. This restored correct routing for /api/characters and fixed pagination.
  - Outcome: Pagination now works as expected, and this issue is fully documented for future reference.
+
+## 2025-04-18
+
+- **Fixed Multiple Issues with Character Display and Filtering**
+  - **Issue 1:** Build-time first page results were showing generic images instead of character images.
+    - **Root cause:** The server-side `stapiService.getCharacters()` method was trying to access the local file system to read the `characters-local.json` file, but this wasn't working correctly in the Netlify build environment.
+    - **Fix:** Modified the characters index page to directly import and use the local characters data for the initial build, ensuring character images are displayed correctly on the first page load.
+
+  - **Issue 2:** The "important" checkbox filter wasn't working.
+    - **Root cause:** The filter was looking for `c.isImportant === true`, but the property in the JSON file was named `important`, not `isImportant`.
+    - **Fix:** Updated the `stapi-proxy.cjs` file to check for both `c.important === true` and `c.isImportant === true`, and updated the characters index page to use `filters.important = 'true'` instead of `filters.isImportant = 'true'`.
+
+  - **Issue 3:** Character detail pages were crashing with "Unexpected token 'export'" error.
+    - **Root cause:** The `slugify.js` file was using ES modules syntax (`export function`), but the Netlify function was trying to import it using CommonJS syntax (`require`).
+    - **Fix:** Created a CommonJS version of the slugify function in a new `slugify.cjs` file and updated the character-detail.cjs file to use it.
+
+  - **Issue 4:** Character detail pages were crashing with "require() of ES Module" error for node-fetch.
+    - **Root cause:** The node-fetch package is an ES module, but we were trying to import it using CommonJS syntax (`require`).
+    - **Fix:** Updated the character-detail.cjs file to use dynamic import for node-fetch.
+
+  - **Issue 5:** Character detail pages were still showing "Not found" error.
+    - **Root cause:** The character-detail.cjs function was trying to import the Astro page module, but this was failing because the Astro page is an ES module.
+    - **Fix:** Replaced the Astro module import with a direct HTML template in the character-detail.cjs file, maintaining the same layout and functionality.
+
+  - **Outcome:** All character images now display correctly on all pages, the "important" checkbox filter works correctly, and character detail pages load without errors.
