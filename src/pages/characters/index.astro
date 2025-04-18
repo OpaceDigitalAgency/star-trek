@@ -445,14 +445,15 @@ const charactersSchema = {
                </div>
              `;
             }).join('');
+          } catch (error) {
+            console.error("Error in render function:", error);
+            container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering characters. Please check the console for details.</p>';
+          }
       } else if (!isLoading) {
           // Ensure loading message is removed if there are truly no results
           container.innerHTML = '';
       }
       // Removed Memory Alpha image fetching logic
-      } catch (error) {
-        console.error("Error in render function:", error);
-        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering characters. Please check the console for details.</p>';
       }
     }
 

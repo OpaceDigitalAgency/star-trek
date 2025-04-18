@@ -1,11 +1,13 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import fs from 'fs';
-import path from 'path';
+// Import path but don't use default export directly
+import { join } from 'path';
 
 // Direct paths to the characters files
-const charactersJsonPath = process.cwd() + '/src/data/characters.json';
-const charactersLocalJsonPath = process.cwd() + '/src/data/characters-local.json';
+const charactersJsonPath = join(process.cwd(), '/src/data/characters.json');
+const charactersLocalJsonPath = join(process.cwd(), '/src/data/characters-local.json');
+const cachePath = charactersJsonPath; // Define cachePath variable
 
 const BASE_URL = 'https://stapi.co/api/v1/rest';
 const MEMORY_ALPHA_API = 'https://memory-alpha.fandom.com/api.php';
