@@ -2,6 +2,16 @@
 import Layout from '../../layouts/Layout.astro';
 import { slugify } from '../../utils/slugify.js'; // Keep slugify if needed elsewhere or for client-side logic
 
+export const prerender = false;
+
+export async function get({ params }) {
+  // This function is needed for server-side rendering
+  // The actual data fetching happens client-side in the script
+  return {
+    props: {}
+  };
+}
+
 // Create JSON-LD schema for series page (will be updated client-side)
 const seriesSchema = {
   "@context": "https://schema.org",
@@ -21,15 +31,15 @@ const seriesSchema = {
 // Create structured data for the series page
 ---
 <Layout
-  title={`${series.title} | Star Trek Series Profile`}
-  description={`Learn about ${series.title}, a Star Trek series that aired from ${series.years}.`}
+  title="Star Trek Series Profile"
+  description="Learn about a Star Trek series."
   schemaData={seriesSchema}
 >
   <div class="container mx-auto px-4 py-12">
     <!-- Main content container -->
     <div class="lcars-header mb-8">
       <div class="lcars-header-content">
-        <h1 class="text-3xl">{series.title}</h1>
+        <h1 id="series-title" class="text-3xl">Loading...</h1>
       </div>
     </div>
     
@@ -44,8 +54,9 @@ const seriesSchema = {
           <div class="panel-content p-6">
             <div class="series-image aspect-video overflow-hidden mb-4">
               <img
-                src={series.wikiImage || series.image || "/images/stars-placeholder.jpg"}
-                alt={series.title}
+                id="series-image"
+                src="/images/stars-placeholder.jpg"
+                alt="Loading series image"
                 class="w-full h-full object-cover"
                 onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
               />
@@ -54,39 +65,37 @@ const seriesSchema = {
             <div class="series-meta space-y-2 mt-6">
               <div class="flex justify-between">
                 <span class="text-gray-400">Abbreviation:</span>
-                <span class="text-white">{series.abbreviation || "N/A"}</span>
+                <span id="series-abbreviation" class="text-white">Loading...</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">Air Date:</span>
-                <span class="text-white">{series.years}</span>
+                <span id="series-years" class="text-white">Loading...</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">Stardate:</span>
-                <span class="text-white">{series.stardate}</span>
+                <span id="series-stardate" class="text-white">Loading...</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">Seasons:</span>
-                <span class="text-white">{series.seasons || series.seasonsCount || "?"}</span>
+                <span id="series-seasons" class="text-white">Loading...</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">Episodes:</span>
-                <span class="text-white">{series.episodes || series.episodesCount || "?"}</span>
+                <span id="series-episodes" class="text-white">Loading...</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">Network:</span>
-                <span class="text-white">{series.originalNetwork || "Various"}</span>
+                <span id="series-network" class="text-white">Loading...</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-400">Production:</span>
-                <span class="text-white">{series.productionCompany || "Paramount"}</span>
+                <span id="series-production" class="text-white">Loading...</span>
               </div>
             </div>
             
-            {series.wikiUrl && (
-              <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4">
-                View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
-              </a>
-            )}
+            <a id="series-wiki-link" href="#" target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4 hidden">
+              View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+            </a>
           </div>
         </div>
       </div>
@@ -102,34 +111,16 @@ const seriesSchema = {
           <div class="panel-content p-6">
             <h2 class="text-2xl text-starfleet-gold mb-4">Series Overview</h2>
             
-            <div class="series-description text-gray-300 mb-6 space-y-4">
-              {series.wikiSummary ? (
-                <div set:html={series.wikiSummary} />
-              ) : (
-                <p>{series.description || `${series.title} is a Star Trek series that aired from ${series.years}.`}</p>
-              )}
+            <div id="series-description" class="series-description text-gray-300 mb-6 space-y-4">
+              <p>Loading series description...</p>
             </div>
             
             <!-- Timeline Placement Section -->
             <!-- This section displays where the series fits in the Star Trek chronology -->
             <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
             <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
-              <p class="text-gray-300">
-                {/* Dynamic timeline text that adapts based on the series */}
-                {/* Uses stardate information and adds contextual era description */}
-                {series.title} is set in the years {series.stardate}, {
-                  /* Special case for Discovery which spans multiple time periods */
-                  series.title.includes("Discovery") && series.stardate.includes("3188") ?
-                  "initially during the 2250s before the crew time-traveled to the 32nd century." :
-                  /* For other series, provide era-specific context */
-                  `during the ${series.title.includes("Original") ? "Five-Year Mission" :
-                    series.title.includes("Next Generation") ? "24th century" :
-                    series.title.includes("Deep Space Nine") ? "Dominion War era" :
-                    series.title.includes("Voyager") ? "Delta Quadrant expedition" :
-                    series.title.includes("Enterprise") ? "early days of Starfleet" :
-                    series.title.includes("Picard") ? "post-Dominion War era" :
-                    "Star Trek timeline"}.`
-                }
+              <p id="series-timeline-info" class="text-gray-300">
+                Loading timeline information...
               </p>
             </div>
             
