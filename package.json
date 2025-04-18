@@ -8,7 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "postbuild": "echo '/api/characters    /.netlify/functions/stapi-proxy    200\n/api/proxy-image   /.netlify/functions/proxy-image    200\n/api/memory-alpha/* /.netlify/functions/memory-alpha-search 200\n/characters/:slug  /.netlify/functions/character-detail 200\n/series/:slug      /.netlify/functions/series-detail    200\n/series/:slug/     /.netlify/functions/series-detail    200\n/*                 /.netlify/functions/entry           200' > dist/_redirects",
+    "postbuild": "echo '/api/characters    /.netlify/functions/stapi-proxy    200\n/api/proxy-image   /.netlify/functions/proxy-image    200\n/api/memory-alpha/* /.netlify/functions/memory-alpha-search 200\n/api/series/:slug  /.netlify/functions/series-detail    200\n/characters/:slug  /.netlify/functions/character-detail 200\n/*                 /.netlify/functions/entry           200' > dist/_redirects",
     "cache-images": "node scripts/cache-character-images.mjs",
     "update-json": "node scripts/update-characters-json.mjs",
     "prepare-images": "npm run cache-images && npm run update-json",

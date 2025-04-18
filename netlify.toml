@@ -58,18 +58,23 @@
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
 
-# Series detail page redirects - these need to be before the catch-all series redirect
-# Handle URLs with trailing slashes
+# API endpoint for series detail data
 [[redirects]]
-  from = "/series/:slug/"
+  from = "/api/series/:slug"
   to = "/.netlify/functions/series-detail"
   status = 200
   force = true
 
-# Handle URLs without trailing slashes
+# Series detail pages should be handled by the Astro SSR page, not directly by the function
 [[redirects]]
   from = "/series/:slug"
-  to = "/.netlify/functions/series-detail"
+  to = "/series/:slug"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/series/:slug/"
+  to = "/series/:slug"
   status = 200
   force = true
 

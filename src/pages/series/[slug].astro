@@ -198,8 +198,8 @@ const seriesSchema = {
     }
 
     try {
-      console.log(`Making request to: /.netlify/functions/series-detail?slug=${slug}`);
-      const response = await fetch(`/.netlify/functions/series-detail?slug=${slug}`);
+      console.log(`Making request to: /api/series/${slug}`);
+      const response = await fetch(`/api/series/${slug}`);
       
       if (!response.ok) {
         const errorText = await response.text();

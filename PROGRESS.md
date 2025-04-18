@@ -305,3 +305,15 @@
     /series/:slug/     /.netlify/functions/series-detail    200
     ```
   - **Outcome:** Series detail pages now load correctly without 404 errors, displaying the appropriate content for each series.
+
+## 2025-04-18
+
+- **Fixed Series Detail Pages Raw JSON Display Issue**
+  - **Issue:** Series detail pages were displaying raw JSON data instead of rendering the HTML template.
+  - **Root cause:** The series-detail.js function was returning JSON data with 'Content-Type: application/json', and the redirect rules were sending requests directly to the function instead of the Astro page.
+  - **Fixes:**
+    1. Updated netlify.toml to redirect `/series/:slug` to the Astro page instead of the Netlify function
+    2. Created a new API endpoint `/api/series/:slug` that redirects to the Netlify function
+    3. Updated the client-side script in `[slug].astro` to use the new API endpoint
+    4. Updated the postbuild script in package.json to include the new API endpoint
+  - **Outcome:** Series detail pages now properly render the HTML template with the series data, instead of displaying raw JSON.

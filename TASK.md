@@ -197,6 +197,19 @@
    - Added detailed entry to PROGRESS.md explaining the root cause and fix
    - Updated TASK.md with the completed subtasks
 
+### Fix Series Detail Pages Raw JSON Display Issue (COMPLETED)
+1. ✅ Fix redirect rules to use Astro page instead of Netlify function:
+   - Updated netlify.toml to redirect `/series/:slug` to the Astro page
+   - Created a new API endpoint `/api/series/:slug` for the Netlify function
+2. ✅ Update client-side script to use new API endpoint:
+   - Changed fetch URL from `/.netlify/functions/series-detail?slug=${slug}` to `/api/series/${slug}`
+3. ✅ Update postbuild script to include new API endpoint:
+   - Removed direct series detail page redirects
+   - Added API endpoint redirect for series detail
+4. ✅ Document the issue and solution:
+   - Added detailed entry to PROGRESS.md explaining the root cause and fix
+   - Updated TASK.md with the completed subtasks
+
 ### Fix Series Detail Pages Redirect Issue (COMPLETED)
 1. ✅ Fix incorrect API endpoint URL in client-side script:
    - Updated fetch URL from `/netlify/functions/series-detail.js` to `/.netlify/functions/series-detail`
