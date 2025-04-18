@@ -408,12 +408,12 @@ const charactersSchema = {
         noResults.classList.toggle('hidden', totalCharacters > 0);
         container.classList.toggle('hidden', totalCharacters === 0); // Hide grid if no results
 
-      // Render character cards for the current page's items (allCharacters is always current page)
-      if (totalCharacters > 0) {
-          try {
-              console.log("Rendering characters:", allCharacters.length);
-              
-              container.innerHTML = allCharacters.map(c => {
+        // Render character cards for the current page's items (allCharacters is always current page)
+        if (totalCharacters > 0) {
+            try {
+                console.log("Rendering characters:", allCharacters.length);
+                
+                container.innerHTML = allCharacters.map(c => {
                   if (!c || !c.name) {
                       console.error("Invalid character data:", c);
                       return ''; // Skip invalid characters
@@ -449,11 +449,15 @@ const charactersSchema = {
             console.error("Error in render function:", error);
             container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering characters. Please check the console for details.</p>';
           }
-      } else if (!isLoading) {
-          // Ensure loading message is removed if there are truly no results
-          container.innerHTML = '';
+        } else if (!isLoading) {
+            // Ensure loading message is removed if there are truly no results
+            container.innerHTML = '';
+        }
+        // Removed Memory Alpha image fetching logic
+      } catch (error) {
+        console.error("Error in main render function:", error);
+        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error rendering page. Please check the console for details.</p>';
       }
-      // Removed Memory Alpha image fetching logic
     }
 
     // Debounced version of applying filters for search input
