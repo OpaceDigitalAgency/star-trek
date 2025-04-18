@@ -1,6 +1,6 @@
 const data = require('../../src/data/characters.json');
 const { slugify } = require('../../src/utils/slugify.cjs');
-const fetch = require('node-fetch');
+// We'll use dynamic import for node-fetch since it's an ES module
 
 exports.handler = async function(event, context) {
   const slug = event.path.replace(/^\/characters\/|\/$/g, '');
@@ -11,6 +11,9 @@ exports.handler = async function(event, context) {
     // Try to reconstruct the name from the slug (replace dashes with spaces)
     const likelyName = slug.replace(/-/g, ' ');
     try {
+      // Dynamically import node-fetch (ES module)
+      const { default: fetch } = await import('node-fetch');
+      
       const enrichmentUrl = `${process.env.URL || 'http://localhost:8888'}/.netlify/functions/character-enrichment?name=${encodeURIComponent(likelyName)}`;
       const resp = await fetch(enrichmentUrl);
       if (resp.ok) {
@@ -18,6 +21,7 @@ exports.handler = async function(event, context) {
       }
     } catch (e) {
       // Ignore fetch errors, will return 404 below if char is still not found
+      console.error('Error fetching character enrichment:', e);
     }
   }
 
