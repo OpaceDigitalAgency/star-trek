@@ -58,10 +58,10 @@
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
 
-# API endpoint for series detail data
+# API endpoint for series detail data - using new API endpoint
 [[redirects]]
   from = "/api/series/:slug"
-  to = "/.netlify/functions/series-detail"
+  to = "/api/series/:slug"
   status = 200
   force = true
 
