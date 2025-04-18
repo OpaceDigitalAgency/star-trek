@@ -24,7 +24,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/characters.json", "src/data/series.json"]
+  included_files = ["netlify/functions/characters.json", "src/data/series.json", "src/data/characters.json"]
 
 # Define redirects for Memory Alpha proxy
 [[redirects]]
@@ -58,12 +58,11 @@
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
 
-# API endpoint for series detail data - using new API endpoint
+# API endpoint for series detail data - using Netlify function as fallback
 [[redirects]]
   from = "/api/series/:slug"
-  to = "/api/series/:slug"
+  to = "/.netlify/functions/series-detail"
   status = 200
-  force = true
 
 # Series detail pages should be handled by the Astro SSR page, not directly by the function
 [[redirects]]
