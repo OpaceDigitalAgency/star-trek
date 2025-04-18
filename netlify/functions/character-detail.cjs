@@ -4,7 +4,14 @@ const { slugify } = require('../../src/utils/slugify.cjs');
 
 exports.handler = async function(event, context) {
   const slug = event.path.replace(/^\/characters\/|\/$/g, '');
-  let char = data.find(c => slugify(c.name) === slug);
+  
+  // First try to find by UID (for URLs like /characters/CHMA0000283851/)
+  let char = data.find(c => c.uid === slug);
+  
+  // If not found by UID, try to find by slugified name
+  if (!char) {
+    char = data.find(c => slugify(c.name) === slug);
+  }
 
   // Fallback: If not found locally, try enrichment function
   if (!char) {
