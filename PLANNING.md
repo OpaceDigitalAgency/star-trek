@@ -105,3 +105,33 @@ For character detail pages, we use a direct HTML template approach in the Netlif
 4. Improves reliability by eliminating potential runtime errors from module imports
 
 The HTML template is embedded directly in the function code and populated with character data before being sent to the client. This ensures character detail pages work reliably in the production environment.
+---
+
+## Series Detail Page Architecture
+
+### Episode Data Management
+- **Lazy Loading Strategy:** Episodes are loaded on-demand when a season section is expanded
+- **Data Caching:** Episode data is cached client-side after initial load to prevent redundant API calls
+- **Progressive Enhancement:** Basic series information loads first, followed by episode details
+
+### Error Handling Architecture
+- **Layered Approach:**
+  1. API-level error catching with retry mechanisms
+  2. Data transformation layer with null/undefined handling
+  3. UI-level error boundaries for graceful degradation
+- **Fallback System:**
+  - Default values for missing metadata
+  - Placeholder text for null fields
+  - Generic error messages for user feedback
+
+### Object Display Strategy
+- **Nested Object Handling:**
+  - Deep object traversal with type checking
+  - Formatted display of complex data structures
+  - Custom serialization for special object types
+- **Null Value Management:**
+  - Explicit null checks at data boundaries
+  - Contextual fallback values
+  - Clear visual indication of missing data
+
+This architecture ensures robust handling of series data while maintaining a smooth user experience, even when dealing with incomplete or malformed data from the API.

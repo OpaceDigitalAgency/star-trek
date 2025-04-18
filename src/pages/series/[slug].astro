@@ -134,6 +134,24 @@ const seriesSchema = {
         </div>
       </div>
     </div>
+
+    <!-- Episodes Section -->
+    <div class="mt-12">
+      <div class="lcars-panel">
+        <div class="lcars-top-bar flex">
+          <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+          <div class="flex-1 h-8 bg-starfleet-blue"></div>
+          <div class="w-16 h-8 bg-starfleet-red"></div>
+        </div>
+        
+        <div class="panel-content p-6">
+          <h2 class="text-2xl text-starfleet-gold mb-4">Episodes</h2>
+          <div id="episodes-container" class="space-y-8">
+            <p class="text-gray-300">Loading episodes...</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </Layout>
 
@@ -173,37 +191,77 @@ const seriesSchema = {
     );
     pointer-events: none; /* Ensures the pattern doesn't interfere with interactions */
   }
-</style>
 
-<script is:load>
-  // Client-side script to fetch and display series data
-  async function fetchSeriesData() {
-    // Handle URLs with or without trailing slashes
-    const path = window.location.pathname.endsWith('/')
-      ? window.location.pathname.slice(0, -1) // Remove trailing slash
-      : window.location.pathname;
-    
-    const pathParts = path.split('/').filter(Boolean);
-    const slug = pathParts[pathParts.length - 1];
-    
-    console.log(`Fetching series data for slug: ${slug} from path: ${path}`);
-    
-    if (!slug || slug === 'series') {
-      console.error("Invalid slug found in URL:", slug);
-      // Only redirect if we're not already on the series index page
-      if (window.location.pathname !== '/series/' && window.location.pathname !== '/series') {
-        window.location.href = '/series/';
-      }
-      return;
+  /* Episodes section styling */
+  .season-header {
+    border-bottom: 2px solid var(--starfleet-gold);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .episode-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .episode-grid:hover {
+    background: rgba(0, 178, 255, 0.1);
+  }
+
+  .episode-number {
+    font-family: "LCARS", monospace;
+    color: var(--starfleet-gold);
+    min-width: 3rem;
+  }
+
+  .episode-title {
+    color: #fff;
+  }
+
+  .episode-date {
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  .episode-stardate {
+    color: var(--starfleet-blue);
+    font-family: "LCARS", monospace;
+  }
+
+  @media (max-width: 768px) {
+    .episode-grid {
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
     }
 
+    .episode-date, .episode-stardate {
+      grid-column: 2;
+      justify-self: start;
+    }
+  }
+</style>
+
+<script client:load>
+  // Client-side script to fetch and display series data
+  async function fetchSeriesData() {
     try {
+      const slug = window.location.pathname.split('/').filter(Boolean).pop();
+      
+      if (!slug || slug === 'series') {
+        if (window.location.pathname !== '/series/' && window.location.pathname !== '/series') {
+          window.location.href = '/series/';
+        }
+        return;
+      }
+
       console.log(`Making request to: /api/series/${slug}`);
       const response = await fetch(`/api/series/${slug}`);
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`HTTP error! status: ${response.status}, response:`, errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
@@ -211,85 +269,48 @@ const seriesSchema = {
       console.log("Series data received:", series);
 
       // Update DOM with series data
-      // Update title and basic info
       document.getElementById('series-title').textContent = series.title;
       
-      // Handle image loading with proper error handling
+      // Handle image loading
       const seriesImage = document.getElementById('series-image');
       const imagePath = series.wikiImage || series.image || "/images/stars-placeholder.jpg";
-      console.log('Loading series image from:', imagePath);
-      
-      // Set image source and add error handling
       seriesImage.src = imagePath;
       seriesImage.alt = series.title;
-      seriesImage.onerror = function() {
-        console.error('Failed to load image:', imagePath);
+      seriesImage.onerror = () => {
         if (imagePath !== "/images/stars-placeholder.jpg") {
-          console.log('Falling back to placeholder image');
-          this.src = "/images/stars-placeholder.jpg";
+          seriesImage.src = "/images/stars-placeholder.jpg";
         }
       };
       
-      // Update other series information
+      // Update metadata
       document.getElementById('series-abbreviation').textContent = series.abbreviation || "N/A";
       document.getElementById('series-years').textContent = series.years || "Unknown";
-      // Update timeline and episode information with detailed logging
       document.getElementById('series-stardate').textContent = series.stardate || "Unknown";
-      
-      // Handle seasons count
-      const seasonsCount = series.seasons || series.seasonsCount;
-      console.log('Series seasons count:', seasonsCount);
-      document.getElementById('series-seasons').textContent = seasonsCount || "?";
-      
-      // Handle episodes with detailed logging
-      let episodesText = "?";
-      console.log('Processing episodes data:', series.episodes, 'episodesCount:', series.episodesCount);
-      
-      if (series.episodesCount) {
-        episodesText = series.episodesCount;
-      } else if (series.episodes) {
-        if (typeof series.episodes === 'object') {
-          episodesText = series.episodes.count || series.episodes.length || "?";
-        } else if (typeof series.episodes === 'number' || typeof series.episodes === 'string') {
-          episodesText = series.episodes;
-        }
-      }
-      console.log('Final episodes text:', episodesText);
-      document.getElementById('series-episodes').textContent = episodesText;
-      
+      document.getElementById('series-seasons').textContent = series.seasonsCount || "?";
+      document.getElementById('series-episodes').textContent = series.episodesCount || series.episodes?.length || "?";
       document.getElementById('series-network').textContent = series.originalNetwork || "Various";
+      document.getElementById('series-production').textContent =
+        typeof series.productionCompany === 'object' ? series.productionCompany?.name || "Paramount" : series.productionCompany || "Paramount";
       
-      // Handle production company object - extract the name if it's an object
-      let productionText = "Paramount";
-      if (series.productionCompany) {
-        if (typeof series.productionCompany === 'object') {
-          productionText = series.productionCompany.name || "Paramount";
-        } else if (typeof series.productionCompany === 'string') {
-          productionText = series.productionCompany;
-        }
-      }
-      document.getElementById('series-production').textContent = productionText;
-      document.getElementById('series-description').innerHTML = series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years}.`;
+      // Update description
+      document.getElementById('series-description').innerHTML =
+        series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years}.`;
 
-      // Update timeline info - with proper null checks
-      const title = series.title || "";
-      const stardate = series.stardate || "Unknown";
-      
-      let timelineText = `${title} is set in the years ${stardate}, `;
-      
-      // Safely check for string includes with null checks
-      if (title && title.includes("Discovery") && stardate && stardate.includes("3188")) {
-        timelineText += "initially during the 2250s before the crew time-traveled to the 32nd century."
-      } else {
-        const era = title.includes("Original") ? "Five-Year Mission" :
-                    title.includes("Next Generation") ? "24th century" :
-                    title.includes("Deep Space Nine") ? "Dominion War era" :
-                    title.includes("Voyager") ? "Delta Quadrant expedition" :
-                    title.includes("Enterprise") ? "early days of Starfleet" :
-                    title.includes("Picard") ? "post-Dominion War era" :
-                    "Star Trek timeline";
-        timelineText += `during the ${era}.`;
+      // Update timeline info
+      let timelineText = `${series.title} is set `;
+      if (series.stardate && series.stardate !== "Unknown") {
+        timelineText += `in the years ${series.stardate}, `;
       }
+      
+      const era = series.title.includes("Original") ? "Five-Year Mission" :
+                  series.title.includes("Next Generation") ? "24th century" :
+                  series.title.includes("Deep Space Nine") ? "Dominion War era" :
+                  series.title.includes("Voyager") ? "Delta Quadrant expedition" :
+                  series.title.includes("Enterprise") ? "early days of Starfleet" :
+                  series.title.includes("Picard") ? "post-Dominion War era" :
+                  "Star Trek timeline";
+      timelineText += `during the ${era}.`;
+      
       document.getElementById('series-timeline-info').textContent = timelineText;
 
       // Update wiki link
@@ -301,37 +322,232 @@ const seriesSchema = {
         wikiLink.classList.add('hidden');
       }
 
-      // Update page title and description in the Layout component (requires accessing Astro.props or similar if possible, or updating meta tags directly)
-      // For now, the Layout title and description will remain placeholders set in the frontmatter.
-      // A more robust solution might involve a client-side framework component or updating meta tags with JavaScript.
-
+      // Display episodes if available
+      if (series.episodes && Array.isArray(series.episodes)) {
+        displayEpisodes(series.episodes);
+      }
     } catch (error) {
       console.error("Failed to fetch series data:", error);
       
-      // Create a more detailed error message for debugging
-      const errorDetails = `
-        Error: ${error.message}
-        URL: ${window.location.href}
-        Slug: ${slug}
-        Time: ${new Date().toISOString()}
-      `;
-      console.error(errorDetails);
-      
-      // Display error message to the user
       document.getElementById('series-title').textContent = "Error loading series data";
       document.getElementById('series-description').innerHTML = `
         <p>Could not load series information. Please try again later.</p>
         <p class="text-sm text-red-500 mt-2">Error: ${error.message}</p>
-        <p class="text-sm mt-4">If this problem persists, please try returning to the <a href="/series/" class="text-starfleet-gold hover:underline">series list</a> and selecting the series again.</p>
       `;
       
-      // Hide other elements or show a specific error state
       document.getElementById('series-image').classList.add('hidden');
       document.querySelector('.series-meta').classList.add('hidden');
       document.querySelector('.timeline-info').classList.add('hidden');
       document.getElementById('series-wiki-link').classList.add('hidden');
+      document.getElementById('episodes-container').innerHTML = '<p class="text-red-500">Failed to load episodes.</p>';
+    }
+    
+  // Function to organize episodes by season
+  function organizeEpisodesBySeason(episodes) {
+    const seasons = {};
+    
+    if (!Array.isArray(episodes)) {
+      console.error('Episodes data is not an array:', episodes);
+      return {};
+    }
+
+    episodes.forEach(episode => {
+      const seasonNum = episode.season || 'Unknown';
+      if (!seasons[seasonNum]) {
+        seasons[seasonNum] = [];
+      }
+      seasons[seasonNum].push(episode);
+    });
+
+    // Sort episodes within each season
+    Object.values(seasons).forEach(seasonEpisodes => {
+      seasonEpisodes.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+    });
+
+    return seasons;
+  }
+
+  // Function to format date
+  function formatDate(dateString) {
+    if (!dateString) return 'Unknown';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return dateString;
     }
   }
 
-  fetchSeriesData();
+  // Function to display episodes
+  function displayEpisodes(episodes) {
+    const container = document.getElementById('episodes-container');
+    if (!container) return;
+
+    if (!Array.isArray(episodes) || episodes.length === 0) {
+      container.innerHTML = '<p class="text-gray-300">No episodes available.</p>';
+      return;
+    }
+
+    const seasons = organizeEpisodesBySeason(episodes);
+    let html = '';
+
+    Object.entries(seasons).sort((a, b) => {
+      // Sort seasons numerically, handling 'Unknown' season
+      if (a[0] === 'Unknown') return 1;
+      if (b[0] === 'Unknown') return -1;
+      return parseInt(a[0]) - parseInt(b[0]);
+    }).forEach(([season, episodes]) => {
+      html += `
+        <div class="season-section">
+          <h3 class="season-header text-xl text-starfleet-gold">Season ${season}</h3>
+          <div class="space-y-2">
+      `;
+
+      episodes.forEach(episode => {
+        html += `
+          <div class="episode-grid">
+            <span class="episode-number">${episode.episodeNumber || '?'}</span>
+            <span class="episode-title">${episode.title || 'Unknown Episode'}</span>
+            <span class="episode-date">${formatDate(episode.airDate)}</span>
+            <span class="episode-stardate">${episode.stardate || 'Unknown'}</span>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  // Initialize the page
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchSeriesData().catch(error => {
+      console.error('Error initializing page:', error);
+      document.getElementById('series-title').textContent = "Error loading series data";
+      document.getElementById('series-description').innerHTML = `
+        <p>Could not load series information. Please try again later.</p>
+        <p class="text-sm text-red-500 mt-2">Error: ${error.message}</p>
+      `;
+    });
+  });
+
+  // Function to organize episodes by season
+  function organizeEpisodesBySeason(episodes) {
+    const seasons = {};
+    
+    if (!Array.isArray(episodes)) {
+      console.error('Episodes data is not an array:', episodes);
+      return {};
+    }
+
+    episodes.forEach(episode => {
+      const seasonNum = episode.season || 'Unknown';
+      if (!seasons[seasonNum]) {
+        seasons[seasonNum] = [];
+      }
+      seasons[seasonNum].push(episode);
+    });
+
+    // Sort episodes within each season
+    Object.values(seasons).forEach(seasonEpisodes => {
+      seasonEpisodes.sort((a, b) => (a.episodeNumber || 0) - (b.episodeNumber || 0));
+    });
+
+    return seasons;
+  }
+
+  // Function to format date
+  function formatDate(dateString) {
+    if (!dateString) return 'Unknown';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return dateString;
+    }
+  }
+
+  // Function to display episodes
+  function displayEpisodes(episodes) {
+    const container = document.getElementById('episodes-container');
+    if (!container) return;
+
+    if (!Array.isArray(episodes) || episodes.length === 0) {
+      container.innerHTML = '<p class="text-gray-300">No episodes available.</p>';
+      return;
+    }
+
+    const seasons = organizeEpisodesBySeason(episodes);
+    let html = '';
+
+    Object.entries(seasons).sort((a, b) => {
+      // Sort seasons numerically, handling 'Unknown' season
+      if (a[0] === 'Unknown') return 1;
+      if (b[0] === 'Unknown') return -1;
+      return parseInt(a[0]) - parseInt(b[0]);
+    }).forEach(([season, episodes]) => {
+      html += `
+        <div class="season-section">
+          <h3 class="season-header text-xl text-starfleet-gold">Season ${season}</h3>
+          <div class="space-y-2">
+      `;
+
+      episodes.forEach(episode => {
+        html += `
+          <div class="episode-grid">
+            <span class="episode-number">${episode.episodeNumber || '?'}</span>
+            <span class="episode-title">${episode.title || 'Unknown Episode'}</span>
+            <span class="episode-date">${formatDate(episode.airDate)}</span>
+            <span class="episode-stardate">${episode.stardate || 'Unknown'}</span>
+          </div>
+        `;
+      });
+
+      html += `
+          </div>
+        </div>
+      `;
+    });
+
+    container.innerHTML = html;
+  }
+
+  // Initialize the page
+  document.addEventListener('DOMContentLoaded', function() {
+    fetchSeriesData().then(function() {
+      // Success - data is already handled in fetchSeriesData
+    }).catch(function(error) {
+      console.error('Error initializing page:', error);
+      document.getElementById('series-title').textContent = "Error loading series data";
+      document.getElementById('series-description').innerHTML = `
+        <p>Could not load series information. Please try again later.</p>
+        <p class="text-sm text-red-500 mt-2">Error: ${error.message}</p>
+      `;
+    });
+  });
+      const response = await fetch(`/api/series/${slug}/episodes`);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      
+      const episodesData = await response.json();
+      displayEpisodes(episodesData.episodes || []);
+    } catch (error) {
+      console.error("Failed to fetch episodes:", error);
+      const container = document.getElementById('episodes-container');
+      if (container) {
+        container.innerHTML = '<p class="text-red-500">Failed to load episodes. Please try again later.</p>';
+      }
+    }
+  };
 </script>

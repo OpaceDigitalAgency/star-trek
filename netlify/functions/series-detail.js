@@ -102,15 +102,39 @@ exports.handler = async (event) => {
       };
     }
     
-    // Get episodes for this series if needed
+    // Get and organize episodes for this series
     if (!series.episodes) {
       try {
         const response = await fetch(`${STAPI_BASE_URL}/episode/search?title=${encodeURIComponent(series.title)}&pageSize=100`);
         const data = await response.json();
-        series.episodes = data.episodes || [];
+        const episodes = data.episodes || [];
+        
+        // Sort episodes by season and episode number
+        episodes.sort((a, b) => {
+          if (a.season === b.season) {
+            return (a.episodeNumber || 0) - (b.episodeNumber || 0);
+          }
+          return (a.season || 0) - (b.season || 0);
+        });
+
+        // Group episodes by season
+        const episodesBySeason = {};
+        episodes.forEach(episode => {
+          const season = episode.season || 'Unknown';
+          if (!episodesBySeason[season]) {
+            episodesBySeason[season] = [];
+          }
+          episodesBySeason[season].push(episode);
+        });
+
+        series.episodes = episodes;
+        series.episodesBySeason = episodesBySeason;
+        series.seasonsCount = Object.keys(episodesBySeason).filter(s => s !== 'Unknown').length;
       } catch (error) {
         console.error(`Error fetching episodes for series ${series.title}:`, error);
         series.episodes = [];
+        series.episodesBySeason = {};
+        series.seasonsCount = 0;
       }
     }
     
