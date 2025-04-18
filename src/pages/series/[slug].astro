@@ -268,13 +268,17 @@ const seriesSchema = {
   function formatDate(dateString) {
     if (!dateString) return 'Unknown';
     try {
-      return new Date(dateString).toLocaleDateString('en-US', {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Unknown';
+      
+      return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
       });
     } catch (e) {
-      return dateString;
+      console.error('Error formatting date:', e);
+      return 'Unknown';
     }
   }
 
@@ -308,9 +312,11 @@ const seriesSchema = {
         return parseInt(a) - parseInt(b);
       })
       .map(function([season, episodes]) {
+        // Handle case where season is an object
+        const seasonDisplay = typeof season === 'object' ? 'Unknown' : season;
         return `
           <div class="season-section">
-            <h3 class="season-header text-xl text-starfleet-gold">Season ${season}</h3>
+            <h3 class="season-header text-xl text-starfleet-gold">Season ${seasonDisplay}</h3>
             <div class="space-y-2">
               ${episodes.map(function(episode) {
                 return `
@@ -441,18 +447,32 @@ const seriesSchema = {
       return;
     }
 
+    // Try the new API endpoint first
     fetch('/api/series/' + slug)
+      .then(function(response) {
+        if (!response.ok) {
+          console.log('New API endpoint failed, trying fallback...');
+          // If that fails, try the old Netlify function
+          return fetch('/.netlify/functions/series-detail?slug=' + slug);
+        }
+        return response;
+      })
       .then(function(response) {
         if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
         return response.json();
       })
       .then(function(series) {
+        console.log('Series data:', series);
         updateUI(series);
         if (series.cast) {
+          console.log('Cast data:', series.cast);
           displayCast(series.cast);
+        } else {
+          console.log('No cast data available');
         }
       })
       .catch(function(error) {
+        console.error('Error fetching series data:', error);
         showError(error);
       });
   });
