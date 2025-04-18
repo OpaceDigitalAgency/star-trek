@@ -175,6 +175,7 @@ try {
   }
   
   console.log(`Initial build: Fetched ${initialSeries.length} series. Total series: ${totalSeries}, Total pages: ${totalPages}.`);
+  console.log('[series/index.astro] Series slugs for cards:', initialSeries.map(s => s.slug || s.uid || s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')));
   
 } catch (error) {
   console.error('Error fetching initial series data:', error);
@@ -246,6 +247,10 @@ const seriesListSchema = {
   schemaData={seriesListSchema}
 >
   <div class="container mx-auto px-4 py-12">
+      <div class="debug-panel bg-space-black text-starfleet-gold p-4 mb-6 rounded-lg border border-starfleet-gold">
+        <div><strong>DEBUG:</strong></div>
+        <div>Slugs for all series cards: <span class="text-console-green">{initialSeries.map(s => s.slug || s.uid || s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')).join(", ")}</span></div>
+      </div>
       <div class="lcars-header mb-8">
         <div class="lcars-header-content">
           <h1 class="text-3xl">Federation Database: Star Trek Series</h1>
@@ -369,7 +374,7 @@ const seriesListSchema = {
     </div>
     
     <!-- Series container with enhanced timeline style -->
-    <div id="series-container" class="timeline-container">
+    <div class="timeline-container" id="series-container" aria-label="Star Trek Series Timeline">
       <!-- Timeline legend -->
       <div class="timeline-legend">
         <div class="legend-item">
@@ -381,8 +386,99 @@ const seriesListSchema = {
           <span class="legend-text">Release Timeline</span>
         </div>
       </div>
-      <!-- Year markers will be added dynamically -->
-      <!-- Series will be rendered here by JavaScript -->
+      <!-- Central timeline line is handled by CSS ::before -->
+
+      {initialSeries.map((series, idx) => {
+        // Determine left/right alignment
+        const alignment = idx % 2 === 0 ? 'left' : 'right';
+        // Use wikiImage, image, or fallback
+        const imageUrl = series.wikiImage || series.image || '/images/stars-placeholder.jpg';
+        // Slug for link
+        const slug = series.slug || series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+        // Dates
+        const stardate = series.stardate || '';
+        const years = series.years || '';
+        // Abbreviation
+        const abbr = series.abbreviation || "ST";
+        // Wiki summary
+        const summary = series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : (series.description || `Star Trek series that aired on ${series.originalNetwork || "television"}.`);
+        // Memory Alpha link
+        const wikiUrl = series.wikiUrl;
+        // Seasons
+        const seasons = series.seasons || series.seasonsCount || "?";
+        // Primary/secondary date for badge
+        const primaryDate = stardate || years || "Unknown";
+        const secondaryDate = years || stardate || "Unknown";
+        // Colors
+        const primaryColor = 'starfleet-blue';
+        const secondaryColor = 'console-green';
+
+        return (
+          <div class={`timeline-row ${alignment} relative`} key={series.uid || series.slug || idx}>
+            {/* Timeline node */}
+            <div class="timeline-node absolute left-1/2 transform -translate-x-1/2" aria-hidden="true"></div>
+            {/* Connector */}
+            <div class={`connector absolute top-16 ${alignment === 'left' ? 'right-0' : 'left-0'} w-12 h-0.5 bg-starfleet-gold transform -translate-y-1/2`} aria-hidden="true"></div>
+            {/* Card */}
+            <a href={`/series/${slug}/`} class="series-card" aria-label={`View details for ${series.title}`}>
+              <div class="lcars-card-header flex">
+                <div class="w-16 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+                <div class="flex-1 h-8 bg-starfleet-blue flex items-center justify-center">
+                  <span class="text-sm font-bold tracking-wider">{abbr}</span>
+                </div>
+              </div>
+              <div class="card-body bg-space-black bg-opacity-90 p-4 border-x border-starfleet-blue">
+                <div class="card-date-badge">{primaryDate}</div>
+                <div class="relative aspect-video mb-4 overflow-hidden rounded-lg shadow-lg card-image-container">
+                  <img
+                    src={imageUrl}
+                    alt={series.title}
+                    class="w-full h-full object-cover card-image"
+                    loading="lazy"
+                    onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
+                  />
+                  <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-3">
+                    <span class="text-console-green text-sm font-mono font-bold">{secondaryDate}</span>
+                  </div>
+                </div>
+                <h2 class="text-xl text-white font-semibold mb-3 border-b border-starfleet-blue pb-2 card-title">{series.title}</h2>
+                <div class="flex justify-between text-gray-300 text-sm mb-3 bg-space-deep p-2 rounded card-meta">
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-console-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    {secondaryDate}
+                  </span>
+                  <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-console-green" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    {seasons} seasons
+                  </span>
+                </div>
+                <p class="text-gray-300 text-sm leading-relaxed card-description">{summary}</p>
+                {wikiUrl && (
+                  <div class="mt-4 pt-2 border-t border-gray-700 card-links">
+                    <a href={wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center bg-space-deep px-2 py-1 rounded" onClick={e => e.stopPropagation()}>
+                      Memory Alpha
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
+                        <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                        <path d="M15 3h6v6"></path>
+                        <path d="M10 14L21 3"></path>
+                      </svg>
+                    </a>
+                  </div>
+                )}
+              </div>
+              <div class="lcars-card-footer flex">
+                <div class="w-10 h-8 bg-starfleet-red"></div>
+                <div class="flex-1 h-8 bg-console-blue"></div>
+                <div class="w-24 h-8 bg-starfleet-gold rounded-br-lg"></div>
+              </div>
+            </a>
+          </div>
+        );
+      })}
     </div>
     
     <!-- Pagination controls -->
@@ -673,25 +769,38 @@ const seriesListSchema = {
             });
             
             // Create and append each series card
-            seriesToRender.forEach(series => {
+            // Alternate left/right columns for timeline layout
+            seriesToRender.forEach((series, idx) => {
               if (!series || !series.title) {
                 console.error("Invalid series data:", series);
                 return; // Skip invalid series
               }
-              
-              // Try to use wikiImage first, then image, then fallback
+
+              const alignment = idx % 2 === 0 ? 'left' : 'right';
               const imageUrl = series.wikiImage || series.image || '/images/stars-placeholder.jpg';
-              
-              // Create a slug if not already present
               const slug = series.slug || series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
-              
-              // Determine which data to show based on view mode
               const primaryDate = viewMode === 'chronology' ? series.stardate : series.years;
               const secondaryDate = viewMode === 'chronology' ? series.years : series.stardate;
               const primaryColor = viewMode === 'chronology' ? 'starfleet-blue' : 'starfleet-red';
               const secondaryColor = viewMode === 'chronology' ? 'console-green' : 'console-blue';
-              
-              // Create the card element
+
+              // Create the timeline row container
+              const row = document.createElement('div');
+              row.className = `timeline-row ${alignment} relative`;
+
+              // Timeline node
+              const node = document.createElement('div');
+              node.className = 'timeline-node absolute left-1/2 transform -translate-x-1/2';
+              node.setAttribute('aria-hidden', 'true');
+              row.appendChild(node);
+
+              // Connector
+              const connector = document.createElement('div');
+              connector.className = `connector absolute top-16 ${alignment === 'left' ? 'right-0' : 'left-0'} w-12 h-0.5 bg-starfleet-gold transform -translate-y-1/2`;
+              connector.setAttribute('aria-hidden', 'true');
+              row.appendChild(connector);
+
+              // Card
               const card = document.createElement('a');
               card.href = `/series/${slug}/`;
               card.className = 'series-card';
@@ -702,10 +811,8 @@ const seriesListSchema = {
                     <span class="text-sm font-bold tracking-wider">${series.abbreviation || "ST"}</span>
                   </div>
                 </div>
-                
                 <div class="card-body bg-space-black bg-opacity-90 p-4 border-x border-${primaryColor}">
                   <div class="card-date-badge">${primaryDate || "Unknown"}</div>
-                  
                   <div class="relative aspect-video mb-4 overflow-hidden rounded-lg shadow-lg card-image-container">
                     <img
                       src="${imageUrl}"
@@ -718,9 +825,7 @@ const seriesListSchema = {
                       <span class="text-${secondaryColor} text-sm font-mono font-bold">${secondaryDate || "Unknown"}</span>
                     </div>
                   </div>
-                  
                   <h2 class="text-xl text-white font-semibold mb-3 border-b border-${primaryColor} pb-2 card-title">${series.title}</h2>
-                  
                   <div class="flex justify-between text-gray-300 text-sm mb-3 bg-space-deep p-2 rounded card-meta">
                     <span class="flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-${secondaryColor}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -735,9 +840,7 @@ const seriesListSchema = {
                       ${series.seasons || series.seasonsCount || "?"} seasons
                     </span>
                   </div>
-                  
                   <p class="text-gray-300 text-sm leading-relaxed card-description">${series.wikiSummary ? series.wikiSummary.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : (series.description || `Star Trek series that aired on ${series.originalNetwork || "television"}.`)}</p>
-                  
                   ${series.wikiUrl ? `
                     <div class="mt-4 pt-2 border-t border-gray-700 card-links">
                       <a href="${series.wikiUrl}" target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center bg-space-deep px-2 py-1 rounded" onclick="event.stopPropagation()">
@@ -751,22 +854,24 @@ const seriesListSchema = {
                     </div>
                   ` : ''}
                 </div>
-                
                 <div class="lcars-card-footer flex">
                   <div class="w-10 h-8 bg-starfleet-${viewMode === 'chronology' ? 'red' : 'blue'}"></div>
                   <div class="flex-1 h-8 bg-console-blue"></div>
                   <div class="w-24 h-8 bg-starfleet-gold rounded-br-lg"></div>
                 </div>
               `;
-              
+
               // Add a data attribute for the year to help with timeline visualization
               const year = viewMode === 'chronology'
                 ? (series.stardate ? parseInt(series.stardate.split('-')[0]) : 0)
                 : (series.productionStartYear || 0);
               card.dataset.year = year;
-              
-              // Append the card to the fragment
-              fragment.appendChild(card);
+
+              // Append the card to the timeline row
+              row.appendChild(card);
+
+              // Append the row to the fragment
+              fragment.appendChild(row);
             });
             
             // Append all cards to the container at once

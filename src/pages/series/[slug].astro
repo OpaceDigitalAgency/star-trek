@@ -17,8 +17,8 @@ export async function getStaticPaths() {
     allSeries = await stapiService.getSeries();
     
     // Filter out irrelevant entries and ensure we have the main series
-    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
-                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
+    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine",
+                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery",
                         "Star Trek: Picard", "Star Trek: The Animated Series"];
     
     allSeries = allSeries.filter(series => mainSeries.includes(series.title));
@@ -34,20 +34,25 @@ export async function getStaticPaths() {
   }
   
   // Create paths for each series
-  return allSeries.map(series => {
+  const allSlugs = allSeries.map(series => series.slug || slugify(series.title));
+  const paths = allSeries.map(series => {
     // Ensure we're using the same slug format consistently
     const slug = series.slug || slugify(series.title);
     return {
       params: { slug },
-      props: { series }
+      props: { series, __allSlugs: allSlugs }
     };
   });
+  console.log('[series/[slug].astro] getStaticPaths slugs:', paths.map(p => p.params.slug));
+  return paths;
 }
 
 // Get the series from props
 const { series } = Astro.props;
 
-// Handle case when series is not found
+console.log('[series/[slug].astro] Rendering slug:', Astro.params.slug, 'Series:', series ? series.title : 'NOT FOUND');
+
+ // Handle case when series is not found
 if (!series) {
   return Astro.redirect('/series');
 }
@@ -69,13 +74,33 @@ const seriesSchema = {
   "inLanguage": "English"
 };
 ---
+let debugSlugs = [];
+if (typeof globalThis !== "undefined") {
+  // Store slugs in a global variable for debugging (client-side)
+  globalThis.__seriesSlugs = globalThis.__seriesSlugs || [];
+}
+if (typeof Astro !== "undefined" && Astro.props && Astro.props.__allSlugs) {
+  debugSlugs = Astro.props.__allSlugs;
+  if (typeof globalThis !== "undefined") {
+    globalThis.__seriesSlugs = debugSlugs;
+  }
+}
 
-<Layout 
+<Layout
   title={`${series.title} | Star Trek Series Profile`}
   description={`Learn about ${series.title}, a Star Trek series that aired from ${series.years}.`}
   schemaData={seriesSchema}
 >
   <div class="container mx-auto px-4 py-12">
+    <div class="debug-panel bg-space-black text-starfleet-gold p-4 mb-6 rounded-lg border border-starfleet-gold">
+      <div><strong>DEBUG:</strong></div>
+      <div>Current slug: <span class="text-console-green">{Astro.params.slug}</span></div>
+      <div>Series found: <span class="text-console-green">{series ? series.title : "NOT FOUND"}</span></div>
+      <div>All available slugs: <span class="text-console-green">{Array.isArray(debugSlugs) && debugSlugs.length > 0 ? debugSlugs.join(", ") : "Unavailable"}</span></div>
+      {!series && (
+        <div class="text-red-500 font-bold mt-2">WARNING: Series not found for this slug. You will be redirected to /series.</div>
+      )}
+    </div>
     <div class="lcars-header mb-8">
       <div class="lcars-header-content">
         <h1 class="text-3xl">{series.title}</h1>
