@@ -11,14 +11,14 @@ class ProgressiveImage extends HTMLElement {
     this._error = false;
     this._src = '';
     this._alt = '';
-    this._fallback = '/images/generic-character.jpg';
+    this._fallback = '/images/stars-placeholder.jpg';
     this._class = '';
   }
 
   connectedCallback() {
     this._src = this.getAttribute('src') || '';
     this._alt = this.getAttribute('alt') || '';
-    this._fallback = this.getAttribute('fallback') || '/images/generic-character.jpg';
+    this._fallback = this.getAttribute('fallback') || '/images/stars-placeholder.jpg';
     this._class = this.getAttribute('class') || '';
     this.render();
     this.loadImage();
@@ -55,9 +55,16 @@ class ProgressiveImage extends HTMLElement {
       this.render();
     };
     img.onerror = () => {
+      console.warn(`Failed to load image: ${this._src}, falling back to: ${this._fallback}`);
       this._loading = false;
       this._error = true;
       this.render();
+      
+      // Try to load the fallback image
+      if (this._fallback && this._fallback !== this._src) {
+        const fallbackImg = new window.Image();
+        fallbackImg.src = this._fallback;
+      }
     };
   }
 

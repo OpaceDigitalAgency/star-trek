@@ -35,14 +35,22 @@ export async function getStaticPaths() {
   
   // Create paths for each series
   return allSeries.map(series => {
+    // Ensure we're using the same slug format consistently
+    const slug = series.slug || slugify(series.title);
     return {
-      params: { slug: series.uid || series.slug || slugify(series.title) },
+      params: { slug },
       props: { series }
     };
   });
 }
 
+// Get the series from props
 const { series } = Astro.props;
+
+// Handle case when series is not found
+if (!series) {
+  return Astro.redirect('/series');
+}
 
 // Create JSON-LD schema for series page
 const seriesSchema = {

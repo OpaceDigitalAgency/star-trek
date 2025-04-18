@@ -29,19 +29,24 @@ export async function handler(event, context) {
     }
     
     // Find the series by slug or UID
-    let series = allSeries.find(s => 
-      s.slug === slug || 
-      s.uid === slug || 
-      slugify(s.title) === slug
-    );
+    let series = allSeries.find(s => {
+      // Ensure we're using the same slug format consistently
+      const seriesSlug = s.slug || slugify(s.title);
+      return seriesSlug === slug || s.uid === slug;
+    });
     
-    // If not found, return 404
+    // If not found, return 404 with more detailed error message
     if (!series) {
+      console.error(`Series not found with slug: ${slug}. Available slugs: ${allSeries.map(s => s.slug || slugify(s.title)).join(', ')}`);
       return {
         statusCode: 404,
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           error: 'Series not found',
-          message: `No series found with slug or UID: ${slug}`
+          message: `No series found with slug or UID: ${slug}`,
+          availableSlugs: allSeries.map(s => s.slug || slugify(s.title))
         })
       };
     }

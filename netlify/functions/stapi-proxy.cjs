@@ -63,7 +63,11 @@ exports.handler = async (event) => {
             filtered = filtered.filter(c => c.important === true || c.isImportant === true);
         }
         if (filters.keep === 'true') {
+            // Ensure we only show primary actor records
             filtered = filtered.filter(c => c.keep === true);
+            
+            // Log how many records have keep=true for debugging
+            console.log(`Found ${filtered.length} characters with keep=true`);
         }
     
         // Paginate

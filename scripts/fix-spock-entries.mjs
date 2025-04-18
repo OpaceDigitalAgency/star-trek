@@ -15,6 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Define paths
 const charactersJsonPath = path.join(__dirname, '..', 'src', 'data', 'characters.json');
 const charactersLocalJsonPath = path.join(__dirname, '..', 'src', 'data', 'characters-local.json');
+const netlifyCharactersJsonPath = path.join(__dirname, '..', 'netlify', 'functions', 'characters.json');
 
 // Helper function to score a character's completeness
 function scoreCharacterCompleteness(character) {
@@ -105,6 +106,15 @@ async function fixSpockEntries() {
           await fs.writeFile(charactersLocalJsonPath, JSON.stringify(characters, null, 2));
         } catch (error) {
           console.log('characters-local.json not found, skipping update.');
+        }
+        
+        // Also update the Netlify functions characters.json if it exists
+        try {
+          await fs.access(netlifyCharactersJsonPath);
+          console.log('Writing updated data to netlify/functions/characters.json...');
+          await fs.writeFile(netlifyCharactersJsonPath, JSON.stringify(characters, null, 2));
+        } catch (error) {
+          console.log('netlify/functions/characters.json not found, skipping update.');
         }
         
         console.log('Successfully updated Spock entries!');

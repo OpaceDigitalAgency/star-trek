@@ -63,10 +63,11 @@ exports.handler = async (event) => {
         if (filters.productionCompany) {
             const companyLower = filters.productionCompany.toLowerCase();
             filtered = filtered.filter(s => {
-                if (typeof s.productionCompany === 'object' && s.productionCompany?.name) {
-                    return s.productionCompany.name.toLowerCase().includes(companyLower);
-                }
-                return s.productionCompany && s.productionCompany.toLowerCase().includes(companyLower);
+                const companyName = typeof s.productionCompany === 'object' && s.productionCompany?.name
+                    ? s.productionCompany.name
+                    : s.productionCompany;
+                
+                return companyName && companyName.toLowerCase().includes(companyLower);
             });
         }
         
@@ -74,10 +75,11 @@ exports.handler = async (event) => {
         if (filters.originalNetwork) {
             const networkLower = filters.originalNetwork.toLowerCase();
             filtered = filtered.filter(s => {
-                if (typeof s.originalNetwork === 'object' && s.originalNetwork?.name) {
-                    return s.originalNetwork.name.toLowerCase().includes(networkLower);
-                }
-                return s.originalNetwork && s.originalNetwork.toLowerCase().includes(networkLower);
+                const networkName = typeof s.originalNetwork === 'object' && s.originalNetwork?.name
+                    ? s.originalNetwork.name
+                    : s.originalNetwork;
+                
+                return networkName && networkName.toLowerCase().includes(networkLower);
             });
         }
         
