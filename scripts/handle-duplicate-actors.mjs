@@ -153,6 +153,9 @@ async function handleDuplicateActors() {
     const duplicates = findPotentialDuplicates(characters);
     console.log(`Found ${duplicates.size} potential duplicate actor sets`);
     
+    // Create a Set to track all UIDs that are part of duplicate sets
+    const duplicateUIDs = new Set();
+    
     // First, mark all characters as "keep: false" by default
     for (const character of characters) {
       character.keep = false;
@@ -164,6 +167,13 @@ async function handleDuplicateActors() {
     // For duplicate sets, find the most complete record
     for (const [name, entries] of duplicates.entries()) {
       console.log(`Processing duplicates for: ${name} (${entries.length} entries)`);
+      
+      // Add all UIDs in this duplicate set to our tracking Set
+      for (const entry of entries) {
+        if (entry.uid) {
+          duplicateUIDs.add(entry.uid);
+        }
+      }
       
       // Find the most complete record using our scoring system
       let mostComplete = entries[0];
@@ -185,11 +195,11 @@ async function handleDuplicateActors() {
       console.log(`  Selected entry with UID ${mostComplete.uid} as the most complete (score: ${maxScore})`);
     }
     
-    // Now mark all non-duplicate characters as "keep: true" as well
+    // Now mark all non-duplicate characters as "keep: true"
     let uniqueCount = 0;
     for (const character of characters) {
-      // If character doesn't have a keep flag yet (not part of a duplicate set)
-      if (character.keep !== true) {
+      // If character is not part of any duplicate set
+      if (character.uid && !duplicateUIDs.has(character.uid)) {
         character.keep = true;
         uniqueCount++;
       }
