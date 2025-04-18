@@ -211,29 +211,82 @@ const seriesSchema = {
       console.log("Series data received:", series);
 
       // Update DOM with series data
+      // Update title and basic info
       document.getElementById('series-title').textContent = series.title;
-      document.getElementById('series-image').src = series.wikiImage || series.image || "/images/stars-placeholder.jpg";
-      document.getElementById('series-image').alt = series.title;
+      
+      // Handle image loading with proper error handling
+      const seriesImage = document.getElementById('series-image');
+      const imagePath = series.wikiImage || series.image || "/images/stars-placeholder.jpg";
+      console.log('Loading series image from:', imagePath);
+      
+      // Set image source and add error handling
+      seriesImage.src = imagePath;
+      seriesImage.alt = series.title;
+      seriesImage.onerror = function() {
+        console.error('Failed to load image:', imagePath);
+        if (imagePath !== "/images/stars-placeholder.jpg") {
+          console.log('Falling back to placeholder image');
+          this.src = "/images/stars-placeholder.jpg";
+        }
+      };
+      
+      // Update other series information
       document.getElementById('series-abbreviation').textContent = series.abbreviation || "N/A";
-      document.getElementById('series-years').textContent = series.years;
-      document.getElementById('series-stardate').textContent = series.stardate;
-      document.getElementById('series-seasons').textContent = series.seasons || series.seasonsCount || "?";
-      document.getElementById('series-episodes').textContent = series.episodes || series.episodesCount || "?";
+      document.getElementById('series-years').textContent = series.years || "Unknown";
+      // Update timeline and episode information with detailed logging
+      document.getElementById('series-stardate').textContent = series.stardate || "Unknown";
+      
+      // Handle seasons count
+      const seasonsCount = series.seasons || series.seasonsCount;
+      console.log('Series seasons count:', seasonsCount);
+      document.getElementById('series-seasons').textContent = seasonsCount || "?";
+      
+      // Handle episodes with detailed logging
+      let episodesText = "?";
+      console.log('Processing episodes data:', series.episodes, 'episodesCount:', series.episodesCount);
+      
+      if (series.episodesCount) {
+        episodesText = series.episodesCount;
+      } else if (series.episodes) {
+        if (typeof series.episodes === 'object') {
+          episodesText = series.episodes.count || series.episodes.length || "?";
+        } else if (typeof series.episodes === 'number' || typeof series.episodes === 'string') {
+          episodesText = series.episodes;
+        }
+      }
+      console.log('Final episodes text:', episodesText);
+      document.getElementById('series-episodes').textContent = episodesText;
+      
       document.getElementById('series-network').textContent = series.originalNetwork || "Various";
-      document.getElementById('series-production').textContent = series.productionCompany || "Paramount";
+      
+      // Handle production company object - extract the name if it's an object
+      let productionText = "Paramount";
+      if (series.productionCompany) {
+        if (typeof series.productionCompany === 'object') {
+          productionText = series.productionCompany.name || "Paramount";
+        } else if (typeof series.productionCompany === 'string') {
+          productionText = series.productionCompany;
+        }
+      }
+      document.getElementById('series-production').textContent = productionText;
       document.getElementById('series-description').innerHTML = series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years}.`;
 
-      // Update timeline info
-      let timelineText = `${series.title} is set in the years ${series.stardate}, `;
-      if (series.title.includes("Discovery") && series.stardate.includes("3188")) {
+      // Update timeline info - with proper null checks
+      const title = series.title || "";
+      const stardate = series.stardate || "Unknown";
+      
+      let timelineText = `${title} is set in the years ${stardate}, `;
+      
+      // Safely check for string includes with null checks
+      if (title && title.includes("Discovery") && stardate && stardate.includes("3188")) {
         timelineText += "initially during the 2250s before the crew time-traveled to the 32nd century."
       } else {
-        const era = series.title.includes("Original") ? "Five-Year Mission" :
-                    series.title.includes("Next Generation") ? "24th century" :
-                    series.title.includes("Deep Space Nine") ? "Dominion War era" :
-                    series.title.includes("Voyager") ? "Delta Quadrant expedition" :
-                    series.title.includes("Enterprise") ? "early days of Starfleet" :
-                    series.title.includes("Picard") ? "post-Dominion War era" :
+        const era = title.includes("Original") ? "Five-Year Mission" :
+                    title.includes("Next Generation") ? "24th century" :
+                    title.includes("Deep Space Nine") ? "Dominion War era" :
+                    title.includes("Voyager") ? "Delta Quadrant expedition" :
+                    title.includes("Enterprise") ? "early days of Starfleet" :
+                    title.includes("Picard") ? "post-Dominion War era" :
                     "Star Trek timeline";
         timelineText += `during the ${era}.`;
       }
