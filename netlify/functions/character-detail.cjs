@@ -1,5 +1,5 @@
 const data = require('../../src/data/characters.json');
-const { slugify } = require('../../src/utils/slugify.js');
+const { slugify } = require('../../src/utils/slugify.cjs');
 const fetch = require('node-fetch');
 
 exports.handler = async function(event, context) {
