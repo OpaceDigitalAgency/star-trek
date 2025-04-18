@@ -396,17 +396,17 @@ const charactersSchema = {
         // Update total count display based on the overall total for the current filter set
         countBadge.textContent = `${totalCharacters} characters found`;
 
-      // Update pagination display (uses overall totalPages for the current filter set)
-      pageNum.textContent = currentPage;
-      totalNum.textContent = totalPages; // Display the overall total pages
+        // Update pagination display (uses overall totalPages for the current filter set)
+        pageNum.textContent = currentPage;
+        totalNum.textContent = totalPages; // Display the overall total pages
 
-      // Enable/disable pagination buttons based on overall totalPages
-      prevBtn.disabled = currentPage <= 1 || isLoading;
-      nextBtn.disabled = currentPage >= totalPages || isLoading;
+        // Enable/disable pagination buttons based on overall totalPages
+        prevBtn.disabled = currentPage <= 1 || isLoading;
+        nextBtn.disabled = currentPage >= totalPages || isLoading;
 
-      // Display "No Results" message if totalCharacters is 0 after fetch/filter
-      noResults.classList.toggle('hidden', totalCharacters > 0);
-      container.classList.toggle('hidden', totalCharacters === 0); // Hide grid if no results
+        // Display "No Results" message if totalCharacters is 0 after fetch/filter
+        noResults.classList.toggle('hidden', totalCharacters > 0);
+        container.classList.toggle('hidden', totalCharacters === 0); // Hide grid if no results
 
       // Render character cards for the current page's items (allCharacters is always current page)
       if (totalCharacters > 0) {
@@ -454,7 +454,6 @@ const charactersSchema = {
           container.innerHTML = '';
       }
       // Removed Memory Alpha image fetching logic
-      }
     }
 
     // Debounced version of applying filters for search input
