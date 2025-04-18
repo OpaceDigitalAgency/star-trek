@@ -1,7 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
-import { slugify } from '../../utils/slugify.js';
+/* removed: import { slugify } from '../../utils/slugify.js'; */
 
 // SEO metadata for pagination
 const currentPage = 1; // Initial page is always 1 for SSR
@@ -231,6 +231,20 @@ const charactersSchema = {
 />
 
 <script>
+  // Simple slugify function for client-side use
+  function slugify(text) {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')        // Replace spaces with -
+      .replace(/&/g, '-and-')      // Replace & with 'and'
+      .replace(/[^\w\-]+/g, '')    // Remove all non-word characters
+      .replace(/\-\-+/g, '-')      // Replace multiple - with single -
+      .replace(/^-+/, '')          // Trim - from start of text
+      .replace(/-+$/, '');         // Trim - from end of text
+  }
+
   // Client-side STAPI client using the Netlify proxy
   const stapiClient = {
     PROXY_URL: '/api/characters', // Use the proxy endpoint
@@ -423,7 +437,19 @@ const charactersSchema = {
                   const imageUrl = c.wikiImage || '/images/generic-character.jpg';
                   
                   // Create a slug that includes both the character name and UID
-                  const nameSlug = c.name ? slugify(c.name) : 'unknown';
+                  // Debug logging for slugify and character fields
+                  if (typeof slugify === 'undefined') {
+                    console.error("slugify is undefined in client-side render. This will cause a runtime error.");
+                  } else {
+                    console.log("slugify is defined:", slugify);
+                  }
+                  if (!c.uid) {
+                    console.error("Character missing uid:", c);
+                  }
+                  if (!c.name) {
+                    console.error("Character missing name:", c);
+                  }
+                  const nameSlug = c.name ? (typeof slugify !== 'undefined' ? slugify(c.name) : 'unknown') : 'unknown';
                   const slug = c.uid ? `${nameSlug}-${c.uid}` : nameSlug; // Combine name slug and UID
 
              return `
