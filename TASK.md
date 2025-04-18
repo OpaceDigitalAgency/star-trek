@@ -10,8 +10,6 @@
 4. Optimize Memory Alpha requests (rate limiting, retries, queueing).
 5. ✅ Update frontend for loading/progressive image states and fallbacks.
 
-None currently active.
-
 ## Completed Tasks
 1. Fix admin issues:
    - Species dropdown, duplicates & search
@@ -151,3 +149,24 @@ None currently active.
    - Added series metadata display
    - Included Memory Alpha integration
    - Created timeline placement information section
+
+### Improve Series Page Layout and UX (COMPLETED)
+1. ✅ Implement a proper timeline-style layout that clearly shows series in chronological order by date:
+  - Added a clear timeline with a central line and year markers
+  - Implemented a legend to distinguish between in-universe and release order timelines
+2. ✅ Redesign each series card to be in a nice, tidy box with consistent styling:
+  - Created consistent card styling with prominent date badges
+  - Enhanced image containers with better aspect ratio and loading states
+  - Improved information hierarchy with clear section separation
+3. ✅ Add visual elements to emphasize the timeline relationship between series:
+  - Added pulsing dots at timeline connection points
+  - Implemented connecting lines with glow effects
+  - Created year markers that adjust based on timeline view
+4. ✅ Ensure the layout works well on all screen sizes:
+  - Optimized for mobile devices with repositioned timeline elements
+  - Implemented stacked cards on smaller screens
+  - Adjusted spacing and sizing for better readability
+5. ✅ Enhance the styling and functionality of filters and dropdowns:
+  - Styled filter labels with underlines and better spacing
+  - Improved dropdown focus and hover states
+  - Added interactive elements for better usability
