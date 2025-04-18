@@ -5,7 +5,6 @@ const fs = require('fs');
 const path = require('path');
 
 const STAPI_BASE_URL = 'https://stapi.co/api/v1/rest';
-const SERIES_CACHE_PATH = path.join(__dirname, '..', '..', 'src', 'data', 'series.json');
 
 exports.handler = async (event) => {
     // Define headers for all responses
@@ -29,29 +28,21 @@ exports.handler = async (event) => {
     // Always use local JSON for filtering to support all filter types
     {
         // Use local JSON for global search/filter
+        const filePath = path.join(__dirname, '..', '..', 'src', 'data', 'series.json');
         let allSeries = [];
         try {
-            // Check if the series.json file exists
-            if (fs.existsSync(SERIES_CACHE_PATH)) {
-                // If it exists, read from it
-                allSeries = JSON.parse(fs.readFileSync(SERIES_CACHE_PATH, 'utf-8'));
-                console.log(`Read ${allSeries.length} series from local cache`);
+            // Check if the file exists
+            if (fs.existsSync(filePath)) {
+                allSeries = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
             } else {
-                // If it doesn't exist, fetch from STAPI and create it
-                console.log('Local series cache not found, fetching from STAPI');
+                // If local file doesn't exist, fetch from STAPI
+                console.log('Local series.json not found, fetching from STAPI');
                 const response = await fetch(`${STAPI_BASE_URL}/series/search?pageSize=100`);
-                if (!response.ok) {
-                    throw new Error(`STAPI API error: ${response.status} ${response.statusText}`);
-                }
                 const data = await response.json();
                 allSeries = data.series || [];
-                
-                // Write to cache file
-                fs.writeFileSync(SERIES_CACHE_PATH, JSON.stringify(allSeries, null, 2));
-                console.log(`Created local cache with ${allSeries.length} series`);
             }
         } catch (err) {
-            console.error('Failed to load or create series data:', err);
+            console.error('Failed to load series data:', err);
             return {
                 statusCode: 500,
                 headers: { 'Content-Type': 'application/json' },
@@ -62,7 +53,7 @@ exports.handler = async (event) => {
         // Apply filters
         let filtered = allSeries;
         
-        // Filter by title
+        // Filter by title (search)
         if (filters.title) {
             const titleLower = filters.title.toLowerCase();
             filtered = filtered.filter(s => s.title && s.title.toLowerCase().includes(titleLower));
@@ -71,27 +62,38 @@ exports.handler = async (event) => {
         // Filter by production company
         if (filters.productionCompany) {
             const companyLower = filters.productionCompany.toLowerCase();
-            filtered = filtered.filter(s => 
-                s.productionCompany && s.productionCompany.toLowerCase().includes(companyLower)
-            );
+            filtered = filtered.filter(s => {
+                if (typeof s.productionCompany === 'object' && s.productionCompany?.name) {
+                    return s.productionCompany.name.toLowerCase().includes(companyLower);
+                }
+                return s.productionCompany && s.productionCompany.toLowerCase().includes(companyLower);
+            });
         }
         
         // Filter by original network
         if (filters.originalNetwork) {
             const networkLower = filters.originalNetwork.toLowerCase();
-            filtered = filtered.filter(s => 
-                s.originalNetwork && s.originalNetwork.toLowerCase().includes(networkLower)
-            );
+            filtered = filtered.filter(s => {
+                if (typeof s.originalNetwork === 'object' && s.originalNetwork?.name) {
+                    return s.originalNetwork.name.toLowerCase().includes(networkLower);
+                }
+                return s.originalNetwork && s.originalNetwork.toLowerCase().includes(networkLower);
+            });
         }
         
-        // Filter by decade/era
+        // Filter by decade
         if (filters.decade) {
-            const decade = parseInt(filters.decade);
+            const decade = parseInt(filters.decade, 10);
             filtered = filtered.filter(s => {
-                const startYear = s.productionStartYear ? parseInt(s.productionStartYear) : 0;
-                const decadeStart = Math.floor(startYear / 10) * 10;
-                return decadeStart === decade;
+                const startYear = s.productionStartYear;
+                return startYear && Math.floor(startYear / 10) * 10 === decade;
             });
+        }
+        
+        // Filter by abbreviation
+        if (filters.abbreviation) {
+            const abbrevLower = filters.abbreviation.toLowerCase();
+            filtered = filtered.filter(s => s.abbreviation && s.abbreviation.toLowerCase().includes(abbrevLower));
         }
     
         // Paginate

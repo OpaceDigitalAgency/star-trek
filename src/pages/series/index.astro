@@ -147,7 +147,7 @@ try {
       years: extractYears(series),
       stardate: extractStardateYears(series),
       image: stapiService.getImageUrl(series.title, 'series'),
-      slug: series.uid || series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+      slug: series.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
     }));
     
     // Enhance with Memory Alpha data for each series
@@ -188,11 +188,13 @@ try {
 const productionCompanies = [...new Set(initialSeries
   .map(s => s.productionCompany)
   .filter(Boolean)
+  .map(company => typeof company === 'object' ? company.name || 'Unknown' : company)
 )].sort();
 
 const networks = [...new Set(initialSeries
   .map(s => s.originalNetwork)
   .filter(Boolean)
+  .map(network => typeof network === 'object' ? network.name || 'Unknown' : network)
 )].sort();
 
 // Extract decades for filter dropdown

@@ -24,12 +24,22 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/characters.json"]
+  included_files = ["netlify/functions/characters.json", "src/data/series.json"]
 
 # Define redirects for Memory Alpha proxy
 [[redirects]]
   from = "/api/proxy-image"
   to = "/.netlify/functions/proxy-image"
+  status = 200
+
+[[redirects]]
+  from = "/api/series"
+  to = "/.netlify/functions/stapi-series-proxy"
+  status = 200
+
+[[redirects]]
+  from = "/series/:slug"
+  to = "/.netlify/functions/series-detail"
   status = 200
 
 [[redirects]]
