@@ -170,6 +170,14 @@ try {
       }
     }
     
+    // Sort series by in-universe chronology (stardate or years)
+    allSeries.sort((a, b) => {
+      // Extract years from stardate or production years
+      const aYear = parseInt(a.stardate?.split('-')?.[0] || a.productionStartYear || 0);
+      const bYear = parseInt(b.stardate?.split('-')?.[0] || b.productionStartYear || 0);
+      return aYear - bYear;
+    });
+    
     initialSeries = allSeries.slice(0, PAGE_SIZE);
     totalPages = Math.ceil(allSeries.length / PAGE_SIZE);
     totalSeries = allSeries.length;
@@ -427,14 +435,15 @@ const seriesListSchema = {
             {/* Card */}
             <a href={`/series/${slug}/`} class="series-card" aria-label={`View details for ${series.title}`} tabindex="0">
               <div class="lcars-card-header flex">
-                <div class="w-16 h-8 bg-starfleet-gold rounded-tl-lg"></div>
-                <div class="flex-1 h-8 bg-starfleet-blue flex items-center justify-center">
-                  <span class="text-sm font-bold tracking-wider">{abbr}</span>
+                <div class="w-24 h-10 bg-starfleet-gold rounded-tl-lg"></div>
+                <div class="flex-1 h-10 bg-starfleet-blue flex items-center justify-center">
+                  <span class="text-base font-bold tracking-wider text-white">{abbr}</span>
                 </div>
+                <div class="w-12 h-10 bg-starfleet-gold"></div>
               </div>
-              <div class="card-body bg-space-black bg-opacity-90 p-4 border-x border-starfleet-blue">
+              <div class="card-body bg-space-black bg-opacity-90 p-0 border-x border-b border-starfleet-blue">
                 <div class="card-date-badge">{primaryDate}</div>
-                <div class="relative aspect-video mb-4 overflow-hidden rounded-lg shadow-lg card-image-container">
+                <div class="card-image-container">
                   <img
                     src={imageUrl}
                     alt={series.title}
@@ -464,7 +473,7 @@ const seriesListSchema = {
                 <p class="text-gray-300 text-sm leading-relaxed card-description">{summary}</p>
                 {wikiUrl && (
                   <div class="mt-4 pt-2 border-t border-gray-700 card-links">
-                    <a href={wikiUrl} target="_blank" rel="noopener noreferrer" class="text-xs text-starfleet-gold hover:underline inline-flex items-center bg-space-deep px-2 py-1 rounded" onClick={e => e.stopPropagation()}>
+                    <a href={wikiUrl} target="_blank" rel="noopener noreferrer" class="memory-alpha-link-card text-xs text-starfleet-gold hover:underline inline-flex items-center bg-space-deep px-2 py-1 rounded" onClick={e => e.stopPropagation()}>
                       Memory Alpha
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1">
                         <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
@@ -1004,9 +1013,10 @@ const seriesListSchema = {
   /* Timeline container with enhanced styling */
   .timeline-container {
     position: relative;
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 40px 0;
+    padding: 60px 0;
+    overflow: visible;
   }
   
   /* Timeline legend */
@@ -1055,14 +1065,14 @@ const seriesListSchema = {
   .timeline-container::before {
     content: '';
     position: absolute;
-    width: 6px;
-    background: linear-gradient(to bottom, var(--starfleet-blue), var(--console-blue));
+    width: 8px;
+    background: linear-gradient(to bottom, var(--starfleet-gold), var(--starfleet-blue), var(--console-blue));
     top: 0;
     bottom: 0;
     left: 50%;
-    margin-left: -3px;
-    border-radius: 3px;
-    box-shadow: 0 0 15px var(--starfleet-blue);
+    margin-left: -4px;
+    border-radius: 4px;
+    box-shadow: 0 0 20px var(--starfleet-blue);
     z-index: 0;
   }
 
@@ -1087,7 +1097,7 @@ const seriesListSchema = {
   .series-card {
     position: relative;
     width: calc(50% - 60px);
-    margin-bottom: 40px;
+    margin-bottom: 100px; /* Further increased for better vertical spacing */
     transition: all 0.3s cubic-bezier(0.17, 0.67, 0.3, 0.96);
     overflow: hidden;
     display: block;
@@ -1095,142 +1105,216 @@ const seriesListSchema = {
     border: 2px solid var(--starfleet-blue);
     border-radius: 12px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 2; /* Ensure cards appear above timeline elements */
   }
   
   /* Card date badge */
   .card-date-badge {
     position: absolute;
-    top: 12px;
-    right: 12px;
+    top: 15px;
+    right: 15px;
     background: var(--space-black);
     color: var(--starfleet-gold);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
     font-weight: bold;
-    border: 1px solid var(--starfleet-gold);
-    box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+    font-family: 'Courier New', monospace;
+    border: 2px solid var(--starfleet-gold);
+    box-shadow: 0 0 12px rgba(255, 204, 0, 0.6);
     z-index: 10;
+    letter-spacing: 0.5px;
   }
   
   /* Card image container */
   .card-image-container {
     position: relative;
-    border: 1px solid var(--starfleet-blue);
-    box-shadow: 0 0 15px rgba(0, 178, 255, 0.3);
+    border: 2px solid var(--starfleet-blue);
+    box-shadow: 0 0 20px rgba(0, 178, 255, 0.5);
     transition: all 0.3s ease;
+    height: 200px;
+    overflow: hidden;
   }
   
   .card-image {
     transition: transform 0.5s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   }
   
   /* Card title */
   .card-title {
     position: relative;
-    padding-bottom: 0.75rem;
-    margin-bottom: 1rem;
+    padding: 1rem 0.75rem;
+    margin: 0;
+    background: linear-gradient(90deg, rgba(0, 178, 255, 0.2), transparent);
+    color: var(--starfleet-gold);
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+    border-bottom: 2px solid var(--starfleet-blue);
+    display: flex;
+    align-items: center;
   }
   
-  .card-title::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--starfleet-blue), transparent);
+  .card-title::before {
+    content: '•';
+    color: var(--starfleet-gold);
+    margin-right: 0.5rem;
+    font-size: 1.5rem;
+    text-shadow: 0 0 10px var(--starfleet-gold);
   }
   
   /* Card meta info */
   .card-meta {
     background: rgba(1, 10, 31, 0.7);
-    border: 1px solid rgba(0, 178, 255, 0.2);
+    border: 1px solid rgba(0, 178, 255, 0.4);
+    padding: 0.75rem;
+    margin: 0.75rem;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Courier New', monospace;
+    color: var(--console-green);
   }
   
   /* Card description */
   .card-description {
-    line-height: 1.5;
-    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    padding: 0.75rem 1rem 1.25rem;
+    font-size: 1rem;
+    border-top: 1px solid rgba(0, 178, 255, 0.2);
+    margin-top: 0.5rem;
   }
   
-  /* Left side cards */
-  .series-card:nth-child(odd) {
-    left: 0;
-    float: left;
-    clear: both;
+  /* Timeline rows */
+  .timeline-row {
+    position: relative;
+    width: 100%;
+    margin-bottom: 80px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
   }
   
-  /* Right side cards */
-  .series-card:nth-child(even) {
-    right: 0;
-    float: right;
-    clear: both;
+  /* Left side timeline rows */
+  .timeline-row.left {
+    justify-content: flex-end;
+    padding-right: calc(50% + 40px);
+  }
+  
+  /* Right side timeline rows */
+  .timeline-row.right {
+    justify-content: flex-start;
+    padding-left: calc(50% + 40px);
+  }
+  
+  /* Series cards inside timeline rows */
+  .timeline-row .series-card {
+    width: 450px;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: inherit;
+    background: rgba(3, 10, 23, 0.85);
+    border: 2px solid var(--starfleet-blue);
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 178, 255, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  /* Make sure the cards don't get too small on mobile */
+  @media (max-width: 768px) {
+    .timeline-row .series-card {
+      width: 90%;
+    }
+    
+    .timeline-row.left, .timeline-row.right {
+      padding: 0;
+      justify-content: center;
+    }
   }
   
   /* Timeline dots with pulsing animation */
-  .series-card::after {
+  .timeline-row::after {
     content: '';
     position: absolute;
-    width: 20px;
-    height: 20px;
-    right: -70px;
-    top: 30px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     z-index: 1;
     background: var(--starfleet-gold);
-    box-shadow: 0 0 10px var(--starfleet-gold);
+    box-shadow: 0 0 15px var(--starfleet-gold);
     animation: pulse 2s infinite;
+    top: 50%;
+    transform: translateY(-50%);
   }
   
-  /* Right side dots */
-  .series-card:nth-child(even)::after {
-    left: -70px;
-    right: auto;
+  /* Position dots for left/right rows */
+  .timeline-row.left::after {
+    right: calc(50% - 12px);
+  }
+  
+  .timeline-row.right::after {
+    left: calc(50% - 12px);
   }
 
   /* Connecting lines to timeline */
-  .series-card::before {
+  .timeline-row::before {
     content: '';
     position: absolute;
-    top: 40px;
-    width: 50px;
-    height: 3px;
+    top: 50%;
+    width: 40px;
+    height: 4px;
     background: var(--starfleet-gold);
     z-index: 1;
-    box-shadow: 0 0 8px var(--starfleet-gold);
+    box-shadow: 0 0 10px var(--starfleet-gold);
+    transform: translateY(-50%);
+  }
+  
+  /* Position connecting lines for left/right rows */
+  .timeline-row.left::before {
+    right: 50%;
   }
 
-  /* Left side connecting lines */
-  .series-card:nth-child(odd)::before {
-    right: -50px;
-  }
-
-  /* Right side connecting lines */
-  .series-card:nth-child(even)::before {
-    left: -50px;
+  .timeline-row.right::before {
+    left: 50%;
   }
   
   /* Enhanced hover effects */
   .series-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 25px rgba(0, 178, 255, 0.5);
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 178, 255, 0.6);
     border-color: var(--starfleet-gold);
   }
   
   .series-card:hover img {
-    transform: scale(1.05);
+    transform: scale(1.1);
     transition: transform 0.5s ease;
   }
   
   .series-card:hover .card-image-container {
-    box-shadow: 0 0 20px rgba(0, 178, 255, 0.5);
+    box-shadow: 0 0 25px rgba(0, 178, 255, 0.7);
+    border-color: var(--starfleet-gold);
   }
   
   .series-card:hover .card-date-badge {
     background-color: var(--starfleet-gold);
     color: var(--space-black);
-    box-shadow: 0 0 12px rgba(255, 204, 0, 0.7);
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
+  }
+  
+  .series-card:hover .card-title {
+    background: linear-gradient(90deg, rgba(255, 204, 0, 0.2), transparent);
+    text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
+  }
+  
+  .series-card:hover .card-meta {
+    border-color: var(--starfleet-gold);
+    color: var(--starfleet-gold);
   }
 
   /* Pulsing animation for timeline dots */
@@ -1325,6 +1409,140 @@ const seriesListSchema = {
     clear: both;
   }
   
+  /* Memory Alpha links and colored bars styling */
+  a[href*="memory-alpha"], a[href*="Memory-Alpha"], .memory-alpha-link {
+    display: inline-block;
+    margin: 40px 0;
+    position: relative;
+    padding: 15px;
+    background-color: rgba(3, 10, 23, 0.5);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border-left: 3px solid var(--starfleet-blue);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    z-index: 5;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  a[href*="memory-alpha"]:hover, a[href*="Memory-Alpha"]:hover, .memory-alpha-link:hover {
+    background-color: rgba(3, 10, 23, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-left-color: var(--starfleet-gold);
+  }
+  
+  /* Add spacing between timeline entries */
+  .timeline-row {
+    margin-bottom: 70px;
+    position: relative;
+    clear: both;
+    padding: 25px 0;
+    border-radius: 8px;
+  }
+  
+  /* Add visual separation between timeline sections */
+  .timeline-row:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Style all colored bars (targeting by their common structure) */
+  [class*="bg-starfleet-"], [class*="bg-console-"] {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    position: relative;
+    margin: 15px 0;
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  /* Add more spacing between horizontal bars */
+  div > div > div[class*="bg-"] {
+    margin-bottom: 30px;
+  }
+  
+  /* Fix for Memory Alpha links and colored bars to be properly positioned */
+  .timeline-row > a[href*="memory-alpha"],
+  .timeline-row > a[href*="Memory-Alpha"],
+  .timeline-row > .memory-alpha-link,
+  .timeline-row > div[class*="bg-"] {
+    position: relative;
+    display: block;
+    clear: both;
+    float: none;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  /* Ensure Memory Alpha links are associated with their series */
+  .timeline-row.left > a[href*="memory-alpha"],
+  .timeline-row.left > a[href*="Memory-Alpha"],
+  .timeline-row.left > .memory-alpha-link,
+  .timeline-row.left > div[class*="bg-"] {
+    float: left;
+    margin-right: 60px;
+    width: calc(50% - 60px);
+  }
+  
+  .timeline-row.right > a[href*="memory-alpha"],
+  .timeline-row.right > a[href*="Memory-Alpha"],
+  .timeline-row.right > .memory-alpha-link,
+  .timeline-row.right > div[class*="bg-"] {
+    float: right;
+    margin-left: 60px;
+    width: calc(50% - 60px);
+  }
+  
+  /* Fix for Memory Alpha links inside cards */
+  .memory-alpha-link-card {
+    display: inline-flex !important;
+    margin: 0 !important;
+    float: none !important;
+    width: auto !important;
+    position: relative !important;
+    border-left: none !important;
+  }
+  
+  /* Fix for Memory Alpha links that are dynamically added */
+  .timeline-row::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  /* Ensure Memory Alpha links are contained within their timeline rows */
+  .timeline-container > a[href*="memory-alpha"],
+  .timeline-container > a[href*="Memory-Alpha"],
+  .timeline-container > .memory-alpha-link,
+  .timeline-container > div[class*="bg-"] {
+    display: none !important; /* Hide any links that are direct children of the timeline container */
+  }
+  
+  /* Add dividers between timeline entries */
+  .timeline-row:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 178, 255, 0.4), transparent);
+  }
+  
+  /* Improve spacing between elements */
+  .timeline-container > div {
+    margin-bottom: 50px;
+  }
+  
+  /* Add spacing between all elements */
+  .timeline-container * + * {
+    margin-top: 10px;
+  }
+  
   /* Enhanced filter styles */
   .filter-label {
     position: relative;
@@ -1373,6 +1591,15 @@ const seriesListSchema = {
   @media screen and (max-width: 992px) {
     .series-card {
       width: calc(50% - 40px);
+      margin-bottom: 70px; /* Adjusted spacing for medium screens */
+    }
+    
+    .timeline-row {
+      margin-bottom: 40px;
+    }
+    
+    .memory-alpha-link {
+      margin: 25px 0;
     }
     
     .series-card::after {
@@ -1415,6 +1642,431 @@ const seriesListSchema = {
       width: calc(100% - 80px);
       float: right;
       margin-left: 80px;
+      margin-bottom: 50px; /* Adjusted spacing for mobile */
+    }
+    
+    .timeline-row {
+      margin-bottom: 30px;
+      padding: 10px 0;
+    }
+    
+    .memory-alpha-link {
+      margin: 15px 0;
+      padding: 8px;
+    }
+    
+    /* Adjust Memory Alpha links and colored bars for mobile */
+    .timeline-row.left > a[href*="memory-alpha"],
+    .timeline-row.left > a[href*="Memory-Alpha"],
+    .timeline-row.left > .memory-alpha-link,
+    .timeline-row.left > div[class*="bg-"],
+    .timeline-row.right > a[href*="memory-alpha"],
+    .timeline-row.right > a[href*="Memory-Alpha"],
+    .timeline-row.right > .memory-alpha-link,
+    .timeline-row.right > div[class*="bg-"] {
+      width: calc(100% - 80px);
+      float: right;
+      margin-left: 80px;
+      margin-right: 0;
+    }
+    
+    /* Ensure Memory Alpha links inside cards remain properly styled on mobile */
+    .memory-alpha-link-card {
+      display: inline-flex !important;
+      margin: 0 !important;
+      float: none !important;
+      width: auto !important;
+    }
+    
+    /* Make all cards stack on top of each other */
+    .series-card:nth-child(odd),
+    .series-card:nth-child(even) {
+      left: 0;
+      right: auto;
+      float: right;
+      clear: both;
+    }
+    
+    /* Make all dots align to the left */
+    .series-card::after,
+    .series-card:nth-child(even)::after {
+      left: -45px;
+      right: auto;
+    }
+    
+    /* Adjust connecting lines for mobile */
+    .series-card::before,
+    .series-card:nth-child(odd)::before,
+    .series-card:nth-child(even)::before {
+      left: -35px;
+      width: 35px;
+    }
+    
+    /* Adjust filters for mobile */
+    .filters .flex {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .filter-group {
+      width: 100%;
+    }
+    
+    /* Year markers positioning for mobile */
+    .timeline-container .year-marker {
+      left: 31px;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      padding: 4px 8px;
+    }
+    
+    .timeline-legend {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-left: 60px;
+      margin-bottom: 1.5rem;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .series-card {
+      margin-left: 60px;
+      width: calc(100% - 60px);
+    }
+    
+    .lcars-pagination button {
+      min-width: 80px;
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .card-date-badge {
+      top: 8px;
+      right: 8px;
+      font-size: 0.7rem;
+      padding: 3px 6px;
+    }
+    
+    .card-title {
+      font-size: 1.1rem;
+    }
+    
+    .card-meta {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+  }
+  
+  .lcars-pagination button {
+    position: relative;
+    z-index: 2;
+    transition: all 0.2s ease;
+    font-weight: bold;
+    min-width: 100px;
+  }
+  
+  .lcars-pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .lcars-pagination button:not(:disabled):hover {
+    background-color: var(--starfleet-gold);
+    color: var(--space-black);
+  }
+  
+  .lcars-pagination::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 204, 0, 0.1), transparent);
+    animation: sweep 2s infinite;
+    z-index: 1;
+  }
+  
+  @keyframes sweep {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  
+  /* Clear floats after timeline */
+  .timeline-container::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  /* Memory Alpha links and colored bars styling */
+  a[href*="memory-alpha"], a[href*="Memory-Alpha"], .memory-alpha-link {
+    display: inline-block;
+    margin: 40px 0;
+    position: relative;
+    padding: 15px;
+    background-color: rgba(3, 10, 23, 0.5);
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    border-left: 3px solid var(--starfleet-blue);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    z-index: 5;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  a[href*="memory-alpha"]:hover, a[href*="Memory-Alpha"]:hover, .memory-alpha-link:hover {
+    background-color: rgba(3, 10, 23, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border-left-color: var(--starfleet-gold);
+  }
+  
+  /* Add spacing between timeline entries */
+  .timeline-row {
+    margin-bottom: 70px;
+    position: relative;
+    clear: both;
+    padding: 25px 0;
+    border-radius: 8px;
+  }
+  
+  /* Add visual separation between timeline sections */
+  .timeline-row:nth-child(odd) {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Style all colored bars (targeting by their common structure) */
+  [class*="bg-starfleet-"], [class*="bg-console-"] {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    position: relative;
+    margin: 15px 0;
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  /* Add more spacing between horizontal bars */
+  div > div > div[class*="bg-"] {
+    margin-bottom: 30px;
+  }
+  
+  /* Fix for Memory Alpha links and colored bars to be properly positioned */
+  .timeline-row > a[href*="memory-alpha"],
+  .timeline-row > a[href*="Memory-Alpha"],
+  .timeline-row > .memory-alpha-link,
+  .timeline-row > div[class*="bg-"] {
+    position: relative;
+    display: block;
+    clear: both;
+    float: none;
+    width: auto;
+    max-width: 100%;
+  }
+  
+  /* Ensure Memory Alpha links are associated with their series */
+  .timeline-row.left > a[href*="memory-alpha"],
+  .timeline-row.left > a[href*="Memory-Alpha"],
+  .timeline-row.left > .memory-alpha-link,
+  .timeline-row.left > div[class*="bg-"] {
+    float: left;
+    margin-right: 60px;
+    width: calc(50% - 60px);
+  }
+  
+  .timeline-row.right > a[href*="memory-alpha"],
+  .timeline-row.right > a[href*="Memory-Alpha"],
+  .timeline-row.right > .memory-alpha-link,
+  .timeline-row.right > div[class*="bg-"] {
+    float: right;
+    margin-left: 60px;
+    width: calc(50% - 60px);
+  }
+  
+  /* Fix for Memory Alpha links inside cards */
+  .memory-alpha-link-card {
+    display: inline-flex !important;
+    margin: 0 !important;
+    float: none !important;
+    width: auto !important;
+    position: relative !important;
+    border-left: none !important;
+  }
+  
+  /* Fix for Memory Alpha links that are dynamically added */
+  .timeline-row::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  /* Ensure Memory Alpha links are contained within their timeline rows */
+  .timeline-container > a[href*="memory-alpha"],
+  .timeline-container > a[href*="Memory-Alpha"],
+  .timeline-container > .memory-alpha-link,
+  .timeline-container > div[class*="bg-"] {
+    display: none !important; /* Hide any links that are direct children of the timeline container */
+  }
+  
+  /* Add dividers between timeline entries */
+  .timeline-row:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 178, 255, 0.4), transparent);
+  }
+  
+  /* Improve spacing between elements */
+  .timeline-container > div {
+    margin-bottom: 50px;
+  }
+  
+  /* Add spacing between all elements */
+  .timeline-container * + * {
+    margin-top: 10px;
+  }
+  
+  /* Enhanced filter styles */
+  .filter-label {
+    position: relative;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+  
+  .filter-label::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--starfleet-blue), transparent);
+  }
+  
+  .filter-select-wrapper {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+  
+  .filter-select {
+    transition: all 0.3s ease;
+  }
+  
+  .filter-select:focus + .filter-chevron svg {
+    fill: var(--console-blue);
+    filter: drop-shadow(0 0 5px var(--console-blue));
+  }
+  
+  .view-toggle-container {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .search-container {
+    position: relative;
+  }
+  
+  .search-container input:focus + div svg {
+    color: var(--starfleet-gold);
+  }
+  /* Enhanced responsive timeline */
+  @media screen and (max-width: 992px) {
+    .series-card {
+      width: calc(50% - 40px);
+      margin-bottom: 70px; /* Adjusted spacing for medium screens */
+    }
+    
+    .timeline-row {
+      margin-bottom: 40px;
+    }
+    
+    .memory-alpha-link {
+      margin: 25px 0;
+    }
+    
+    .series-card::after {
+      width: 15px;
+      height: 15px;
+      right: -55px;
+    }
+    
+    .series-card:nth-child(even)::after {
+      left: -55px;
+    }
+    
+    .series-card::before {
+      width: 40px;
+    }
+    
+    .series-card:nth-child(odd)::before {
+      right: -40px;
+    }
+    
+    .series-card:nth-child(even)::before {
+      left: -40px;
+    }
+    
+    .timeline-legend {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    /* Place the timeline to the left */
+    .timeline-container::before {
+      left: 31px;
+    }
+    
+    /* Full-width cards */
+    .series-card {
+      width: calc(100% - 80px);
+      float: right;
+      margin-left: 80px;
+      margin-bottom: 50px; /* Adjusted spacing for mobile */
+    }
+    
+    .timeline-row {
+      margin-bottom: 30px;
+      padding: 10px 0;
+    }
+    
+    .memory-alpha-link {
+      margin: 15px 0;
+      padding: 8px;
+    }
+    
+    /* Adjust Memory Alpha links and colored bars for mobile */
+    .timeline-row.left > a[href*="memory-alpha"],
+    .timeline-row.left > a[href*="Memory-Alpha"],
+    .timeline-row.left > .memory-alpha-link,
+    .timeline-row.left > div[class*="bg-"],
+    .timeline-row.right > a[href*="memory-alpha"],
+    .timeline-row.right > a[href*="Memory-Alpha"],
+    .timeline-row.right > .memory-alpha-link,
+    .timeline-row.right > div[class*="bg-"] {
+      width: calc(100% - 80px);
+      float: right;
+      margin-left: 80px;
+      margin-right: 0;
+    }
+    
+    /* Ensure Memory Alpha links inside cards remain properly styled on mobile */
+    .memory-alpha-link-card {
+      display: inline-flex !important;
+      margin: 0 !important;
+      float: none !important;
+      width: auto !important;
     }
     
     /* Make all cards stack on top of each other */

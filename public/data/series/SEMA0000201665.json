@@ -1,0 +1,467 @@
+{
+  "uid": "SEMA0000201665",
+  "title": "Star Trek: Discovery",
+  "abbreviation": "DIS",
+  "productionStartYear": 2017,
+  "productionEndYear": null,
+  "originalRunStartDate": "2017-09-24",
+  "originalRunEndDate": null,
+  "seasonsCount": 4,
+  "episodesCount": 55,
+  "featureLengthEpisodesCount": 0,
+  "productionCompany": {
+    "uid": "COMA0000052430",
+    "name": "CBS Studios",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000201662",
+    "name": "Paramount+",
+    "broadcaster": true,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": false,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": false,
+    "videoGameCompany": false
+  },
+  "years": "2017–present",
+  "stardate": null,
+  "image": "/images/placeholder-discovery.jpg",
+  "slug": "star-trek-discovery",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/4/48/USS_Discovery_in_Klingon_space.jpg/revision/latest/scale-to-width-down/1200?cb=20180221180657&path-prefix=en",
+  "wikiSummary": "<i><b>Star Trek: Discovery</b></i> is the seventh series set in the <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> universe. Created by <a href=\"/wiki/Bryan_Fuller\" title=\"Bryan Fuller\">Bryan Fuller</a> and <a href=\"/wiki/Alex_Kurtzman\" title=\"Alex Kurtzman\">Alex Kurtzman</a>, <i>Discovery</i> was originally set roughly a decade before <i><a href=\"/wiki/Star_Trek:_The_Original_Series\" title=\"Star Trek: The Original Series\">Star Trek: The Original Series</a></i>, set primarily aboard the <a href=\"/wiki/Starship\" title=\"Starship\">starship</a> <a href=\"/wiki/USS_Discovery\" title=\"USS Discovery\">USS <i>Discovery</i></a>, before jumping from the <a href=\"/wiki/23rd_century\" title=\"23rd century\">23rd century</a> to the <a href=\"/wiki/32nd_century\" title=\"32nd century\">32nd century</a>. \nThe series was announced by <a href=\"/wiki/StarTrek.com\" title=\"StarTrek.com\">StarTrek.com</a> on <a href=\"/wiki/2_November\" title=\"2 November\">2 November</a> <a href=\"/wiki/November_2015\" class=\"mw-redirect\" title=\"November 2015\">2015</a>. According to the press release, \"<i>The brand-new </i>Star Trek<i> will introduce new characters seeking imaginative new worlds and new civilizations, while exploring the dramatic contemporary themes that have been a signature of the franchise since its inception in <a href=\"/wiki/1966_(production)\" title=\"1966 (production)\">1966</a>.</i>\" <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://www.startrek.com/article/new-star-trek-series-premieres-january-2017\">[1]</a>\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Discovery",
+  "episodes": [
+    {
+      "uid": "EPMA0000241783",
+      "title": "Brother",
+      "titleGerman": "Bruder",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000229213",
+        "title": "DIS Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 1,
+      "productionSerialNumber": "201",
+      "featureLength": false,
+      "stardateFrom": 1025.19,
+      "stardateTo": 1025.19,
+      "yearFrom": 2257,
+      "yearTo": 2257,
+      "usAirDate": "2019-01-17",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000274335",
+      "title": "Anomaly",
+      "titleGerman": "Anomalie",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000254126",
+        "title": "DIS Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 2,
+      "productionSerialNumber": "402",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 3190,
+      "yearTo": 3190,
+      "usAirDate": "2021-11-25",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000226101",
+      "title": "Battle at the Binary Stars",
+      "titleGerman": "Das Urteil",
+      "titleItalian": null,
+      "titleJapanese": "連星系の戦い",
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000212566",
+        "title": "DIS Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 2,
+      "productionSerialNumber": "102",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2017-09-24",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000274337",
+      "title": "All Is Possible",
+      "titleGerman": "Alles ist möglich",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000254126",
+        "title": "DIS Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 4,
+      "productionSerialNumber": "404",
+      "featureLength": false,
+      "stardateFrom": 865661.2,
+      "stardateTo": 865661.2,
+      "yearFrom": 3190,
+      "yearTo": 3190,
+      "usAirDate": "2021-12-09",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000242720",
+      "title": "An Obol for Charon",
+      "titleGerman": "Der Charonspfennig",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000229213",
+        "title": "DIS Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 4,
+      "productionSerialNumber": "204",
+      "featureLength": false,
+      "stardateFrom": 1834.2512,
+      "stardateTo": 1834.2512,
+      "yearFrom": 2257,
+      "yearTo": 2257,
+      "usAirDate": "2019-02-07",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000275161",
+      "title": "...But to Connect",
+      "titleGerman": "Verbindung",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000254126",
+        "title": "DIS Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 7,
+      "productionSerialNumber": "407",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2021-12-30",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000276601",
+      "title": "All In",
+      "titleGerman": "Alles oder nichts",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "season": {
+        "uid": "SAMA0000254126",
+        "title": "DIS Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 8,
+      "productionSerialNumber": "408",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 3190,
+      "yearTo": 3190,
+      "usAirDate": "2022-02-10",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000229213",
+      "title": "DIS Season 2",
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": 14
+    },
+    {
+      "uid": "SAMA0000276062",
+      "title": "DIS Season 5",
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "seasonNumber": 5,
+      "numberOfEpisodes": null
+    },
+    {
+      "uid": "SAMA0000244009",
+      "title": "DIS Season 3",
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": 13
+    },
+    {
+      "uid": "SAMA0000254126",
+      "title": "DIS Season 4",
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "seasonNumber": 4,
+      "numberOfEpisodes": 13
+    },
+    {
+      "uid": "SAMA0000212566",
+      "title": "DIS Season 1",
+      "series": {
+        "uid": "SEMA0000201665",
+        "title": "Star Trek: Discovery"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 15
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000232387",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232387/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000245906",
+      "name": "A. Colville",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000245906/",
+      "image": "/images/character-cache/a-colville-CHMA0000245906.jpg"
+    },
+    {
+      "uid": "CHMA0000280373",
+      "name": "A. Cooper",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280373/",
+      "image": "/images/character-cache/a-cooper-CHMA0000280373.jpg"
+    },
+    {
+      "uid": "CHMA0000143026",
+      "name": "A. Deguzman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000143026/",
+      "image": "/images/character-cache/a-deguzman-CHMA0000143026.jpg"
+    },
+    {
+      "uid": "CHMA0000250125",
+      "name": "A. Dekovic",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000250125/",
+      "image": "/images/character-cache/a-dekovic-CHMA0000250125.jpg"
+    },
+    {
+      "uid": "CHMA0000139474",
+      "name": "A. Dominguez",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000139474/",
+      "image": "/images/character-cache/a-dominguez-CHMA0000139474.jpg"
+    },
+    {
+      "uid": "CHMA0000110557",
+      "name": "A. Eastman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000110557/",
+      "image": "/images/character-cache/a-eastman-CHMA0000110557.jpg"
+    },
+    {
+      "uid": "CHMA0000068579",
+      "name": "A. Estradajem",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068579/",
+      "image": "/images/character-cache/a-estradajem-CHMA0000068579.jpg"
+    },
+    {
+      "uid": "CHMA0000279362",
+      "name": "A. Finch",
+      "performer": "Guy Fernandez, Jr.",
+      "characterLink": "/characters/CHMA0000279362/",
+      "image": "/images/character-cache/a-finch-CHMA0000279362.jpg"
+    },
+    {
+      "uid": "CHMA0000055407",
+      "name": "A. Fredrickson",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000055407/",
+      "image": "/images/character-cache/a-fredrickson-CHMA0000055407.jpg"
+    }
+  ]
+}

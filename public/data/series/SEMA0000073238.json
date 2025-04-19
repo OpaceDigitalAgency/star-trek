@@ -1,0 +1,736 @@
+{
+  "uid": "SEMA0000073238",
+  "title": "Star Trek: Deep Space Nine",
+  "abbreviation": "DS9",
+  "productionStartYear": 1992,
+  "productionEndYear": 1999,
+  "originalRunStartDate": "1993-01-03",
+  "originalRunEndDate": "1999-06-02",
+  "seasonsCount": 7,
+  "episodesCount": 173,
+  "featureLengthEpisodesCount": 3,
+  "productionCompany": {
+    "uid": "COMA0000001845",
+    "name": "Paramount Pictures",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": true,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000052430",
+    "name": "CBS Studios",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "years": "1992–1999",
+  "stardate": null,
+  "image": "/images/placeholder-deep-space-nine.jpg",
+  "slug": "star-trek-deep-space-nine",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/3/39/Site-community-image/revision/latest?cb=20241212154521&path-prefix=en",
+  "wikiSummary": "Aside from the series, <i><a href=\"/wiki/Star_Trek:_Deep_Space_Nine\" title=\"Star Trek: Deep Space Nine\">Star Trek: Deep Space Nine</a></i>, <b>Deep Space Nine</b> may refer to:\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Deep_Space_Nine",
+  "episodes": [
+    {
+      "uid": "EPMA0000000961",
+      "title": "A Time to Stand",
+      "titleGerman": "Zeit des Widerstands",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001740",
+        "title": "DS9 Season 6"
+      },
+      "seasonNumber": 6,
+      "episodeNumber": 1,
+      "productionSerialNumber": "40510-525",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2374,
+      "yearTo": 2374,
+      "usAirDate": "1997-09-29",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000935",
+      "title": "Apocalypse Rising",
+      "titleGerman": "Die Apokalypse droht",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001739",
+        "title": "DS9 Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 1,
+      "productionSerialNumber": "40510-499",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2373,
+      "yearTo": 2373,
+      "usAirDate": "1996-09-30",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000987",
+      "title": "Afterimage",
+      "titleGerman": "Nachempfindung",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001741",
+        "title": "DS9 Season 7"
+      },
+      "seasonNumber": 7,
+      "episodeNumber": 3,
+      "productionSerialNumber": "40510-553",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2375,
+      "yearTo": 2375,
+      "usAirDate": "1998-10-14",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000533",
+      "title": "A Man Alone",
+      "titleGerman": "Unter Verdacht",
+      "titleItalian": null,
+      "titleJapanese": "宇宙ステーション殺人事件",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001735",
+        "title": "DS9 Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 4,
+      "productionSerialNumber": "40511-403",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "1993-01-17",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000964",
+      "title": "Behind the Lines",
+      "titleGerman": "Hinter der Linie",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001740",
+        "title": "DS9 Season 6"
+      },
+      "seasonNumber": 6,
+      "episodeNumber": 4,
+      "productionSerialNumber": "40510-528",
+      "featureLength": false,
+      "stardateFrom": 51145.3,
+      "stardateTo": 51145.3,
+      "yearFrom": 2374,
+      "yearTo": 2374,
+      "usAirDate": "1997-10-20",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001105",
+      "title": "Babel",
+      "titleGerman": "Babel",
+      "titleItalian": null,
+      "titleJapanese": "恐怖のウイルス",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001735",
+        "title": "DS9 Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 5,
+      "productionSerialNumber": "40511-405",
+      "featureLength": false,
+      "stardateFrom": 46423.7,
+      "stardateTo": 46423.7,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1993-01-24",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000863",
+      "title": "Cardassians",
+      "titleGerman": "Die Konspiration",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001736",
+        "title": "DS9 Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 5,
+      "productionSerialNumber": "40512-425",
+      "featureLength": false,
+      "stardateFrom": 47177.2,
+      "stardateTo": 47177.2,
+      "yearFrom": 2370,
+      "yearTo": 2370,
+      "usAirDate": "1993-10-24",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000844",
+      "title": "Captive Pursuit",
+      "titleGerman": "Tosk, der Gejagte",
+      "titleItalian": null,
+      "titleJapanese": "ワーム・ホールから来たエイリアン",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001735",
+        "title": "DS9 Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 6,
+      "productionSerialNumber": "40511-406",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1993-01-30",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000038489",
+      "title": "Armageddon Game",
+      "titleGerman": "Das Harvester-Desaster",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001736",
+        "title": "DS9 Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 13,
+      "productionSerialNumber": "40512-433",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2370,
+      "yearTo": 2370,
+      "usAirDate": "1994-01-30",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000851",
+      "title": "Battle Lines",
+      "titleGerman": "Die Prophezeiung",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001735",
+        "title": "DS9 Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 13,
+      "productionSerialNumber": "40511-413",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1993-04-25",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000999",
+      "title": "Badda-Bing, Badda-Bang",
+      "titleGerman": "Badda-Bing, Badda-Bang",
+      "titleItalian": null,
+      "titleJapanese": "アドリブ作戦で行こう！",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001741",
+        "title": "DS9 Season 7"
+      },
+      "seasonNumber": 7,
+      "episodeNumber": 15,
+      "productionSerialNumber": "40510-566",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2375,
+      "yearTo": 2375,
+      "usAirDate": "1999-02-24",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000949",
+      "title": "By Inferno's Light",
+      "titleGerman": "Im Lichte des Infernos",
+      "titleItalian": null,
+      "titleJapanese": "敗れざる者・後編",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001739",
+        "title": "DS9 Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 15,
+      "productionSerialNumber": "40510-513",
+      "featureLength": false,
+      "stardateFrom": 50564.2,
+      "stardateTo": 50564.2,
+      "yearFrom": 2373,
+      "yearTo": 2373,
+      "usAirDate": "1997-02-17",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000924",
+      "title": "Bar Association",
+      "titleGerman": "Der Streik",
+      "titleItalian": null,
+      "titleJapanese": "ロムの反乱",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001738",
+        "title": "DS9 Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 16,
+      "productionSerialNumber": "40510-488",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2372,
+      "yearTo": 2372,
+      "usAirDate": "1996-02-19",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000951",
+      "title": "A Simple Investigation",
+      "titleGerman": "Der Datenkristall",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001739",
+        "title": "DS9 Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 17,
+      "productionSerialNumber": "40510-515",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2373,
+      "yearTo": 2373,
+      "usAirDate": "1997-03-31",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000925",
+      "title": "Accession",
+      "titleGerman": "Die Übernahme",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001738",
+        "title": "DS9 Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 17,
+      "productionSerialNumber": "40510-489",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2372,
+      "yearTo": 2372,
+      "usAirDate": "1996-02-24",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001002",
+      "title": "'Til Death Do Us Part",
+      "titleGerman": "Bis daß der Tod uns scheide",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001741",
+        "title": "DS9 Season 7"
+      },
+      "seasonNumber": 7,
+      "episodeNumber": 18,
+      "productionSerialNumber": "40510-568",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2375,
+      "yearTo": 2375,
+      "usAirDate": "1999-04-14",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000267647",
+      "title": "Business as Usual",
+      "titleGerman": "Kriegsgeschäfte",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001739",
+        "title": "DS9 Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 18,
+      "productionSerialNumber": "40510-516",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2373,
+      "yearTo": 2373,
+      "usAirDate": "1997-04-05",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000878",
+      "title": "Blood Oath",
+      "titleGerman": "Der Blutschwur",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001736",
+        "title": "DS9 Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 19,
+      "productionSerialNumber": "40512-439",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2370,
+      "yearTo": 2370,
+      "usAirDate": "1994-03-27",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000957",
+      "title": "Blaze of Glory",
+      "titleGerman": "Glanz des Ruhms",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001739",
+        "title": "DS9 Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 23,
+      "productionSerialNumber": "40510-521",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2373,
+      "yearTo": 2373,
+      "usAirDate": "1997-05-12",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000933",
+      "title": "Body Parts",
+      "titleGerman": "Quarks Schicksal",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001738",
+        "title": "DS9 Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 25,
+      "productionSerialNumber": "40510-497",
+      "featureLength": false,
+      "stardateFrom": 49930.3,
+      "stardateTo": 49930.3,
+      "yearFrom": 2372,
+      "yearTo": 2372,
+      "usAirDate": "1996-06-10",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000934",
+      "title": "Broken Link",
+      "titleGerman": "Das Urteil",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001738",
+        "title": "DS9 Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 26,
+      "productionSerialNumber": "40510-498",
+      "featureLength": false,
+      "stardateFrom": 49962.4,
+      "stardateTo": 49962.4,
+      "yearFrom": 2372,
+      "yearTo": 2372,
+      "usAirDate": "1996-06-17",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000960",
+      "title": "Call to Arms",
+      "titleGerman": "Zu den Waffen!",
+      "titleItalian": null,
+      "titleJapanese": "DS9撤退の日",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "season": {
+        "uid": "SAMA0000001739",
+        "title": "DS9 Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 26,
+      "productionSerialNumber": "40510-524",
+      "featureLength": false,
+      "stardateFrom": 50975.2,
+      "stardateTo": 50975.2,
+      "yearFrom": 2373,
+      "yearTo": 2373,
+      "usAirDate": "1997-06-16",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000001735",
+      "title": "DS9 Season 1",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 19
+    },
+    {
+      "uid": "SAMA0000001740",
+      "title": "DS9 Season 6",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 6,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001736",
+      "title": "DS9 Season 2",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001737",
+      "title": "DS9 Season 3",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001738",
+      "title": "DS9 Season 4",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 4,
+      "numberOfEpisodes": 25
+    },
+    {
+      "uid": "SAMA0000001739",
+      "title": "DS9 Season 5",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 5,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001741",
+      "title": "DS9 Season 7",
+      "series": {
+        "uid": "SEMA0000073238",
+        "title": "Star Trek: Deep Space Nine"
+      },
+      "seasonNumber": 7,
+      "numberOfEpisodes": 25
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    }
+  ]
+}

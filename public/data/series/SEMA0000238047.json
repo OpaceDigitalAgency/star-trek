@@ -1,0 +1,347 @@
+{
+  "uid": "SEMA0000238047",
+  "title": "Star Trek: Picard",
+  "abbreviation": "PIC",
+  "productionStartYear": 2019,
+  "productionEndYear": 2022,
+  "originalRunStartDate": "2020-01-23",
+  "originalRunEndDate": "2023-04-20",
+  "seasonsCount": 3,
+  "episodesCount": 30,
+  "featureLengthEpisodesCount": 0,
+  "productionCompany": {
+    "uid": "COMA0000052430",
+    "name": "CBS Studios",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000201662",
+    "name": "Paramount+",
+    "broadcaster": true,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": false,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": false,
+    "videoGameCompany": false
+  },
+  "years": "2019–2022",
+  "stardate": null,
+  "image": "/images/placeholder-picard.jpg",
+  "slug": "star-trek-picard",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/1/1c/La_Sirena%2C_fore.png/revision/latest/scale-to-width-down/1200?cb=20200229160032&path-prefix=en",
+  "wikiSummary": "<i><b>Star Trek: Picard</b></i> is the eighth main series set in the <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> universe, the ninth including the companion series <i><a href=\"/wiki/Star_Trek:_Short_Treks\" title=\"Star Trek: Short Treks\">Star Trek: Short Treks</a></i>, and the eleventh <i>Star Trek</i> series overall. <i>Picard</i> is produced by <a href=\"/wiki/CBS_Studios\" title=\"CBS Studios\">CBS Studios</a> and stars <a href=\"/wiki/Patrick_Stewart\" title=\"Patrick Stewart\">Patrick Stewart</a>, reprising the role of <a href=\"/wiki/Jean-Luc_Picard\" title=\"Jean-Luc Picard\">Jean-Luc Picard</a> from <i><a href=\"/wiki/Star_Trek:_The_Next_Generation\" title=\"Star Trek: The Next Generation\">Star Trek: The Next Generation</a></i>. <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://x.com/startrekcbs/status/1025841138022805506\">[1]</a> The new series is set twenty years after the events of <a href=\"/wiki/Star_Trek_Nemesis\" title=\"Star Trek Nemesis\"><span style=\"cursor:help;\" title=\"Star Trek Nemesis (FLM 10, TNG 4)\"><i>Star Trek Nemesis</i></span></a>, <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://x.com/TrekCore/status/1025842567168974848\">[2]</a> dealing with \"the new chapter in Picard's life.\"\nThe series forms part of <a href=\"/wiki/Alex_Kurtzman\" title=\"Alex Kurtzman\">Alex Kurtzman</a>'s five-year deal with CBS to expand the <i>Star Trek</i> <a href=\"/wiki/Star_Trek_franchise\" class=\"mw-redirect\" title=\"Star Trek franchise\">franchise</a>. The first season debuted on <a href=\"/wiki/CBS_All_Access\" class=\"mw-redirect\" title=\"CBS All Access\">CBS All Access</a>, which subsequently became <a href=\"/wiki/Paramount%2B\" class=\"mw-redirect\" title=\"Paramount+\">Paramount+</a>. <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://www.startrek.com/article/sir-patrick-stewart-returning-to-iconic-picard-role\">[3]</a> Kurtzman serves as executive producer on the series along with Stewart, as well as <a href=\"/wiki/James_Duff\" title=\"James Duff\">James Duff</a>, <a href=\"/wiki/Akiva_Goldsman\" title=\"Akiva Goldsman\">Akiva Goldsman</a>, <a href=\"/wiki/Michael_Chabon\" title=\"Michael Chabon\">Michael Chabon</a>, <a href=\"/wiki/Trevor_Roth\" title=\"Trevor Roth\">Trevor Roth</a>, <a href=\"/wiki/Heather_Kadin\" title=\"Heather Kadin\">Heather Kadin</a>, and <a href=\"/wiki/Rod_Roddenberry\" title=\"Rod Roddenberry\">Rod Roddenberry</a>. In addition, <a href=\"/wiki/Aaron_Baiers\" title=\"Aaron Baiers\">Aaron Baiers</a> serves as co-executive producer. <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"http://variety.com/2018/tv/news/star-trek-patrick-stewart-picard-cbs-all-access-1202895410\">[4]</a> Writer <a href=\"/wiki/Kirsten_Beyer\" title=\"Kirsten Beyer\">Kirsten Beyer</a> devised the concept for the series, <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://x.com/karterhol/status/1025847088335093761\">[5]</a> and she features as part of the writing staff alongside Kurtzman, Duff, Goldsman, and Chabon. Chabon served as the first season's showrunner. <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://www.startrek.com/news/michael-chabon-named-showrunner-star-trek-picard\">[6]</a>\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Picard",
+  "episodes": [
+    {
+      "uid": "EPMA0000278226",
+      "title": "Assimilation",
+      "titleGerman": null,
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000238047",
+        "title": "Star Trek: Picard"
+      },
+      "season": {
+        "uid": "SAMA0000250097",
+        "title": "PIC Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 3,
+      "productionSerialNumber": "203",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2022-03-17",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000251557",
+      "title": "Absolute Candor",
+      "titleGerman": "Unbedingte Offenheit",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000238047",
+        "title": "Star Trek: Picard"
+      },
+      "season": {
+        "uid": "SAMA0000246418",
+        "title": "PIC Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 4,
+      "productionSerialNumber": "103",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2399,
+      "yearTo": 2399,
+      "usAirDate": "2020-02-13",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000252564",
+      "title": "Broken Pieces",
+      "titleGerman": "Bruchstücke",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000238047",
+        "title": "Star Trek: Picard"
+      },
+      "season": {
+        "uid": "SAMA0000246418",
+        "title": "PIC Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 8,
+      "productionSerialNumber": "107",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2399,
+      "yearTo": 2399,
+      "usAirDate": "2020-03-12",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000246418",
+      "title": "PIC Season 1",
+      "series": {
+        "uid": "SEMA0000238047",
+        "title": "Star Trek: Picard"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 10
+    },
+    {
+      "uid": "SAMA0000261414",
+      "title": "PIC Season 3",
+      "series": {
+        "uid": "SEMA0000238047",
+        "title": "Star Trek: Picard"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": 10
+    },
+    {
+      "uid": "SAMA0000250097",
+      "title": "PIC Season 2",
+      "series": {
+        "uid": "SEMA0000238047",
+        "title": "Star Trek: Picard"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": 10
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000232387",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232387/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000245906",
+      "name": "A. Colville",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000245906/",
+      "image": "/images/character-cache/a-colville-CHMA0000245906.jpg"
+    },
+    {
+      "uid": "CHMA0000280373",
+      "name": "A. Cooper",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280373/",
+      "image": "/images/character-cache/a-cooper-CHMA0000280373.jpg"
+    },
+    {
+      "uid": "CHMA0000143026",
+      "name": "A. Deguzman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000143026/",
+      "image": "/images/character-cache/a-deguzman-CHMA0000143026.jpg"
+    },
+    {
+      "uid": "CHMA0000250125",
+      "name": "A. Dekovic",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000250125/",
+      "image": "/images/character-cache/a-dekovic-CHMA0000250125.jpg"
+    },
+    {
+      "uid": "CHMA0000139474",
+      "name": "A. Dominguez",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000139474/",
+      "image": "/images/character-cache/a-dominguez-CHMA0000139474.jpg"
+    },
+    {
+      "uid": "CHMA0000110557",
+      "name": "A. Eastman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000110557/",
+      "image": "/images/character-cache/a-eastman-CHMA0000110557.jpg"
+    },
+    {
+      "uid": "CHMA0000068579",
+      "name": "A. Estradajem",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068579/",
+      "image": "/images/character-cache/a-estradajem-CHMA0000068579.jpg"
+    },
+    {
+      "uid": "CHMA0000279362",
+      "name": "A. Finch",
+      "performer": "Guy Fernandez, Jr.",
+      "characterLink": "/characters/CHMA0000279362/",
+      "image": "/images/character-cache/a-finch-CHMA0000279362.jpg"
+    },
+    {
+      "uid": "CHMA0000055407",
+      "name": "A. Fredrickson",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000055407/",
+      "image": "/images/character-cache/a-fredrickson-CHMA0000055407.jpg"
+    }
+  ]
+}

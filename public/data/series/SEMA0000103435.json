@@ -1,0 +1,632 @@
+{
+  "uid": "SEMA0000103435",
+  "title": "Star Trek: Enterprise",
+  "abbreviation": "ENT",
+  "productionStartYear": 2001,
+  "productionEndYear": 2005,
+  "originalRunStartDate": "2001-09-26",
+  "originalRunEndDate": "2005-05-13",
+  "seasonsCount": 4,
+  "episodesCount": 97,
+  "featureLengthEpisodesCount": 1,
+  "productionCompany": {
+    "uid": "COMA0000001845",
+    "name": "Paramount Pictures",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": true,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000021844",
+    "name": "UPN",
+    "broadcaster": true,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": false,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": false,
+    "videoGameCompany": false
+  },
+  "years": "2001–2005",
+  "stardate": null,
+  "image": "/images/placeholder-enterprise.jpg",
+  "slug": "star-trek-enterprise",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/3/39/Site-community-image/revision/latest?cb=20241212154521&path-prefix=en",
+  "wikiSummary": "<b>Enterprise</b> or <b>Enterprize</b> could refer to:\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Enterprise",
+  "episodes": [
+    {
+      "uid": "EPMA0000001014",
+      "title": "Broken Bow",
+      "titleGerman": "Aufbruch ins Unbekannte, Teil I",
+      "titleItalian": "Prima missione",
+      "titleJapanese": "夢への旅立ち",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001756",
+        "title": "ENT Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 1,
+      "productionSerialNumber": "40358-721",
+      "featureLength": true,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2001-09-26",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000002814",
+      "title": "Anomaly",
+      "titleGerman": "Anomalie",
+      "titleItalian": null,
+      "titleJapanese": "オサーリア人の襲撃",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001758",
+        "title": "ENT Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 2,
+      "productionSerialNumber": "40358-054",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2153,
+      "yearTo": 2153,
+      "usAirDate": "2003-09-17",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000003386",
+      "title": "Carbon Creek",
+      "titleGerman": "Carbon Creek",
+      "titleItalian": null,
+      "titleJapanese": "スプートニクの飛んだ夜に",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001757",
+        "title": "ENT Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 2,
+      "productionSerialNumber": "40358-027",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2002-09-25",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000007252",
+      "title": "Borderland",
+      "titleGerman": "Borderland",
+      "titleItalian": "Terra di confine",
+      "titleJapanese": "ボーダーランド",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000003604",
+        "title": "ENT Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 4,
+      "productionSerialNumber": "40358-080",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2004-10-29",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000003399",
+      "title": "A Night in Sickbay",
+      "titleGerman": "Eine Nacht Krankenstation",
+      "titleItalian": null,
+      "titleJapanese": "小さな生命の灯",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001757",
+        "title": "ENT Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 5,
+      "productionSerialNumber": "40358-030",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2152,
+      "yearTo": 2152,
+      "usAirDate": "2002-10-16",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000009981",
+      "title": "Awakening",
+      "titleGerman": "Zeit des Erwachens",
+      "titleItalian": "Risvegli",
+      "titleJapanese": "陰謀の嵐",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000003604",
+        "title": "ENT Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 8,
+      "productionSerialNumber": "40358-084",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2154,
+      "yearTo": 2154,
+      "usAirDate": "2004-11-26",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001020",
+      "title": "Breaking the Ice",
+      "titleGerman": "Das Eis bricht",
+      "titleItalian": null,
+      "titleJapanese": "彗星は去り行くとも",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001756",
+        "title": "ENT Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 8,
+      "productionSerialNumber": "40358-008",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2151,
+      "yearTo": 2151,
+      "usAirDate": "2001-11-07",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000011330",
+      "title": "Babel One",
+      "titleGerman": "Babel",
+      "titleItalian": null,
+      "titleJapanese": "バベル1号星",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000003604",
+        "title": "ENT Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 12,
+      "productionSerialNumber": "40358-088",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2005-01-28",
+      "finalScriptDate": "2004-11-01"
+    },
+    {
+      "uid": "EPMA0000013307",
+      "title": "Affliction",
+      "titleGerman": "Die Heimsuchung",
+      "titleItalian": null,
+      "titleJapanese": "クリンゴンの苦境",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000003604",
+        "title": "ENT Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 15,
+      "productionSerialNumber": "40358-091",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2005-02-18",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000014329",
+      "title": "Bound",
+      "titleGerman": "Die Verbindung",
+      "titleItalian": "Le schiave di Orione",
+      "titleJapanese": "誘惑の甘い罠",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000003604",
+        "title": "ENT Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 17,
+      "productionSerialNumber": "40358-093",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2005-04-15",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000003487",
+      "title": "Canamar",
+      "titleGerman": "Canamar",
+      "titleItalian": null,
+      "titleJapanese": "地獄への護送船",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001757",
+        "title": "ENT Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 17,
+      "productionSerialNumber": "40358-043",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2152,
+      "yearTo": 2152,
+      "usAirDate": "2003-02-26",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001986",
+      "title": "Azati Prime",
+      "titleGerman": "Azati Prime",
+      "titleItalian": null,
+      "titleJapanese": "爬虫類族の攻撃",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001758",
+        "title": "ENT Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 18,
+      "productionSerialNumber": "40358-070",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2154,
+      "yearTo": 2154,
+      "usAirDate": "2004-03-03",
+      "finalScriptDate": "2003-12-18"
+    },
+    {
+      "uid": "EPMA0000003100",
+      "title": "Acquisition",
+      "titleGerman": "Raumpiraten",
+      "titleItalian": null,
+      "titleJapanese": "獲物たちの罠",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001756",
+        "title": "ENT Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 19,
+      "productionSerialNumber": "40358-019",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2151,
+      "yearTo": 2151,
+      "usAirDate": "2002-03-27",
+      "finalScriptDate": "2002-01-14"
+    },
+    {
+      "uid": "EPMA0000003494",
+      "title": "Bounty",
+      "titleGerman": "Kopfgeld",
+      "titleItalian": null,
+      "titleJapanese": "狙われた首",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "season": {
+        "uid": "SAMA0000001757",
+        "title": "ENT Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 25,
+      "productionSerialNumber": "40358-051",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2153,
+      "yearTo": 2153,
+      "usAirDate": "2003-05-14",
+      "finalScriptDate": "2003-03-07"
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000001758",
+      "title": "ENT Season 3",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": 24
+    },
+    {
+      "uid": "SAMA0000003604",
+      "title": "ENT Season 4",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "seasonNumber": 4,
+      "numberOfEpisodes": 22
+    },
+    {
+      "uid": "SAMA0000001756",
+      "title": "ENT Season 1",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 25
+    },
+    {
+      "uid": "SAMA0000001757",
+      "title": "ENT Season 2",
+      "series": {
+        "uid": "SEMA0000103435",
+        "title": "Star Trek: Enterprise"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": 26
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000232387",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232387/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000245906",
+      "name": "A. Colville",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000245906/",
+      "image": "/images/character-cache/a-colville-CHMA0000245906.jpg"
+    },
+    {
+      "uid": "CHMA0000280373",
+      "name": "A. Cooper",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280373/",
+      "image": "/images/character-cache/a-cooper-CHMA0000280373.jpg"
+    },
+    {
+      "uid": "CHMA0000143026",
+      "name": "A. Deguzman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000143026/",
+      "image": "/images/character-cache/a-deguzman-CHMA0000143026.jpg"
+    },
+    {
+      "uid": "CHMA0000250125",
+      "name": "A. Dekovic",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000250125/",
+      "image": "/images/character-cache/a-dekovic-CHMA0000250125.jpg"
+    },
+    {
+      "uid": "CHMA0000139474",
+      "name": "A. Dominguez",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000139474/",
+      "image": "/images/character-cache/a-dominguez-CHMA0000139474.jpg"
+    },
+    {
+      "uid": "CHMA0000110557",
+      "name": "A. Eastman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000110557/",
+      "image": "/images/character-cache/a-eastman-CHMA0000110557.jpg"
+    },
+    {
+      "uid": "CHMA0000068579",
+      "name": "A. Estradajem",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068579/",
+      "image": "/images/character-cache/a-estradajem-CHMA0000068579.jpg"
+    },
+    {
+      "uid": "CHMA0000279362",
+      "name": "A. Finch",
+      "performer": "Guy Fernandez, Jr.",
+      "characterLink": "/characters/CHMA0000279362/",
+      "image": "/images/character-cache/a-finch-CHMA0000279362.jpg"
+    },
+    {
+      "uid": "CHMA0000055407",
+      "name": "A. Fredrickson",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000055407/",
+      "image": "/images/character-cache/a-fredrickson-CHMA0000055407.jpg"
+    }
+  ]
+}

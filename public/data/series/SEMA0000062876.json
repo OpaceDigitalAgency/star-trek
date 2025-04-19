@@ -1,0 +1,642 @@
+{
+  "uid": "SEMA0000062876",
+  "title": "Star Trek: The Next Generation",
+  "abbreviation": "TNG",
+  "productionStartYear": 1987,
+  "productionEndYear": 1994,
+  "originalRunStartDate": "1987-09-28",
+  "originalRunEndDate": "1994-05-23",
+  "seasonsCount": 7,
+  "episodesCount": 176,
+  "featureLengthEpisodesCount": 2,
+  "productionCompany": {
+    "uid": "COMA0000001845",
+    "name": "Paramount Pictures",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": true,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000052430",
+    "name": "CBS Studios",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "years": "1987–1994",
+  "stardate": null,
+  "image": "/images/placeholder-the-next-generation.jpg",
+  "slug": "star-trek-the-next-generation",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/4/4b/USS_Enterprise-D%2C_These_Are_the_Voyages.jpg/revision/latest/scale-to-width-down/1200?cb=20190727031723&path-prefix=en",
+  "wikiSummary": "<i><b>Star Trek: The Next Generation</b></i>, often abbreviated to <b>TNG</b>, is the second live-action <i>Star Trek</i> television series, and the first set in the <a href=\"/wiki/24th_century\" title=\"24th century\">24th century</a>. Like its predecessors, it was created by <a href=\"/wiki/Gene_Roddenberry\" title=\"Gene Roddenberry\">Gene Roddenberry</a>. Produced at <a href=\"/wiki/Paramount_Pictures\" title=\"Paramount Pictures\">Paramount Pictures</a>, it aired in first-run <a href=\"/wiki/Syndication\" title=\"Syndication\">syndication</a>, by <a href=\"/wiki/Paramount_Television\" class=\"mw-redirect\" title=\"Paramount Television\">Paramount Television</a> in the US, from <a href=\"/wiki/September_1987\" class=\"mw-redirect\" title=\"September 1987\">September 1987</a> to <a href=\"/wiki/May_1994\" class=\"mw-redirect\" title=\"May 1994\">May 1994</a>. The series was set in the 24th century and featured the voyages of the <a href=\"/wiki/Starship\" title=\"Starship\">starship</a> <a href=\"/wiki/USS_Enterprise_(NCC-1701-D)\" title=\"USS Enterprise (NCC-1701-D)\">USS <i>Enterprise</i>-D</a> under <a href=\"/wiki/Captain\" title=\"Captain\">Captain</a> <a href=\"/wiki/Jean-Luc_Picard\" title=\"Jean-Luc Picard\">Jean-Luc Picard</a>. \nThe series led to four spin-offs set in the same time period: <i><a href=\"/wiki/Star_Trek:_Deep_Space_Nine\" title=\"Star Trek: Deep Space Nine\">Star Trek: Deep Space Nine</a></i>, which it ran alongside during its final two seasons, <i><a href=\"/wiki/Star_Trek:_Voyager\" title=\"Star Trek: Voyager\">Star Trek: Voyager</a></i>, <i><a href=\"/wiki/Star_Trek:_Lower_Decks\" title=\"Star Trek: Lower Decks\">Star Trek: Lower Decks</a></i> and <i><a href=\"/wiki/Star_Trek:_Picard\" title=\"Star Trek: Picard\">Star Trek: Picard</a></i>. It is also the beginning of a contiguous period of time during which there was always at least one <i>Star Trek</i> series in production, ending with <i><a href=\"/wiki/Star_Trek:_Enterprise\" title=\"Star Trek: Enterprise\">Star Trek: Enterprise</a></i> in <a href=\"/wiki/2005_(production)\" title=\"2005 (production)\">2005</a>. \n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/The_Next_Generation",
+  "episodes": [
+    {
+      "uid": "EPMA0000001361",
+      "title": "Brothers",
+      "titleGerman": "Die ungleichen Brüder",
+      "titleItalian": "Fratelli",
+      "titleJapanese": "永遠の絆",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001636",
+        "title": "TNG Season 4"
+      },
+      "seasonNumber": 4,
+      "episodeNumber": 3,
+      "productionSerialNumber": "40274-177",
+      "featureLength": false,
+      "stardateFrom": 44085.7,
+      "stardateTo": 44085.7,
+      "yearFrom": 2367,
+      "yearTo": 2367,
+      "usAirDate": "1990-10-08",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001340",
+      "title": "Booby Trap",
+      "titleGerman": "Die Energiefalle",
+      "titleItalian": "Trappola spaziale",
+      "titleJapanese": "メンサー星人の罠",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001635",
+        "title": "TNG Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 6,
+      "productionSerialNumber": "40273-154",
+      "featureLength": false,
+      "stardateFrom": 43205.6,
+      "stardateTo": 43205.6,
+      "yearFrom": 2366,
+      "yearTo": 2366,
+      "usAirDate": "1989-10-30",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001415",
+      "title": "A Fistful of Datas",
+      "titleGerman": "Eine Handvoll Datas",
+      "titleItalian": null,
+      "titleJapanese": "ホロデッキ・イン・ザ・ウエスト",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001638",
+        "title": "TNG Season 6"
+      },
+      "seasonNumber": 6,
+      "episodeNumber": 8,
+      "productionSerialNumber": "40276-234",
+      "featureLength": false,
+      "stardateFrom": 46271.5,
+      "stardateTo": 46271.5,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1992-11-07",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001320",
+      "title": "A Matter Of Honor",
+      "titleGerman": "Der Austauschoffizier",
+      "titleItalian": null,
+      "titleJapanese": "錯綜した美学",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001634",
+        "title": "TNG Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 8,
+      "productionSerialNumber": "40272-134",
+      "featureLength": false,
+      "stardateFrom": 42506.5,
+      "stardateTo": 42506.5,
+      "yearFrom": 2365,
+      "yearTo": 2365,
+      "usAirDate": "1989-02-06",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001442",
+      "title": "Attached",
+      "titleGerman": "Kontakte",
+      "titleItalian": null,
+      "titleJapanese": "混迷の惑星ケスプリット",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001639",
+        "title": "TNG Season 7"
+      },
+      "seasonNumber": 7,
+      "episodeNumber": 8,
+      "productionSerialNumber": "40277-260",
+      "featureLength": false,
+      "stardateFrom": 47304.2,
+      "stardateTo": 47304.2,
+      "yearFrom": 2370,
+      "yearTo": 2370,
+      "usAirDate": "1993-11-08",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001390",
+      "title": "A Matter Of Time",
+      "titleGerman": "Der zeitreisende Historiker",
+      "titleItalian": "Uno strano visitatore",
+      "titleJapanese": "26世紀のタイム・トラベラー",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001637",
+        "title": "TNG Season 5"
+      },
+      "seasonNumber": 5,
+      "episodeNumber": 9,
+      "productionSerialNumber": "40275-209",
+      "featureLength": false,
+      "stardateFrom": 45349.1,
+      "stardateTo": 45349.1,
+      "yearFrom": 2368,
+      "yearTo": 2368,
+      "usAirDate": "1991-11-18",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001421",
+      "title": "Aquiel",
+      "titleGerman": "Aquiel",
+      "titleItalian": null,
+      "titleJapanese": "謎の蒸発事件",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001638",
+        "title": "TNG Season 6"
+      },
+      "seasonNumber": 6,
+      "episodeNumber": 13,
+      "productionSerialNumber": "40276-239",
+      "featureLength": false,
+      "stardateFrom": 46461.3,
+      "stardateTo": 46461.3,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1993-02-01",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000064865",
+      "title": "A Matter of Perspective",
+      "titleGerman": "Riker unter Verdacht",
+      "titleItalian": null,
+      "titleJapanese": "疑惑のビーム",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001635",
+        "title": "TNG Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 14,
+      "productionSerialNumber": "40273-162",
+      "featureLength": false,
+      "stardateFrom": 43610.4,
+      "stardateTo": 43610.4,
+      "yearFrom": 2366,
+      "yearTo": 2366,
+      "usAirDate": "1990-02-12",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000504",
+      "title": "Angel One",
+      "titleGerman": "Planet Angel One",
+      "titleItalian": null,
+      "titleJapanese": "奪われた女神達の惑星",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001633",
+        "title": "TNG Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 14,
+      "productionSerialNumber": "40271-115",
+      "featureLength": false,
+      "stardateFrom": 41636.9,
+      "stardateTo": 41636.9,
+      "yearFrom": 2364,
+      "yearTo": 2364,
+      "usAirDate": "1988-01-25",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000000505",
+      "title": "11001001",
+      "titleGerman": "11001001",
+      "titleItalian": null,
+      "titleJapanese": "盗まれたエンタープライズ",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001633",
+        "title": "TNG Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 15,
+      "productionSerialNumber": "40271-116",
+      "featureLength": false,
+      "stardateFrom": 41365.9,
+      "stardateTo": 41365.9,
+      "yearFrom": 2364,
+      "yearTo": 2364,
+      "usAirDate": "1988-02-01",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001423",
+      "title": "Birthright, Part I",
+      "titleGerman": "Der Moment der Erkenntnis, Teil I",
+      "titleItalian": "La voce del sangue - prima parte",
+      "titleJapanese": "バースライト・前編",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001638",
+        "title": "TNG Season 6"
+      },
+      "seasonNumber": 6,
+      "episodeNumber": 16,
+      "productionSerialNumber": "40276-242",
+      "featureLength": false,
+      "stardateFrom": 46578.4,
+      "stardateTo": 46578.4,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1993-02-22",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001424",
+      "title": "Birthright, Part II",
+      "titleGerman": "Der Moment der Erkenntnis, Teil II",
+      "titleItalian": null,
+      "titleJapanese": "バースライト・後編",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001638",
+        "title": "TNG Season 6"
+      },
+      "seasonNumber": 6,
+      "episodeNumber": 17,
+      "productionSerialNumber": "40276-243",
+      "featureLength": false,
+      "stardateFrom": 46579.2,
+      "stardateTo": 46579.2,
+      "yearFrom": 2369,
+      "yearTo": 2369,
+      "usAirDate": "1993-03-01",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001351",
+      "title": "Allegiance",
+      "titleGerman": "Versuchskaninchen",
+      "titleItalian": null,
+      "titleJapanese": "姿なき誘拐犯",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001635",
+        "title": "TNG Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 18,
+      "productionSerialNumber": "40273-166",
+      "featureLength": false,
+      "stardateFrom": 43714.1,
+      "stardateTo": 43714.1,
+      "yearFrom": 2366,
+      "yearTo": 2366,
+      "usAirDate": "1990-03-26",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001352",
+      "title": "Captain's Holiday",
+      "titleGerman": "Picard macht Urlaub",
+      "titleItalian": null,
+      "titleJapanese": "大いなるホリデイ",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001635",
+        "title": "TNG Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 19,
+      "productionSerialNumber": "40273-167",
+      "featureLength": false,
+      "stardateFrom": 43745.2,
+      "stardateTo": 43745.2,
+      "yearFrom": 2366,
+      "yearTo": 2366,
+      "usAirDate": "1990-04-02",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001455",
+      "title": "Bloodlines",
+      "titleGerman": "Boks Vergeltung",
+      "titleItalian": null,
+      "titleJapanese": "怨讐の彼方に",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001639",
+        "title": "TNG Season 7"
+      },
+      "seasonNumber": 7,
+      "episodeNumber": 22,
+      "productionSerialNumber": "40277-274",
+      "featureLength": false,
+      "stardateFrom": 47829.1,
+      "stardateTo": 47829.1,
+      "yearFrom": 2370,
+      "yearTo": 2370,
+      "usAirDate": "1994-05-02",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000001458",
+      "title": "All Good Things...",
+      "titleGerman": "Gestern, Heute, Morgen, Teil I",
+      "titleItalian": null,
+      "titleJapanese": "永遠への旅",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "season": {
+        "uid": "SAMA0000001639",
+        "title": "TNG Season 7"
+      },
+      "seasonNumber": 7,
+      "episodeNumber": 25,
+      "productionSerialNumber": "40277-747",
+      "featureLength": true,
+      "stardateFrom": 47988,
+      "stardateTo": 47988,
+      "yearFrom": 2370,
+      "yearTo": 2370,
+      "usAirDate": "1994-05-23",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000001638",
+      "title": "TNG Season 6",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 6,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001637",
+      "title": "TNG Season 5",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 5,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001633",
+      "title": "TNG Season 1",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 25
+    },
+    {
+      "uid": "SAMA0000001635",
+      "title": "TNG Season 3",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": 26
+    },
+    {
+      "uid": "SAMA0000001639",
+      "title": "TNG Season 7",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 7,
+      "numberOfEpisodes": 25
+    },
+    {
+      "uid": "SAMA0000001634",
+      "title": "TNG Season 2",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": 22
+    },
+    {
+      "uid": "SAMA0000001636",
+      "title": "TNG Season 4",
+      "series": {
+        "uid": "SEMA0000062876",
+        "title": "Star Trek: The Next Generation"
+      },
+      "seasonNumber": 4,
+      "numberOfEpisodes": 26
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    }
+  ]
+}

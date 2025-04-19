@@ -1,0 +1,342 @@
+{
+  "uid": "SEMA0000240166",
+  "title": "Star Trek: Lower Decks",
+  "abbreviation": "LD",
+  "productionStartYear": 2018,
+  "productionEndYear": null,
+  "originalRunStartDate": "2020-08-06",
+  "originalRunEndDate": null,
+  "seasonsCount": 3,
+  "episodesCount": 30,
+  "featureLengthEpisodesCount": 0,
+  "productionCompany": {
+    "uid": "COMA0000240172",
+    "name": "CBS Eye Animation Productions",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000201662",
+    "name": "Paramount+",
+    "broadcaster": true,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": false,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": false,
+    "videoGameCompany": false
+  },
+  "years": "2018–present",
+  "stardate": null,
+  "image": "/images/placeholder-lower-decks.jpg",
+  "slug": "star-trek-lower-decks",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/b/b4/USS_Cerritos%2C_2381.jpg/revision/latest/scale-to-width-down/1200?cb=20210820113244&path-prefix=en",
+  "wikiSummary": "<i><b>Star Trek: Lower Decks</b></i> is the ninth main series set in the <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> universe, the tenth including the companion series <i><a href=\"/wiki/Star_Trek:_Short_Treks\" title=\"Star Trek: Short Treks\">Star Trek: Short Treks</a></i>, and the twelfth <i>Star Trek</i> series overall. It is the second series to be entirely animated, after <i><a href=\"/wiki/Star_Trek:_The_Animated_Series\" title=\"Star Trek: The Animated Series\">Star Trek: The Animated Series</a></i>, with episodes running half an hour, and the third series to have animated episodes, after <i>Short Treks</i>. <i>Lower Decks</i> is the first original animated series commissioned by CBS All Access, as well as the first produced by the new CBS animation arm, <a href=\"/wiki/CBS_Eye_Animation_Productions\" title=\"CBS Eye Animation Productions\">CBS Eye Animation Productions</a>, and was announced in <a href=\"/wiki/October_2018\" class=\"mw-redirect\" title=\"October 2018\">October 2018</a>, with All Access committing to a two-season order. <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"http://deadline.com/2018/10/star-trek-lower-decks-animated-series-rick-and-morty-mike-mcmahan-alex-kurtzman-cbs-all-access-1202489207\">[1]</a>\nCreated by <a href=\"/wiki/Mike_McMahan\" title=\"Mike McMahan\">Mike McMahan</a>, the series is an adult animation comedy produced in association with <a href=\"/wiki/Titmouse,_Inc.\" title=\"Titmouse, Inc.\">Titmouse, Inc.</a>. It forms part of <a href=\"/wiki/Alex_Kurtzman\" title=\"Alex Kurtzman\">Alex Kurtzman</a>'s five-year deal with CBS to expand the <i>Star Trek</i> franchise. <i>Lower Decks</i> focuses on \"<i>the support crew serving on one of <a href=\"/wiki/Starfleet\" title=\"Starfleet\">Starfleet</a>'s least important ships.</i>\" <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://www.startrek.com/news/star-trek-lower-decks-sets-release-date-previews-first-trailer-and-series-poster\">[2]</a>\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Lower_Decks",
+  "episodes": [
+    {
+      "uid": "EPMA0000271368",
+      "title": "An Embarrassment Of Dooplers",
+      "titleGerman": "Die Doopler-Verwirrung",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "season": {
+        "uid": "SAMA0000250142",
+        "title": "LD Season 2"
+      },
+      "seasonNumber": 2,
+      "episodeNumber": 5,
+      "productionSerialNumber": "LD-2005",
+      "featureLength": false,
+      "stardateFrom": 58053.9,
+      "stardateTo": 58053.9,
+      "yearFrom": 2381,
+      "yearTo": 2381,
+      "usAirDate": "2021-09-09",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000283710",
+      "title": "A Mathematically Perfect Redemption",
+      "titleGerman": "Eine mathematisch perfekte Vergeltung",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "season": {
+        "uid": "SAMA0000267336",
+        "title": "LD Season 3"
+      },
+      "seasonNumber": 3,
+      "episodeNumber": 7,
+      "productionSerialNumber": "LD-3007",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2381,
+      "yearTo": 2381,
+      "usAirDate": "2022-10-06",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000276060",
+      "title": "LD Season 4",
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "seasonNumber": 4,
+      "numberOfEpisodes": null
+    },
+    {
+      "uid": "SAMA0000250142",
+      "title": "LD Season 2",
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": 10
+    },
+    {
+      "uid": "SAMA0000267336",
+      "title": "LD Season 3",
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": 10
+    },
+    {
+      "uid": "SAMA0000247983",
+      "title": "LD Season 1",
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 10
+    },
+    {
+      "uid": "SAMA0000288747",
+      "title": "LD Season 5",
+      "series": {
+        "uid": "SEMA0000240166",
+        "title": "Star Trek: Lower Decks"
+      },
+      "seasonNumber": 5,
+      "numberOfEpisodes": null
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000232387",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232387/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000245906",
+      "name": "A. Colville",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000245906/",
+      "image": "/images/character-cache/a-colville-CHMA0000245906.jpg"
+    },
+    {
+      "uid": "CHMA0000280373",
+      "name": "A. Cooper",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280373/",
+      "image": "/images/character-cache/a-cooper-CHMA0000280373.jpg"
+    },
+    {
+      "uid": "CHMA0000143026",
+      "name": "A. Deguzman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000143026/",
+      "image": "/images/character-cache/a-deguzman-CHMA0000143026.jpg"
+    },
+    {
+      "uid": "CHMA0000250125",
+      "name": "A. Dekovic",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000250125/",
+      "image": "/images/character-cache/a-dekovic-CHMA0000250125.jpg"
+    },
+    {
+      "uid": "CHMA0000139474",
+      "name": "A. Dominguez",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000139474/",
+      "image": "/images/character-cache/a-dominguez-CHMA0000139474.jpg"
+    },
+    {
+      "uid": "CHMA0000110557",
+      "name": "A. Eastman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000110557/",
+      "image": "/images/character-cache/a-eastman-CHMA0000110557.jpg"
+    },
+    {
+      "uid": "CHMA0000068579",
+      "name": "A. Estradajem",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068579/",
+      "image": "/images/character-cache/a-estradajem-CHMA0000068579.jpg"
+    },
+    {
+      "uid": "CHMA0000279362",
+      "name": "A. Finch",
+      "performer": "Guy Fernandez, Jr.",
+      "characterLink": "/characters/CHMA0000279362/",
+      "image": "/images/character-cache/a-finch-CHMA0000279362.jpg"
+    },
+    {
+      "uid": "CHMA0000055407",
+      "name": "A. Fredrickson",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000055407/",
+      "image": "/images/character-cache/a-fredrickson-CHMA0000055407.jpg"
+    }
+  ]
+}

@@ -1,0 +1,362 @@
+{
+  "uid": "SEMA0000242790",
+  "title": "Star Trek: Prodigy",
+  "abbreviation": "PRO",
+  "productionStartYear": 2019,
+  "productionEndYear": null,
+  "originalRunStartDate": "2021-10-28",
+  "originalRunEndDate": null,
+  "seasonsCount": 1,
+  "episodesCount": 19,
+  "featureLengthEpisodesCount": 0,
+  "productionCompany": {
+    "uid": "COMA0000240172",
+    "name": "CBS Eye Animation Productions",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000201662",
+    "name": "Paramount+",
+    "broadcaster": true,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": false,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": false,
+    "videoGameCompany": false
+  },
+  "years": "2019–present",
+  "stardate": null,
+  "image": "/images/stars-placeholder.jpg",
+  "slug": "star-trek-prodigy",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/3/39/Site-community-image/revision/latest?cb=20241212154521&path-prefix=en",
+  "wikiSummary": "A <b>prodigy</b>, <b>boy wonder</b>, <b>whiz kid</b>, <b>wonder child</b> or <b><a href=\"/wiki/German_language\" title=\"German language\">wunderkind</a></b>, were <a href=\"/wiki/Term\" class=\"mw-redirect\" title=\"Term\">terms</a> reserved for <a href=\"/wiki/Children\" class=\"mw-redirect\" title=\"Children\">young individuals</a> who was <a href=\"/wiki/Intelligence\" title=\"Intelligence\">smarter</a> than <a href=\"/wiki/Average\" title=\"Average\">average</a>, perhaps even <a href=\"/wiki/Genius\" title=\"Genius\">genius</a>, for their <a href=\"/wiki/Age\" class=\"mw-redirect\" title=\"Age\">age</a>, or those who <a href=\"/wiki/Achievement\" title=\"Achievement\">achieved</a> early in <a href=\"/wiki/Life\" title=\"Life\">life</a>.\nWhen it was believed that <a href=\"/wiki/Enterprise_(NX-01)\" title=\"Enterprise (NX-01)\"><i>Enterprise</i> NX-01</a> was going to be permanently recalled to <a href=\"/wiki/Earth\" title=\"Earth\">Earth</a> in <a href=\"/wiki/2151\" title=\"2151\">2151</a>, <a href=\"/wiki/Travis_Mayweather\" title=\"Travis Mayweather\">Travis Mayweather</a> and <a href=\"/wiki/Hoshi_Sato\" title=\"Hoshi Sato\">Hoshi Sato</a> began to discuss their future options. When Mayweather asked if Sato thought she was replaced in <a href=\"/wiki/Brazil\" title=\"Brazil\">Brazil</a>, she replied, \"<i>Even if they have, they'd take me back. I'm a prodigy, remember?</i>\" (<a href=\"/wiki/Star_Trek:_Enterprise\" title=\"Star Trek: Enterprise\"><span style=\"cursor:help;\" title=\"Star Trek: Enterprise\">ENT</span></a>: \"<a href=\"/wiki/Shockwave_(episode)\" title=\"Shockwave (episode)\"><span style=\"cursor:help;\" title=\"Shockwave (ENT 1x26)\">Shockwave</span></a>\")\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Prodigy",
+  "episodes": [
+    {
+      "uid": "EPMA0000276201",
+      "title": "A Moral Star, Part 1",
+      "titleGerman": "Rückkehr nach Tars Lamora, Teil I",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000242790",
+        "title": "Star Trek: Prodigy"
+      },
+      "season": {
+        "uid": "SAMA0000257714",
+        "title": "PRO Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 9,
+      "productionSerialNumber": "109",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": 2383,
+      "yearTo": 2383,
+      "usAirDate": "2022-01-27",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000276392",
+      "title": "A Moral Star, Part 2",
+      "titleGerman": "Rückkehr nach Tars Lamora, Teil II",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000242790",
+        "title": "Star Trek: Prodigy"
+      },
+      "season": {
+        "uid": "SAMA0000257714",
+        "title": "PRO Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 10,
+      "productionSerialNumber": "110",
+      "featureLength": false,
+      "stardateFrom": 61103.1,
+      "stardateTo": 61103.1,
+      "yearFrom": 2384,
+      "yearTo": 2384,
+      "usAirDate": "2022-02-03",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000284043",
+      "title": "Asylum",
+      "titleGerman": "Asyl_",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000242790",
+        "title": "Star Trek: Prodigy"
+      },
+      "season": {
+        "uid": "SAMA0000257714",
+        "title": "PRO Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 11,
+      "productionSerialNumber": "111",
+      "featureLength": false,
+      "stardateFrom": 61209.5,
+      "stardateTo": 61209.5,
+      "yearFrom": 2384,
+      "yearTo": 2384,
+      "usAirDate": "2022-10-27",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000284291",
+      "title": "All the World's a Stage",
+      "titleGerman": "Die ganze Welt ist eine Bühne",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000242790",
+        "title": "Star Trek: Prodigy"
+      },
+      "season": {
+        "uid": "SAMA0000257714",
+        "title": "PRO Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 13,
+      "productionSerialNumber": "113",
+      "featureLength": false,
+      "stardateFrom": 61296.9,
+      "stardateTo": 61296.9,
+      "yearFrom": 2384,
+      "yearTo": 2384,
+      "usAirDate": "2022-11-10",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000257714",
+      "title": "PRO Season 1",
+      "series": {
+        "uid": "SEMA0000242790",
+        "title": "Star Trek: Prodigy"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 19
+    },
+    {
+      "uid": "SAMA0000257983",
+      "title": "PRO Season 2",
+      "series": {
+        "uid": "SEMA0000242790",
+        "title": "Star Trek: Prodigy"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": null
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000232387",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232387/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000245906",
+      "name": "A. Colville",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000245906/",
+      "image": "/images/character-cache/a-colville-CHMA0000245906.jpg"
+    },
+    {
+      "uid": "CHMA0000280373",
+      "name": "A. Cooper",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280373/",
+      "image": "/images/character-cache/a-cooper-CHMA0000280373.jpg"
+    },
+    {
+      "uid": "CHMA0000143026",
+      "name": "A. Deguzman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000143026/",
+      "image": "/images/character-cache/a-deguzman-CHMA0000143026.jpg"
+    },
+    {
+      "uid": "CHMA0000250125",
+      "name": "A. Dekovic",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000250125/",
+      "image": "/images/character-cache/a-dekovic-CHMA0000250125.jpg"
+    },
+    {
+      "uid": "CHMA0000139474",
+      "name": "A. Dominguez",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000139474/",
+      "image": "/images/character-cache/a-dominguez-CHMA0000139474.jpg"
+    },
+    {
+      "uid": "CHMA0000110557",
+      "name": "A. Eastman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000110557/",
+      "image": "/images/character-cache/a-eastman-CHMA0000110557.jpg"
+    },
+    {
+      "uid": "CHMA0000068579",
+      "name": "A. Estradajem",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068579/",
+      "image": "/images/character-cache/a-estradajem-CHMA0000068579.jpg"
+    },
+    {
+      "uid": "CHMA0000279362",
+      "name": "A. Finch",
+      "performer": "Guy Fernandez, Jr.",
+      "characterLink": "/characters/CHMA0000279362/",
+      "image": "/images/character-cache/a-finch-CHMA0000279362.jpg"
+    },
+    {
+      "uid": "CHMA0000055407",
+      "name": "A. Fredrickson",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000055407/",
+      "image": "/images/character-cache/a-fredrickson-CHMA0000055407.jpg"
+    }
+  ]
+}

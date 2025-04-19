@@ -1,0 +1,322 @@
+{
+  "uid": "SEMA0000255370",
+  "title": "Star Trek: Strange New Worlds",
+  "abbreviation": "SNW",
+  "productionStartYear": 2021,
+  "productionEndYear": null,
+  "originalRunStartDate": "2022-05-05",
+  "originalRunEndDate": null,
+  "seasonsCount": 1,
+  "episodesCount": 10,
+  "featureLengthEpisodesCount": 0,
+  "productionCompany": {
+    "uid": "COMA0000052430",
+    "name": "CBS Studios",
+    "broadcaster": false,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": true,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": true,
+    "videoGameCompany": false
+  },
+  "originalBroadcaster": {
+    "uid": "COMA0000201662",
+    "name": "Paramount+",
+    "broadcaster": true,
+    "collectibleCompany": false,
+    "conglomerate": false,
+    "digitalVisualEffectsCompany": false,
+    "distributor": false,
+    "gameCompany": false,
+    "filmEquipmentCompany": false,
+    "makeUpEffectsStudio": false,
+    "mattePaintingCompany": false,
+    "modelAndMiniatureEffectsCompany": false,
+    "postProductionCompany": false,
+    "productionCompany": false,
+    "propCompany": false,
+    "recordLabel": false,
+    "specialEffectsCompany": false,
+    "tvAndFilmProductionCompany": false,
+    "videoGameCompany": false
+  },
+  "years": "2021–present",
+  "stardate": null,
+  "image": "/images/placeholder-strange-new-worlds.jpg",
+  "slug": "star-trek-strange-new-worlds",
+  "wikiImage": "https://static.wikia.nocookie.net/memoryalpha/images/d/d7/USS_Enterprise%2C_2259.jpg/revision/latest/scale-to-width-down/1200?cb=20230705064856&path-prefix=en",
+  "wikiSummary": "<i><b>Star Trek: Strange New Worlds</b></i> is the tenth overall <i><a href=\"/wiki/Star_Trek\" title=\"Star Trek\">Star Trek</a></i> spin-off series, and the first direct spin-off of <i><a href=\"/wiki/Star_Trek:_Discovery\" title=\"Star Trek: Discovery\">Star Trek: Discovery</a></i> that was announced on <a href=\"/wiki/15_May\" title=\"15 May\">15 May</a> <a href=\"/wiki/May_2020\" class=\"mw-redirect\" title=\"May 2020\">2020</a>. It was produced by <a href=\"/wiki/CBS_Studios\" title=\"CBS Studios\">CBS Studios</a> and stars <a href=\"/wiki/Anson_Mount\" title=\"Anson Mount\">Anson Mount</a> as <a href=\"/wiki/Christopher_Pike\" title=\"Christopher Pike\">Christopher Pike</a>, <a href=\"/wiki/Ethan_Peck\" title=\"Ethan Peck\">Ethan Peck</a> as <a href=\"/wiki/Spock\" title=\"Spock\">Spock</a>, and <a href=\"/wiki/Rebecca_Romijn\" title=\"Rebecca Romijn\">Rebecca Romijn</a> as <a href=\"/wiki/Una_Chin-Riley\" title=\"Una Chin-Riley\">Una Chin-Riley</a>.\nThe official announcement stated that \"the series will follow <a href=\"/wiki/Captain\" title=\"Captain\">Captain</a> Pike, <a href=\"/wiki/Science_Officer\" class=\"mw-redirect\" title=\"Science Officer\">Science Officer</a> Spock, and <a href=\"/wiki/Una_Chin-Riley\" title=\"Una Chin-Riley\">Number One</a> in the <a href=\"/wiki/2250s\" title=\"2250s\">decade</a> before Captain <a href=\"/wiki/James_T._Kirk\" title=\"James T. Kirk\">Kirk</a> <a href=\"/wiki/2265\" title=\"2265\">boarded</a> the <a href=\"/wiki/USS_Enterprise_(NCC-1701)\" title=\"USS Enterprise (NCC-1701)\">USS <i>Enterprise</i></a>, as they explore new worlds around the galaxy.\" <a target=\"_blank\" rel=\"nofollow noreferrer noopener\" class=\"external autonumber\" href=\"https://www.startrek.com/news/star-trek-strange-new-worlds-anson-mount-rebecca-romijn-ethan-peck-cbs-all-access\">[1]</a>\n",
+  "wikiUrl": "https://memory-alpha.fandom.com/wiki/Strange_New_Worlds",
+  "episodes": [
+    {
+      "uid": "EPMA0000281615",
+      "title": "All Those Who Wander",
+      "titleGerman": "Alle, die wandern",
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000255370",
+        "title": "Star Trek: Strange New Worlds"
+      },
+      "season": {
+        "uid": "SAMA0000255378",
+        "title": "SNW Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 9,
+      "productionSerialNumber": "109",
+      "featureLength": false,
+      "stardateFrom": 2510.6,
+      "stardateTo": 2510.6,
+      "yearFrom": 2259,
+      "yearTo": 2259,
+      "usAirDate": "2022-06-30",
+      "finalScriptDate": null
+    },
+    {
+      "uid": "EPMA0000281768",
+      "title": "A Quality of Mercy",
+      "titleGerman": null,
+      "titleItalian": null,
+      "titleJapanese": null,
+      "series": {
+        "uid": "SEMA0000255370",
+        "title": "Star Trek: Strange New Worlds"
+      },
+      "season": {
+        "uid": "SAMA0000255378",
+        "title": "SNW Season 1"
+      },
+      "seasonNumber": 1,
+      "episodeNumber": 10,
+      "productionSerialNumber": "110",
+      "featureLength": false,
+      "stardateFrom": null,
+      "stardateTo": null,
+      "yearFrom": null,
+      "yearTo": null,
+      "usAirDate": "2022-07-07",
+      "finalScriptDate": null
+    }
+  ],
+  "seasons": [
+    {
+      "uid": "SAMA0000276057",
+      "title": "SNW Season 2",
+      "series": {
+        "uid": "SEMA0000255370",
+        "title": "Star Trek: Strange New Worlds"
+      },
+      "seasonNumber": 2,
+      "numberOfEpisodes": null
+    },
+    {
+      "uid": "SAMA0000255378",
+      "title": "SNW Season 1",
+      "series": {
+        "uid": "SEMA0000255370",
+        "title": "Star Trek: Strange New Worlds"
+      },
+      "seasonNumber": 1,
+      "numberOfEpisodes": 10
+    },
+    {
+      "uid": "SAMA0000288746",
+      "title": "SNW Season 3",
+      "series": {
+        "uid": "SEMA0000255370",
+        "title": "Star Trek: Strange New Worlds"
+      },
+      "seasonNumber": 3,
+      "numberOfEpisodes": null
+    }
+  ],
+  "cast": [
+    {
+      "uid": "CHMA0000215045",
+      "name": "0413 Theta",
+      "performer": "Jack R. Orend",
+      "characterLink": "/characters/CHMA0000215045/",
+      "image": "/images/character-cache/0413-theta-CHMA0000215045.jpg"
+    },
+    {
+      "uid": "CHMA0000174718",
+      "name": "0718",
+      "performer": "Joseph Gatt",
+      "characterLink": "/characters/CHMA0000174718/",
+      "image": "/images/character-cache/0718-CHMA0000174718.jpg"
+    },
+    {
+      "uid": "CHMA0000283851",
+      "name": "10111",
+      "performer": "Fred Tatasciore",
+      "characterLink": "/characters/CHMA0000283851/",
+      "image": "/images/character-cache/10111-CHMA0000283851.jpg"
+    },
+    {
+      "uid": "CHMA0000278055",
+      "name": "335",
+      "performer": "Alex Diehl",
+      "characterLink": "/characters/CHMA0000278055/",
+      "image": "/images/character-cache/335-CHMA0000278055.jpg"
+    },
+    {
+      "uid": "CHMA0000282741",
+      "name": "355",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000282741/",
+      "image": "/images/character-cache/355-CHMA0000282741.jpg"
+    },
+    {
+      "uid": "CHMA0000026532",
+      "name": "A'trom",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000026532/",
+      "image": "/images/character-cache/atrom-CHMA0000026532.jpg"
+    },
+    {
+      "uid": "CHMA0000280385",
+      "name": "A. Armaganian",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280385/",
+      "image": "/images/character-cache/a-armaganian-CHMA0000280385.jpg"
+    },
+    {
+      "uid": "CHMA0000226457",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226457/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000232390",
+      "name": "A. Baiers",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232390/",
+      "image": "/images/character-cache/a-baiers-CHMA0000226457.jpg"
+    },
+    {
+      "uid": "CHMA0000068580",
+      "name": "A. Banda",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068580/",
+      "image": "/images/character-cache/a-banda-CHMA0000068580.jpg"
+    },
+    {
+      "uid": "CHMA0000053843",
+      "name": "A. Bormanis",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000053843/",
+      "image": "/images/character-cache/a-bormanis-CHMA0000053843.jpg"
+    },
+    {
+      "uid": "CHMA0000069222",
+      "name": "A. Bro",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069222/",
+      "image": "/images/character-cache/a-bro-CHMA0000069222.jpg"
+    },
+    {
+      "uid": "CHMA0000280434",
+      "name": "A. Brock",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280434/",
+      "image": "/images/character-cache/a-brock-CHMA0000280434.jpg"
+    },
+    {
+      "uid": "CHMA0000069227",
+      "name": "A. Codron",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000069227/",
+      "image": "/images/character-cache/a-codron-CHMA0000069227.jpg"
+    },
+    {
+      "uid": "CHMA0000226461",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000226461/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000232387",
+      "name": "A. Coleite",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000232387/",
+      "image": "/images/character-cache/a-coleite-CHMA0000226461.jpg"
+    },
+    {
+      "uid": "CHMA0000245906",
+      "name": "A. Colville",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000245906/",
+      "image": "/images/character-cache/a-colville-CHMA0000245906.jpg"
+    },
+    {
+      "uid": "CHMA0000280373",
+      "name": "A. Cooper",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000280373/",
+      "image": "/images/character-cache/a-cooper-CHMA0000280373.jpg"
+    },
+    {
+      "uid": "CHMA0000143026",
+      "name": "A. Deguzman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000143026/",
+      "image": "/images/character-cache/a-deguzman-CHMA0000143026.jpg"
+    },
+    {
+      "uid": "CHMA0000250125",
+      "name": "A. Dekovic",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000250125/",
+      "image": "/images/character-cache/a-dekovic-CHMA0000250125.jpg"
+    },
+    {
+      "uid": "CHMA0000139474",
+      "name": "A. Dominguez",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000139474/",
+      "image": "/images/character-cache/a-dominguez-CHMA0000139474.jpg"
+    },
+    {
+      "uid": "CHMA0000110557",
+      "name": "A. Eastman",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000110557/",
+      "image": "/images/character-cache/a-eastman-CHMA0000110557.jpg"
+    },
+    {
+      "uid": "CHMA0000068579",
+      "name": "A. Estradajem",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000068579/",
+      "image": "/images/character-cache/a-estradajem-CHMA0000068579.jpg"
+    },
+    {
+      "uid": "CHMA0000279362",
+      "name": "A. Finch",
+      "performer": "Guy Fernandez, Jr.",
+      "characterLink": "/characters/CHMA0000279362/",
+      "image": "/images/character-cache/a-finch-CHMA0000279362.jpg"
+    },
+    {
+      "uid": "CHMA0000055407",
+      "name": "A. Fredrickson",
+      "performer": null,
+      "characterLink": "/characters/CHMA0000055407/",
+      "image": "/images/character-cache/a-fredrickson-CHMA0000055407.jpg"
+    }
+  ]
+}

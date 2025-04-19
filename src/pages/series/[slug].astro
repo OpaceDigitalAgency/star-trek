@@ -2,101 +2,79 @@
 import Layout from '../../layouts/Layout.astro';
 import seriesList from '../../data/series.json'; // Used only for slugs initially
 import { slugify } from '../../utils/slugify.js'; // Import the utility
+import path from 'path'; // Import path module for file extension handling
 
 export const prerender = true;
 
+// Import series characters data
+import seriesCharactersData from '../../data/series-characters.json';
+
 // Fetch all data needed for each series page at build time
 export async function getStaticPaths() {
-  const paths = await Promise.all(
-    seriesList.map(async (seriesStub) => {
-      const slug = seriesStub.slug;
-      let seriesData = null;
-      let episodesBySeason = {};
-      let castWithDetails = [];
+  const paths = seriesList.map((seriesStub) => {
+    const slug = seriesStub.slug || slugify(seriesStub.title);
+    let seriesData = seriesStub;
+    let episodesBySeason = {};
+    let castWithDetails = [];
 
-      try {
-        // Construct the absolute URL for the Netlify function
-        const siteUrl = process.env.URL || (import.meta.env.DEV ? 'http://localhost:8888' : Astro.site?.origin); // Use Netlify's URL env var, fallback for local dev or if Astro.site is set
-        if (!siteUrl) {
-            console.error(`Error building page for ${slug}: Site URL could not be determined. process.env.URL: ${process.env.URL}, Astro.site: ${Astro.site?.origin}`);
-            return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
-        }
-        const fetchUrl = `${siteUrl}/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`;
-        console.log(`Fetching series details for ${slug} from: ${fetchUrl}`); // Log the URL being fetched
+    try {
+      // Get cast data from series-characters.json
+      const slugifiedTitle = slugify(seriesData.title);
+      const cast = seriesCharactersData[slugifiedTitle] || [];
+      
+      // Add cast to series data
+      seriesData = {
+        ...seriesData,
+        cast: cast,
+        episodes: seriesData.episodes || [],
+        slug: seriesData.slug || slugify(seriesData.title)
+      };
 
-        const res = await fetch(fetchUrl);
+      // --- Process Episodes ---
+      if (Array.isArray(seriesData.episodes) && seriesData.episodes.length > 0) {
+        // Group episodes correctly by season number
+        episodesBySeason = seriesData.episodes.reduce((acc, ep) => {
+          const seasonNum = ep.season?.seasonNumber;
+          const key = (typeof seasonNum === 'number' && !isNaN(seasonNum)) ? String(seasonNum) : "Unknown";
+          if (!acc[key]) acc[key] = [];
+          acc[key].push(ep);
+          return acc;
+        }, {});
 
-        if (!res.ok) {
-          const errorBody = await res.text(); // Attempt to read error body
-          console.error(`Failed to fetch series details for ${slug}. Status: ${res.status} ${res.statusText}. URL: ${fetchUrl}. Response: ${errorBody}`);
-          // Allow build to continue but page will show "Not Found"
-          return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
-        }
-
-        const data = await res.json();
-        seriesData = data.series || data; // Adjust based on actual function response structure
-
-        // --- Process Episodes ---
-        if (Array.isArray(seriesData.episodes) && seriesData.episodes.length > 0) {
-          // Group episodes correctly by season number (using data fetched by updated function)
-          episodesBySeason = seriesData.episodes.reduce((acc, ep) => {
-            const seasonNum = ep.season?.seasonNumber;
-            const key = (typeof seasonNum === 'number' && !isNaN(seasonNum)) ? String(seasonNum) : "Unknown";
-            if (!acc[key]) acc[key] = [];
-            acc[key].push(ep);
-            return acc;
-          }, {});
-
-          // Sort episodes within each season by episode number
-          Object.values(episodesBySeason).forEach(eps => {
-            eps.sort((a, b) => (a.episodeNumber ?? Infinity) - (b.episodeNumber ?? Infinity));
-          });
-        }
-
-        // --- Process Cast ---
-        // Assuming the function returns `cast` array with objects like { name, uid, performer, characterLink (optional) }
-        if (Array.isArray(seriesData.cast) && seriesData.cast.length > 0) {
-           // Process cast data, ensuring correct image path generation matching cache script
-           castWithDetails = seriesData.cast.map(member => {
-            const characterSlug = member.characterLink ? member.characterLink.split('/').pop() : slugify(`${member.name || member.uid}-${member.uid}`); // Use UID in slugify fallback
-
-            // Determine image extension from the provided image path (if available) or default to .jpg
-            let ext = '.jpg';
-            if (member.image && typeof member.image === 'string') {
-                const urlPart = member.image.split('?')[0]; // Remove query params
-                const detectedExt = path.extname(urlPart);
-                if (detectedExt) {
-                    ext = detectedExt;
-                }
-            }
-
-            // Construct image path matching cache-character-images.mjs logic
-            const filename = `${slugify(member.name || member.uid)}-${member.uid}${ext}`;
-            const imagePath = `/images/character-cache/${filename}`;
-
-            return {
-              ...member,
-              characterSlug: characterSlug,
-              imagePath: imagePath,
-            };
-          }).filter(member => member.name && member.uid); // Ensure member has name and UID
-        }
-
-      } catch (error) {
-        console.error(`Error fetching or processing data for series ${slug}:`, error);
-        // Allow build to continue but page will show "Not Found"
-        return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
+        // Sort episodes within each season by episode number
+        Object.values(episodesBySeason).forEach(eps => {
+          eps.sort((a, b) => (a.episodeNumber ?? Infinity) - (b.episodeNumber ?? Infinity));
+        });
       }
 
-      // Pass fetched & processed data as props
-      return {
-        params: { slug },
-        props: { seriesData, episodesBySeason, castWithDetails }
-      };
-    })
-  );
+      // --- Process Cast ---
+      if (Array.isArray(seriesData.cast) && seriesData.cast.length > 0) {
+        // Process cast data, ensuring correct image path generation
+        castWithDetails = seriesData.cast.map(member => {
+          // Use existing image path if available, otherwise generate one
+          const imagePath = member.image || '/images/generic-character.jpg';
+          
+          return {
+            ...member,
+            characterSlug: slugify(member.name || 'unknown-character'),
+            imagePath: imagePath,
+          };
+        });
+      }
+    } catch (error) {
+      console.error(`Error processing data for series ${slug}:`, error);
+      // Allow build to continue but page will show "Not Found"
+      return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
+    }
 
-  return paths.filter(p => p); // Filter out any potential nulls from errors
+    // Pass data as props
+    return {
+      params: { slug },
+      props: { seriesData, episodesBySeason, castWithDetails }
+    };
+  });
+
+  return paths;
 }
 
 // --- Component Script ---
