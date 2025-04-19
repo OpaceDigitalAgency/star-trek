@@ -14,13 +14,40 @@ export async function getStaticPaths() {
 
 // Get the current series data and cast for the slug
 const { slug } = Astro.params;
-const series = seriesList.find(s => s.slug === slug);
+let series = seriesList.find(s => s.slug === slug);
 
 // Handle missing series gracefully
 const notFound = !series;
 
 // Get cast for this series (may be undefined)
-const cast = seriesCharacters[slug] || [];
+let cast = seriesCharacters[slug] || [];
+
+// --- Hybrid fallback: If episodes or cast are missing, fetch from Netlify function at build time ---
+if (series && (!Array.isArray(series.episodes) || series.episodes.length === 0 || cast.length < 5)) {
+  try {
+    const res = await fetch(`/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`);
+    if (res.ok) {
+      const dynamic = await res.json();
+      // Merge in episodes if missing or incomplete
+      if (Array.isArray(dynamic.episodes) && dynamic.episodes.length > 0) {
+        series = { ...series, episodes: dynamic.episodes };
+      }
+      // Merge in cast if missing or incomplete
+      if (Array.isArray(dynamic.cast) && dynamic.cast.length > 0) {
+        cast = dynamic.cast;
+      }
+      // Prefer best available description/timeline
+      if (dynamic.wikiSummary && (!series.wikiSummary || series.wikiSummary.length < 40)) {
+        series = { ...series, wikiSummary: dynamic.wikiSummary };
+      }
+      if (dynamic.description && (!series.description || series.description.length < 40)) {
+        series = { ...series, description: dynamic.description };
+      }
+    }
+  } catch (err) {
+    // Fallback failed, do nothing
+  }
+}
 
 // JSON-LD schema for SEO
 const seriesSchema = series
