@@ -393,4 +393,102 @@ const seriesSchema = series
   }
 </style>
 
-<!-- All client-side scripts and fetches removed: content is now fully server-rendered. -->
+<script>
+  // Minimal client-side fallback: if cast or episodes are missing, fetch from Netlify function at runtime
+  document.addEventListener('DOMContentLoaded', function() {
+    const castEls = document.querySelectorAll('.cast-member');
+    const episodesContainer = document.getElementById('episodes-container');
+    const slug = window.location.pathname.split('/').filter(Boolean).pop();
+
+    const needsCast = castEls.length === 0;
+    const needsEpisodes = episodesContainer && episodesContainer.textContent.includes('No episodes available.');
+
+    if (needsCast || needsEpisodes) {
+      fetch('/.netlify/functions/series-detail?slug=' + encodeURIComponent(slug))
+        .then(res => res.ok ? res.json() : null)
+        .then(series => {
+          if (!series) return;
+          // Update cast if needed
+          if (needsCast && Array.isArray(series.cast) && series.cast.length > 0) {
+            const castGrid = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4.lg\\:grid-cols-6');
+            if (castGrid) {
+              castGrid.innerHTML = series.cast.map(member => `
+                <div class="cast-member text-center" style="min-width:0">
+                  <div class="aspect-square overflow-hidden rounded-lg mb-2">
+                    <img
+                      src="${member.image || '/images/generic-character.jpg'}"
+                      alt="${member.name}"
+                      class="w-full h-full object-cover"
+                      onerror="this.onerror=null;this.src='/images/generic-character.jpg';"
+                    />
+                  </div>
+                  <a href="${member.url}" target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
+                    ${member.name}
+                  </a>
+                  ${member.performer ? `<div class="text-xs text-gray-400">${member.performer}</div>` : ''}
+                </div>
+              `).join('');
+            }
+          }
+          // Update episodes if needed
+          if (needsEpisodes && Array.isArray(series.episodes) && series.episodes.length > 0) {
+            // Use the same displayEpisodes logic as in src/scripts/seriesDetail.js
+            var container = episodesContainer;
+            var seasons = series.episodes.reduce(function(acc, episode) {
+              var season = episode.season || 'Unknown';
+              var seasonKey = typeof season === 'object'
+                ? (season.title || season.name || season.number || JSON.stringify(season))
+                : String(season);
+              if (!acc[seasonKey]) acc[seasonKey] = [];
+              acc[seasonKey].push(episode);
+              return acc;
+            }, {});
+            Object.values(seasons).forEach(function(seasonEpisodes) {
+              seasonEpisodes.sort(function(a, b) {
+                return (a.episodeNumber || 0) - (b.episodeNumber || 0);
+              });
+            });
+            var html = Object.entries(seasons)
+              .sort(function([a], [b]) {
+                if (a === 'Unknown') return 1;
+                if (b === 'Unknown') return -1;
+                return parseInt(a) - parseInt(b);
+              })
+              .map(function([season, episodes]) {
+                var seasonDisplay = season;
+                if (season === 'Unknown') {
+                  seasonDisplay = 'Unknown';
+                } else if (season === 'null' || season === 'undefined') {
+                  seasonDisplay = 'Special';
+                } else if (typeof season === 'string' && season.startsWith('{')) {
+                  try {
+                    var seasonObj = JSON.parse(season);
+                    seasonDisplay = seasonObj.title || seasonObj.name || seasonObj.number || 'Special';
+                  } catch (e) {
+                    seasonDisplay = 'Special';
+                  }
+                }
+                return `
+                  <div class="season-section">
+                    <h3 class="season-header text-xl text-starfleet-gold">Season ${seasonDisplay}</h3>
+                    <div class="space-y-2">
+                      ${episodes.map(function(episode) {
+                        return `
+                          <div class="episode-grid">
+                            <span class="episode-number">${episode.episodeNumber || '?'}</span>
+                            <span class="episode-title">${episode.title || 'Unknown Episode'}</span>
+                            <span class="episode-date">${episode.airDate ? new Date(episode.airDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown'}</span>
+                            <span class="episode-stardate">${episode.stardate || 'Unknown'}</span>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('');
+            container.innerHTML = html;
+          }
+        });
+    }
+  });
+</script>
