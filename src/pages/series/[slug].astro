@@ -15,16 +15,20 @@ export async function getStaticPaths() {
       let castWithDetails = [];
 
       try {
-        // Fetch comprehensive data from the Netlify function
-        // Use the full URL if running locally and function isn't served, or relative path for Netlify build
-        const fetchUrl = import.meta.env.DEV
-          ? `http://localhost:8888/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`
-          : `/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`;
+        // Construct the absolute URL for the Netlify function
+        const siteUrl = process.env.URL || (import.meta.env.DEV ? 'http://localhost:8888' : Astro.site?.origin); // Use Netlify's URL env var, fallback for local dev or if Astro.site is set
+        if (!siteUrl) {
+            console.error(`Error building page for ${slug}: Site URL could not be determined. process.env.URL: ${process.env.URL}, Astro.site: ${Astro.site?.origin}`);
+            return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
+        }
+        const fetchUrl = `${siteUrl}/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`;
+        console.log(`Fetching series details for ${slug} from: ${fetchUrl}`); // Log the URL being fetched
 
         const res = await fetch(fetchUrl);
 
         if (!res.ok) {
-          console.error(`Failed to fetch series details for ${slug}: ${res.status} ${res.statusText}`);
+          const errorBody = await res.text(); // Attempt to read error body
+          console.error(`Failed to fetch series details for ${slug}. Status: ${res.status} ${res.statusText}. URL: ${fetchUrl}. Response: ${errorBody}`);
           // Allow build to continue but page will show "Not Found"
           return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
         }
