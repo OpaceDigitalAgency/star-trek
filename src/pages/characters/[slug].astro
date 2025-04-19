@@ -8,13 +8,149 @@ export const prerender = false;
 
 export async function get({ params, request }) {
   const slug = params.slug;
-  const url = new URL(request.url);
-  url.pathname = '/api/characters';
-  url.searchParams.set('slug', slug);
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('Character not found');
-  const character = await res.json();
-  return { props: { character } };
+  console.log(`[slug].astro: Processing request for slug: "${slug}"`);
+  
+  try {
+    // First try the API endpoint (works in production with redirects)
+    const url = new URL(request.url);
+    url.pathname = '/api/characters';
+    url.searchParams.set('slug', slug);
+    const res = await fetch(url);
+    
+    if (res.ok) {
+      const character = await res.json();
+      console.log(`[slug].astro: Successfully fetched character from API: ${character?.name || 'unknown'}`);
+      return { props: { character } };
+    }
+  } catch (error) {
+    console.error('[slug].astro: Error fetching from API:', error);
+  }
+  
+  // Fallback for local development: load characters directly from JSON
+  try {
+    console.log('[slug].astro: Falling back to local JSON data');
+    const fs = await import('fs');
+    const path = await import('path');
+    const { slugify } = await import('../../utils/slugify.js');
+    
+    const charactersPath = path.join(process.cwd(), 'src', 'data', 'characters.json');
+    console.log(`[slug].astro: Loading characters from: ${charactersPath}`);
+    const charactersData = JSON.parse(fs.readFileSync(charactersPath, 'utf8'));
+    console.log(`[slug].astro: Loaded ${charactersData.length} characters from JSON`);
+    
+    // Extract UID from the slug - handle different formats
+    // Format could be: name-slug-UIDVALUE or just UIDVALUE (like 0413-theta-CHMA0000215045 or CHMA0000215045)
+    let uid = null;
+    
+    // Try to extract UID with CHMA format
+    const chmaMatch = slug.match(/CHMA\d+/);
+    if (chmaMatch) {
+      uid = chmaMatch[0];
+      console.log(`[slug].astro: Extracted CHMA UID from slug: ${uid}`);
+    }
+    // If no CHMA format, try to extract numeric/alphanumeric ID at the end or beginning
+    else {
+      const numericMatch = slug.match(/^([0-9]+)|([0-9]+)$/);
+      if (numericMatch) {
+        uid = numericMatch[0];
+        console.log(`[slug].astro: Extracted numeric UID from slug: ${uid}`);
+      } else {
+        // Try to extract any alphanumeric sequence that might be a UID
+        const alphaNumMatch = slug.match(/([A-Z0-9]+)$/);
+        if (alphaNumMatch) {
+          uid = alphaNumMatch[0];
+          console.log(`[slug].astro: Extracted alphanumeric UID from slug: ${uid}`);
+        }
+      }
+    }
+    
+    // First try to find by UID extracted from the slug
+    let character = uid ? charactersData.find(c => c.uid === uid) : null;
+    if (character) {
+      console.log(`[slug].astro: Found character by UID: ${character.name}`);
+    }
+    
+    // If not found by UID, try to find by full slug match
+    if (!character) {
+      character = charactersData.find(c => {
+        const nameSlug = slugify(c.name);
+        const fullSlug = `${nameSlug}-${c.uid}`;
+        return fullSlug === slug;
+      });
+      if (character) {
+        console.log(`[slug].astro: Found character by full slug match: ${character.name}`);
+      }
+    }
+    
+    // If still not found, try to find by just the slug itself as UID
+    if (!character) {
+      character = charactersData.find(c => c.uid === slug);
+      if (character) {
+        console.log(`[slug].astro: Found character by slug as UID: ${character.name}`);
+      }
+    }
+    
+    // If still not found, try to find by slugified name
+    if (!character) {
+      character = charactersData.find(c => slugify(c.name) === slug);
+      if (character) {
+        console.log(`[slug].astro: Found character by slugified name: ${character.name}`);
+      }
+    }
+    
+    // Look for the specific character by the full slug
+    if (!character) {
+      // For the specific case of "0413-theta-CHMA0000215045"
+      const chmaMatch = slug.match(/(.*?)-(CHMA\d+)$/);
+      if (chmaMatch) {
+        const nameSlug = chmaMatch[1]; // "0413-theta"
+        const uid = chmaMatch[2];      // "CHMA0000215045"
+        console.log(`[slug].astro: Parsed slug "${slug}" into nameSlug="${nameSlug}" and uid="${uid}"`);
+        
+        // Try to find by UID
+        character = charactersData.find(c => c.uid === uid);
+        if (character) {
+          console.log(`[slug].astro: Found character by parsed UID: ${character.name}`);
+        }
+      }
+    }
+    
+    // Direct lookup by image filename
+    if (!character) {
+      // Check if there's a matching image in the character-cache directory
+      const imagePath = path.join(process.cwd(), 'public', 'images', 'character-cache', `${slug}.jpg`);
+      console.log(`[slug].astro: Checking for image at ${imagePath}`);
+      
+      try {
+        if (fs.existsSync(imagePath)) {
+          console.log(`[slug].astro: Found matching image file for slug: ${slug}`);
+          // Extract UID from filename
+          const uidMatch = slug.match(/(CHMA\d+)$/);
+          if (uidMatch) {
+            const uid = uidMatch[1];
+            character = charactersData.find(c => c.uid === uid);
+            if (character) {
+              console.log(`[slug].astro: Found character by image filename UID: ${character.name}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`[slug].astro: Error checking for image file: ${error}`);
+      }
+    }
+    
+    if (character) {
+      return { props: { character } };
+    } else {
+      console.log(`[slug].astro: No character found for slug: ${slug}`);
+    }
+  } catch (error) {
+    console.error('[slug].astro: Error loading character from JSON:', error);
+  }
+  
+  // If all methods fail, return null character (will redirect in component)
+  console.log('[slug].astro: All lookup methods failed, returning null character');
+  return { props: { character: null } };
 }
 
 // Get the character from props
