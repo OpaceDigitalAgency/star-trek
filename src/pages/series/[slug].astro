@@ -239,24 +239,29 @@ const seriesSchema = !notFound && seriesData
                   <Fragment set:html={seriesData.wikiSummary || seriesData.description || `<p>${seriesData.title} is a Star Trek series that aired from ${seriesData.years || "Unknown"}.</p>`} />
                 </div>
 
-                {/* Timeline Placement Section */}
+                {/* Timeline Placement Section - Enhanced */}
                 <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
                 <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
+                  <div class="flex items-center mb-2">
+                    <div class="w-4 h-4 bg-starfleet-gold rounded-full mr-2"></div>
+                    <span class="text-starfleet-gold font-bold">Starfleet Temporal Database</span>
+                  </div>
                   <p class="text-gray-300">
-                    {seriesData.title} is set
-                    {seriesData.stardate && seriesData.stardate !== "Unknown" ? ` in the years ${seriesData.stardate}, ` : " "}
+                    <span class="text-starfleet-blue font-bold">{seriesData.title}</span> is set
+                    {seriesData.stardate && seriesData.stardate !== "Unknown" ?
+                      <span class="text-starfleet-gold"> in the years {seriesData.stardate}, </span> : " "}
                     {(() => {
                       const title = seriesData.title || "";
-                      if (title.includes("Original")) return "during the Five-Year Mission.";
-                      if (title.includes("Next Generation")) return "during the 24th century.";
-                      if (title.includes("Deep Space Nine")) return "during the Dominion War era.";
-                      if (title.includes("Voyager")) return "during the Delta Quadrant expedition.";
-                      if (title.includes("Enterprise")) return "in the early days of Starfleet.";
-                      if (title.includes("Picard")) return "in the post-Dominion War era.";
-                      if (title.includes("Discovery")) return "across multiple eras, primarily the 23rd and 32nd centuries.";
-                      if (title.includes("Lower Decks")) return "shortly after the Dominion War.";
-                      if (title.includes("Prodigy")) return "in the Delta Quadrant after Voyager's return.";
-                      if (title.includes("Strange New Worlds")) return "before the Original Series.";
+                      if (title.includes("Original")) return "during the historic Five-Year Mission under Captain Kirk.";
+                      if (title.includes("Next Generation")) return "during the 24th century aboard the Federation flagship Enterprise-D.";
+                      if (title.includes("Deep Space Nine")) return "during the tumultuous Dominion War era on a strategic space station.";
+                      if (title.includes("Voyager")) return "during the legendary Delta Quadrant expedition, 70,000 light years from home.";
+                      if (title.includes("Enterprise")) return "in the pioneering early days of Starfleet, before the Federation was formed.";
+                      if (title.includes("Picard")) return "in the post-Dominion War era, following the legendary admiral's final adventures.";
+                      if (title.includes("Discovery")) return "across multiple eras, primarily the 23rd and 32nd centuries, following an unprecedented time jump.";
+                      if (title.includes("Lower Decks")) return "shortly after the Dominion War, focusing on the unsung heroes of Starfleet.";
+                      if (title.includes("Prodigy")) return "in the Delta Quadrant after Voyager's return, featuring a new generation of explorers.";
+                      if (title.includes("Strange New Worlds")) return "before the Original Series, chronicling the early voyages of the Enterprise.";
                       return "in the Star Trek timeline.";
                     })()}
                   </p>
