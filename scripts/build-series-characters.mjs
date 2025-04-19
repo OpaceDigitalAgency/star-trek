@@ -731,9 +731,14 @@ async function buildSeriesCharactersCache() {
       console.log(`Added ${enhancedCharacters.length} characters for ${series.title}`);
     }
     
-    // Write the data to the file
+    // Write the data to both locations
     console.log(`Writing series characters data to ${seriesCharactersPath}...`);
     await fs.writeFile(seriesCharactersPath, JSON.stringify(seriesCharacters, null, 2));
+    
+    // Also write to src/data for the series detail page
+    const srcDataPath = path.join(__dirname, '..', 'src', 'data', 'series-characters.json');
+    console.log(`Writing series characters data to ${srcDataPath}...`);
+    await fs.writeFile(srcDataPath, JSON.stringify(seriesCharacters, null, 2));
     
     console.log('Series characters cache built successfully!');
   } catch (error) {
