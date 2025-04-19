@@ -20,6 +20,8 @@ This project includes a system for caching character images locally to improve p
 
 ### Scripts
 
+#### Image Caching Scripts
+
 The following npm scripts are available for managing image caching:
 
 - `npm run cache-images` - Downloads character images from Memory Alpha and caches them locally
@@ -27,6 +29,22 @@ The following npm scripts are available for managing image caching:
 - `npm run prepare-images` - Runs both scripts in sequence
 
 Run these scripts after adding new characters or when images aren't displaying correctly.
+
+#### Series Data Scripts
+
+The following scripts are available for managing series data:
+
+- `scripts/build-series-cache.mjs` - Builds a local cache of Star Trek series data from STAPI and enhances it with Memory Alpha content
+- `scripts/build-series-characters.mjs` - Builds a cache of character data for each Star Trek series, using a combination of STAPI API data and manually curated lists
+- `scripts/build-series-episodes.mjs` - Enhances the series data with episode information from STAPI, organized by season
+
+To update the series data:
+
+1. Run `node scripts/build-series-cache.mjs` to update the basic series information
+2. Run `node scripts/build-series-episodes.mjs` to add episode data to the series
+3. Run `node scripts/build-series-characters.mjs` to update the character data for each series
+
+These scripts ensure that the series detail pages have complete and accurate information about each Star Trek series, including cast and episodes.
 
 ### Deployment Notes
 

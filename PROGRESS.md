@@ -341,3 +341,38 @@
   - Enhanced loading states with better visual feedback
   - Added retry mechanisms for failed data fetches
   - Improved error messages to be more user-friendly
+
+## 2025-04-19
+
+- **Fixed UX Issues on Series Pages**
+ - **Issue:** Series pages had UX issues, particularly on desktop where the layout was inconsistent
+ - **Analysis:**
+   - Identified that STAPI API was returning incomplete character data
+   - Discovered that episode data was not being properly fetched and grouped by season
+   - Found that the hardcoded cast lists were incomplete
+ - **Solutions implemented:**
+   1. **Enhanced Cast Information:**
+      - Updated the hardcoded cast lists in `scripts/build-series-characters.mjs` with more complete cast information for all Star Trek series
+      - Added missing characters based on Google Knowledge Graph and Memory Alpha data
+      - Ensured proper display of cast members on series detail pages
+   
+   2. **Added Episode Data Grouped by Season:**
+      - Created a new script `scripts/build-series-episodes.mjs` that:
+        - Fetches seasons for each series from STAPI
+        - Fetches episodes for each season
+        - Adds the episodes to the series data
+        - Writes the updated data back to `src/data/series.json`
+      - Successfully retrieved complete episode data for all series:
+        - TNG: 176 episodes across 7 seasons
+        - DS9: 173 episodes across 7 seasons
+        - VOY: 168 episodes across 7 seasons
+        - ENT: 97 episodes across 4 seasons
+        - And more for other series
+   
+   3. **Improved Series Detail Page:**
+      - Enhanced the series/[slug].astro template to properly display:
+        - Complete cast information with character names and performers
+        - Episodes grouped by season with episode numbers, titles, air dates, and stardates
+      - Improved the layout and styling for better readability
+ 
+ - **Outcome:** Series detail pages now provide a much better user experience with comprehensive information about each Star Trek series, properly organized and displayed in a visually appealing way.

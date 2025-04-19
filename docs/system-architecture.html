@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Trek Timelines System Architecture Documentation</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/styles/github.min.css">
+    
+    <!-- Mermaid.js for diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3/dist/mermaid.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #0099ff;
+            --secondary-color: #004C99;
+            --accent-color: #ffcc00;
+            --dark-bg: #030a17;
+            --light-text: #f8f9fa;
+            --code-bg: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            position: relative;
+        }
+        
+        .trek-theme {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+        }
+        
+        .trek-header {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem 0;
+            border-bottom: 4px solid var(--accent-color);
+        }
+        
+        .trek-title {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        .trek-subtitle {
+            color: var(--primary-color);
+        }
+        
+        .sidebar {
+            position: sticky;
+            top: 20px;
+            height: calc(100vh - 40px);
+            overflow-y: auto;
+            padding-right: 15px;
+            padding-top: 20px;
+        }
+        
+        .sidebar .nav-link {
+            color: #333;
+            border-left: 2px solid transparent;
+            padding: 0.5rem 1rem;
+            margin: 0.2rem 0;
+        }
+        
+        .sidebar .nav-link:hover {
+            background-color: rgba(0, 153, 255, 0.1);
+            border-left: 2px solid var(--primary-color);
+        }
+        
+        .sidebar .nav-link.active {
+            background-color: rgba(0, 153, 255, 0.2);
+            border-left: 2px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .sidebar-heading {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1rem;
+            color: #6c757d;
+            font-weight: bold;
+            margin-top: 1rem;
+        }
+        
+        .content-section {
+            padding: 2rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .content-section:last-child {
+            border-bottom: none;
+        }
+        
+        .section-heading {
+            color: var(--secondary-color);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .subsection-heading {
+            color: var(--secondary-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card {
+            margin-bottom: 1.5rem;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .collapsible-section {
+            cursor: pointer;
+        }
+        
+        .collapsible-section .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .collapsible-section .card-header::after {
+            content: '\f077';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            transition: transform 0.3s ease;
+        }
+        
+        .collapsible-section.collapsed .card-header::after {
+            transform: rotate(180deg);
+        }
+        
+        .diagram-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+        
+        .zoom-btn {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .zoom-btn:hover {
+            background-color: rgba(0, 153, 255, 0.1);
+        }
+        
+        pre {
+            background-color: var(--code-bg);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+        
+        code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .tech-details {
+            background-color: rgba(0, 153, 255, 0.05);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .tech-details-header {
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .troubleshooting-item {
+            margin-bottom: 2rem;
+        }
+        
+        .troubleshooting-symptom {
+            font-weight: bold;
+            color: #dc3545;
+        }
+        
+        .troubleshooting-cause {
+            font-weight: bold;
+            color: #fd7e14;
+        }
+        
+        .troubleshooting-solution {
+            font-weight: bold;
+            color: #198754;
+        }
+        
+        .footer {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+        
+        /* Zoom functionality for diagrams */
+        .diagram-wrapper {
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            transform-origin: center center;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: relative;
+                height: auto;
+                margin-bottom: 2rem;
+            }
+        }
+    </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#sidebar" data-bs-offset="200">
+    <!-- Header -->
+    <header class="trek-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="trek-title">Star Trek Timelines</h1>
+                    <h2 class="trek-subtitle">System Architecture Documentation</h2>
+                </div>
+                <div class="col-md-4 text-end">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Star_Trek_insignia.svg/1200px-Star_Trek_insignia.svg.png" alt="Star Trek Logo" height="80">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <nav id="sidebar" class="sidebar">
+                    <div class="sidebar-heading">Contents</div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#overview">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#system-architecture">System Architecture</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#data-flow">Data Flow</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#image-caching">Image Caching System</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#build-runtime">Build vs. Runtime Processing</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#series-episodes-strategy">Series & Episodes Build Strategy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#series-data-sources">Series Data Sources</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#component-details">Component Details</a>
+                            <ul class="nav flex-column ms-3">
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#frontend">Frontend (Astro.js)</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#netlify-functions">Netlify Functions</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#stapi-integration">STAPI Integration</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#memory-alpha">Memory Alpha Integration</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#progressive-image">ProgressiveImage Component</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#known-issues">Known Issues and Solutions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#troubleshooting">Troubleshooting Guide</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#infrastructure">Project Infrastructure</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#conclusion">Conclusion</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Overview Section -->
+                <section id="overview" class="content-section">
+                    <h2 class="section-heading">Overview</h2>
+                    
+                    <div class="alert alert-info">
+                        <strong>Project Information:</strong>
+                        <ul class="mb-0">
+                            <li><strong>Repository:</strong> <a href="https://github.com/OpaceDigitalAgency/star-trek.git" target="_blank">https://github.com/OpaceDigitalAgency/star-trek.git</a></li>
+                            <li><strong>Hosting:</strong> Netlify</li>
+                            <li><strong>Deployment URL:</strong> <a href="https://star-trek-timelines.netlify.app" target="_blank">https://star-trek-timelines.netlify.app</a></li>
+                            <li><strong>Framework:</strong> Astro.js with Tailwind CSS</li>
+                            <li><strong>Data Sources:</strong> STAPI (Star Trek API) and Memory Alpha Wiki</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <p>The Star Trek Timelines application is a comprehensive web application that provides information about characters, series, and timeline events in the Star Trek universe. It is built with Astro.js and Tailwind CSS, uses STAPI (Star Trek API) for data, and Memory Alpha wiki for images.</p>
+                            
+                            <p>The application handles approximately 7,600 characters, with the first 48 processed at build time and the rest at runtime when requested. All images are cached locally to avoid overloading Memory Alpha with requests.</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">Key Features</div>
+                                        <div class="card-body">
+                                            <ul>
+                                                <li>Comprehensive character database (7,600+ characters)</li>
+                                                <li>Series information with timeline view</li>
+                                                <li>Local image caching for performance</li>
+                                                <li>Hybrid build/runtime processing approach</li>
+                                                <li>Progressive image loading with fallbacks</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header">Technologies Used</div>
+                                        <div class="card-body">
+                                            <ul>
+                                                <li>Astro.js for frontend</li>
+                                                <li>Tailwind CSS for styling</li>
+                                                <li>STAPI (Star Trek API) for data</li>
+                                                <li>Memory Alpha wiki for images</li>
+                                                <li>Netlify for hosting and serverless functions</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- System Architecture Section -->
+                <section id="system-architecture" class="content-section">
+                    <h2 class="section-heading">System Architecture</h2>
+                    <p>The system consists of several key components that work together to provide a seamless user experience:</p>
+                    
+                    <div class="diagram-container">
+                        <div class="zoom-controls">
+                            <div class="zoom-btn zoom-in" title="Zoom In"><i class="fas fa-plus"></i></div>
+                            <div class="zoom-btn zoom-reset" title="Reset Zoom"><i class="fas fa-sync-alt"></i></div>
+                            <div class="zoom-btn zoom-out" title="Zoom Out"><i class="fas fa-minus"></i></div>
+                        </div>
+                        <div class="diagram-wrapper" data-zoom-level="1">
+                            <div class="mermaid">
+                            flowchart TD
+                                User([User Browser]) --> Frontend[Frontend - Astro.js]
+                                Frontend --> CharacterList[Character List Page]
+                                Frontend --> CharacterDetail[Character Detail Page]
+                                Frontend --> SeriesList[Series List Page]
+                                Frontend --> SeriesDetail[Series Detail Page]
+                                
+                                CharacterList --> StapiProxy[Netlify Function:\nstapi-proxy.cjs]:::issueNode
+                                CharacterDetail --> CharDetailFunc[Netlify Function:\ncharacter-detail.cjs]:::issueNode
+                                CharDetailFunc --> CharEnrichFunc[Netlify Function:\ncharacter-enrichment.cjs]:::issueNode
+                                
+                                StapiProxy --> STAPI[(STAPI API)]
+                                CharDetailFunc --> LocalCache[(Local Cache:\ncharacters.json)]
+                                CharEnrichFunc --> STAPI
+                                CharEnrichFunc --> MemoryAlpha[(Memory Alpha Wiki)]
+                                
+                                Frontend --> ImageComponent[ProgressiveImage Component]
+                                ImageComponent --> LocalImages[(Local Image Cache)]
+                                ImageComponent --> ProxyImage[Netlify Function:\nproxy-image.js]:::issueNode
+                                ProxyImage --> MemoryAlpha
+                                
+                                subgraph BuildTime[Build Time Processing]
+                                    BuildScript[build-characters-cache.mjs] --> STAPI
+                                    BuildScript --> MemoryAlpha
+                                    BuildScript --> LocalCache
+                                    CacheImages[cache-character-images.mjs] --> MemoryAlpha
+                                    CacheImages --> LocalImages
+                                    UpdateJson[update-characters-json.mjs] --> LocalCache
+                                end
+                                
+                                classDef issueNode fill:#ffecb3,stroke:#e6b800,stroke-width:2px;
+                                classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
+                                classDef component fill:#e6f7ff,stroke:#0099ff,stroke-width:1px;
+                                classDef storage fill:#d1e7dd,stroke:#198754,stroke-width:1px;
+                                
+                                class User,Frontend component;
+                                class CharacterList,CharacterDetail,SeriesList,SeriesDetail component;
+                                class ImageComponent component;
+                                class STAPI,MemoryAlpha,LocalCache,LocalImages storage;
+                                class BuildScript,CacheImages,UpdateJson component;
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>🔄 Recurring Issue:</strong> We've had persistent problems with Netlify function routing. The order of redirects in netlify.toml is critical - specific routes must come before catch-all routes.
+                    </div>
+                    
+                    <div class="card collapsible-section" id="key-components-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#key-components-content">
+                            Key Components
+                        </div>
+                        <div id="key-components-content" class="collapse show">
+                            <div class="card-body">
+                                <ol>
+                                    <li>
+                                        <strong>Frontend (Astro.js):</strong> Handles the user interface and routing
+                                    </li>
+                                    <li>
+                                        <strong>Netlify Functions:</strong> Serverless functions that handle API requests and data processing
+                                    </li>
+                                    <li>
+                                        <strong>STAPI API:</strong> Provides the base character and series data
+                                    </li>
+                                    <li>
+                                        <strong>Memory Alpha Wiki:</strong> Source for character and series images and additional information
+                                    </li>
+                                    <li>
+                                        <strong>Local Caches:</strong> Store character data and images for performance
+                                    </li>
+                                    <li>
+                                        <strong>Build Scripts:</strong> Process data and images at build time
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Flow Section -->
+                <section id="data-flow" class="content-section">
+                    <h2 class="section-heading">Data Flow</h2>
+                    <p>The data flow in the system follows these paths:</p>
+                    
+                    <div class="diagram-container">
+                        <div class="zoom-controls">
+                            <div class="zoom-btn zoom-in" title="Zoom In"><i class="fas fa-plus"></i></div>
+                            <div class="zoom-btn zoom-reset" title="Reset Zoom"><i class="fas fa-sync-alt"></i></div>
+                            <div class="zoom-btn zoom-out" title="Zoom Out"><i class="fas fa-minus"></i></div>
+                        </div>
+                        <div class="diagram-wrapper" data-zoom-level="1">
+                            <div class="mermaid">
+                            sequenceDiagram
+                                participant User as User Browser
+                                participant Frontend as Astro Frontend
+                                participant NetlifyFunc as Netlify Functions
+                                participant LocalCache as Local Cache
+                                participant STAPI as STAPI API
+                                participant MemoryAlpha as Memory Alpha Wiki
+                                
+                                User->>Frontend: Request character list
+                                Frontend->>NetlifyFunc: Request character data
+                                
+                                alt Data in local cache
+                                    NetlifyFunc->>LocalCache: Check cache
+                                    LocalCache-->>NetlifyFunc: Return cached data
+                                else Data not in cache
+                                    NetlifyFunc->>STAPI: Fetch character data
+                                    STAPI-->>NetlifyFunc: Return character data
+                                    NetlifyFunc->>MemoryAlpha: Fetch additional info
+                                    MemoryAlpha-->>NetlifyFunc: Return additional info
+                                    NetlifyFunc->>LocalCache: Update cache
+                                end
+                                
+                                NetlifyFunc-->>Frontend: Return enriched data
+                                Frontend-->>User: Display character list
+                                
+                                User->>Frontend: Request character image
+                                
+                                alt Image in local cache
+                                    Frontend->>LocalCache: Check image cache
+                                    LocalCache-->>Frontend: Return cached image
+                                else Image not in cache
+                                    Frontend->>NetlifyFunc: Request image via proxy
+                                    NetlifyFunc->>MemoryAlpha: Fetch image
+                                    MemoryAlpha-->>NetlifyFunc: Return image
+                                    NetlifyFunc-->>Frontend: Return proxied image
+                                end
+                                
+                                Frontend-->>User: Display character image
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>🔄 Recurring Issue:</strong> We've had issues with pagination logic, where the client-side code incorrectly assumed <code>allCharacters</code> contained all characters for all pages. We now ensure each page request fetches the correct data.
+                    </div>
+                    
+                    <div class="card collapsible-section" id="technical-details-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#technical-details-content">
+                            Technical Details
+                        </div>
+                        <div id="technical-details-content" class="collapse show">
+                            <div class="card-body">
+                                <h4 class="subsection-heading">Character Data Request</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Request Flow:</div>
+                                    <ol>
+                                        <li>The browser requests character data from the Astro frontend</li>
+                                        <li>The frontend calls the appropriate Netlify function (stapi-proxy.cjs or character-detail.cjs)</li>
+                                        <li>The function checks the local cache (characters.json)</li>
+                                        <li>If not in cache, it fetches from STAPI and enriches with Memory Alpha data</li>
+                                        <li>The enriched data is returned to the frontend</li>
+                                    </ol>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Image Request</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Request Flow:</div>
+                                    <ol>
+                                        <li>The ProgressiveImage component requests an image</li>
+                                        <li>If the image is in the local cache (/public/images/character-cache/), it's served directly</li>
+                                        <li>If not, the proxy-image.js function fetches it from Memory Alpha</li>
+                                        <li>The image is returned to the component, which displays it with loading states and fallbacks</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Image Caching System Section -->
+                <section id="image-caching" class="content-section">
+                    <h2 class="section-heading">Image Caching System</h2>
+                    <p>The image caching system is a critical component that improves performance and reduces dependency on external APIs:</p>
+                    
+                    <div class="diagram-container">
+                        <div class="zoom-controls">
+                            <div class="zoom-btn zoom-in" title="Zoom In"><i class="fas fa-plus"></i></div>
+                            <div class="zoom-btn zoom-reset" title="Reset Zoom"><i class="fas fa-sync-alt"></i></div>
+                            <div class="zoom-btn zoom-out" title="Zoom Out"><i class="fas fa-minus"></i></div>
+                        </div>
+                        <div class="diagram-wrapper" data-zoom-level="1">
+                            <div class="mermaid">
+                            flowchart TD
+                                subgraph BuildTime["Build Time"]
+                                    BuildScript[build-characters-cache.mjs] --> FetchChar[Fetch Character Data]
+                                    FetchChar --> EnrichChar[Enrich with Memory Alpha]
+                                    EnrichChar --> CacheScript[cache-character-images.mjs]
+                                    CacheScript --> DownloadImg[Download Images]
+                                    DownloadImg --> StoreLocal[Store in /public/images/character-cache/]
+                                    StoreLocal --> UpdateScript[update-characters-json.mjs]
+                                    UpdateScript --> UpdateJSON[Update characters.json\nwith local paths]
+                                end
+                                
+                                subgraph Runtime["Runtime"]
+                                    ImgComponent[ProgressiveImage Component] --> CheckCache{Image in Cache?}
+                                    CheckCache -->|Yes| ServeLocal[Serve from Local Cache]
+                                    CheckCache -->|No| ProxyFunc[proxy-image.js Function]:::issueNode
+                                    ProxyFunc --> FetchMA[Fetch from Memory Alpha]:::issueNode
+                                    FetchMA --> ValidateImg{Valid Image?}:::issueNode
+                                    ValidateImg -->|Yes| ReturnImg[Return Image]
+                                    ValidateImg -->|No| FallbackImg[Use Fallback Image]
+                                end
+                                
+                                classDef issueNode fill:#ffecb3,stroke:#e6b800,stroke-width:2px;
+                                classDef default fill:#f9f9f9,stroke:#333,stroke-width:1px;
+                                classDef component fill:#e6f7ff,stroke:#0099ff,stroke-width:1px;
+                                classDef storage fill:#d1e7dd,stroke:#198754,stroke-width:1px;
+                                
+                                class BuildScript,CacheScript,UpdateScript,ImgComponent component;
+                                class FetchChar,EnrichChar,DownloadImg,UpdateJSON component;
+                                class ServeLocal,ReturnImg,FallbackImg storage;
+                                class StoreLocal storage;
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>⚠️ Development Challenge:</strong> Production builds initially showed blank character images because they couldn't access the enriched <code>characters.json</code> with <code>wikiImage</code> fields. We implemented the hybrid caching approach to solve this.
+                    </div>
+                    
+                    <div class="card collapsible-section" id="image-caching-implementation-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#image-caching-implementation-content">
+                            Technical Implementation
+                        </div>
+                        <div id="image-caching-implementation-content" class="collapse show">
+                            <div class="card-body">
+                                <h4 class="subsection-heading">Build Time Processing</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Process:</div>
+                                    <ol>
+                                        <li>The <code>build-characters-cache.mjs</code> script fetches character data from STAPI</li>
+                                        <li>It enriches important characters with Memory Alpha data</li>
+                                        <li>The <code>cache-character-images.mjs</code> script downloads images from Memory Alpha</li>
+                                        <li>Images are stored in <code>/public/images/character-cache/</code></li>
+                                        <li>The <code>update-characters-json.mjs</code> script updates characters.json with local image paths</li>
+                                    </ol>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Runtime Processing</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Process:</div>
+                                    <ol>
+                                        <li>The ProgressiveImage component requests an image</li>
+                                        <li>If the image is in the local cache, it's served directly</li>
+                                        <li>If not, the proxy-image.js function fetches it from Memory Alpha</li>
+                                        <li>If the image fails to load, a fallback image is used</li>
+                                    </ol>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Image Proxy Implementation</h4>
+                                <pre><code class="language-javascript">// From proxy-image.js
+const imageUrl = event.queryStringParameters.url;
+
+// Validate URL to prevent abuse
+const allowedDomains = [
+  'static.wikia.nocookie.net',
+  'memory-alpha.fandom.com',
+  'vignette.wikia.nocookie.net',
+  'www.startrek.com',
+  'images.startrek.com',
+  'static.stapi.co'
+];
+
+const isAllowed = allowedDomains.some(domain => imageUrl.includes(domain));
+
+// Fetch the image with proper headers
+const response = await fetch(cleanedUrl, {
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Origin': 'https://memory-alpha.fandom.com',
+    'Referer': 'https://memory-alpha.fandom.com/'
+  }
+});</code></pre>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Build vs. Runtime Processing Section -->
+                <section id="build-runtime" class="content-section">
+                    <h2 class="section-heading">Build vs. Runtime Processing</h2>
+                    <p>The application uses a hybrid approach to balance build time performance with comprehensive data coverage:</p>
+                    
+                    <div class="diagram-container">
+                        <div class="zoom-controls">
+                            <div class="zoom-btn zoom-in" title="Zoom In"><i class="fas fa-plus"></i></div>
+                            <div class="zoom-btn zoom-reset" title="Reset Zoom"><i class="fas fa-sync-alt"></i></div>
+                            <div class="zoom-btn zoom-out" title="Zoom Out"><i class="fas fa-minus"></i></div>
+                        </div>
+                        <div class="diagram-wrapper" data-zoom-level="1">
+                            <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+                                <!-- Build Time Processing -->
+                                <rect x="50" y="50" width="700" height="150" rx="5" fill="#f8f9fa" stroke="#333" />
+                                <text x="100" y="80" font-size="16" font-weight="bold">Build Time Processing</text>
+                                
+                                <rect x="100" y="100" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                                <text x="150" y="125" text-anchor="middle">Build Start</text>
+                                
+                                <rect x="250" y="100" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                                <text x="300" y="125" text-anchor="middle">Fetch Important Characters</text>
+                                
+                                <rect x="400" y="100" width="100" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                                <text x="450" y="125" text-anchor="middle">Enrich with Memory Alpha</text>
+                                
+                                <rect x="550" y="100" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                                <text x="600" y="125" text-anchor="middle">Cache Images Locally</text>
+                                
+                                <rect x="250" y="150" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                                <text x="300" y="175" text-anchor="middle">Update characters.json</text>
+                                
+                                <rect x="400" y="150" width="100" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                                <text x="450" y="175" text-anchor="middle">Deploy to Netlify</text>
+                                
+                                <line x1="200" y1="120" x2="250" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="350" y1="120" x2="400" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="500" y1="120" x2="550" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="600" y1="140" x2="350" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="350" y1="150" x2="400" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                
+                                <!-- Runtime Processing -->
+                                <rect x="50" y="230" width="700" height="150" rx="5" fill="#f8f9fa" stroke="#333" />
+                                <text x="100" y="260" font-size="16" font-weight="bold">Runtime Processing</text>
+                                
+                                <rect x="100" y="280" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                                <text x="150" y="305" text-anchor="middle">User Requests Character</text>
+                                
+                                <rect x="250" y="280" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                                <text x="300" y="305" text-anchor="middle">In Cache?</text>
+                                
+                                <rect x="400" y="230" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                                <text x="450" y="255" text-anchor="middle">Serve from Cache</text>
+                                
+                                <rect x="400" y="330" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                                <text x="450" y="355" text-anchor="middle">Fetch from STAPI</text>
+                                
+                                <rect x="550" y="330" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                                <text x="600" y="355" text-anchor="middle">Enrich with Memory Alpha</text>
+                                
+                                <rect x="650" y="280" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                                <text x="700" y="305" text-anchor="middle">Serve to User</text>
+                                
+                                <line x1="200" y1="300" x2="250" y2="300" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="350" y1="280" x2="400" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <text x="370" y="260" text-anchor="middle" font-size="12">Yes</text>
+                                <line x1="350" y1="320" x2="400" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <text x="370" y="340" text-anchor="middle" font-size="12">No</text>
+                                <line x1="500" y1="350" x2="550" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="500" y1="250" x2="700" y2="280" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                <line x1="650" y1="350" x2="700" y2="320" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                                
+                                <!-- Arrow definitions -->
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning mt-3">
+                        <strong>🔄 Recurring Issue:</strong> Netlify build times were a major challenge. Processing all 7,600+ characters at build time caused builds to take 15+ minutes or time out completely.
+                    </div>
+                    
+                    <div class="card collapsible-section" id="build-runtime-details-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#build-runtime-details-content">
+                            Technical Details
+                        </div>
+                        <div id="build-runtime-details-content" class="collapse show">
+                            <div class="card-body">
+                                <h4 class="subsection-heading">Build Time Processing</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Process:</div>
+                                    <ul>
+                                        <li>The first 48 characters are processed at build time</li>
+                                        <li>Character data is fetched from STAPI</li>
+                                        <li>Images are downloaded from Memory Alpha</li>
+                                        <li>Data and images are stored in local caches</li>
+                                        <li>The build process takes minutes instead of hours by limiting the number of characters processed</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Runtime Processing</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Process:</div>
+                                    <ul>
+                                        <li>When a user requests a character not processed at build time, it's processed on-demand</li>
+                                        <li>The character-enrichment.cjs function fetches data from STAPI</li>
+                                        <li>It enriches the data with Memory Alpha information</li>
+                                        <li>The result is cached for future requests</li>
+                                        <li>This distributes the processing load across user requests</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Caching Strategy</h4>
+                                <pre><code class="language-javascript">// From stapiService.js
+async getAllCharacters() {
+  try {
+    // Check if we have a file cache first
+    if (process.env.SKIP_CHAR_CACHE !== 'true' && fs.existsSync(cachePath)) {
+      console.log('🟢  Using cached characters.json');
+      return JSON.parse(fs.readFileSync(cachePath, 'utf8'));
+    }
+    
+    // If no file cache or SKIP_CHAR_CACHE=true, use in-memory cache
+    console.log('🟡  Cache miss – crawling STAPI');
+    const cacheKey = 'all_characters_v2';
+    return await this.getCachedData(cacheKey, async () => {
+      // Fetch characters from STAPI
+    }, 3600000); // Cache for 1 hour
+  } catch (error) {
+    console.error('Error in getAllCharacters:', error);
+    return [];
+  }
+}</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Series & Episodes Build Strategy Section -->
+                <section id="series-episodes-strategy" class="content-section">
+                    <h2 class="section-heading">Series & Episodes Build Strategy</h2>
+                    <p class="added-date">⭐ Added 2025-04-19</p>
+                    
+                    <div class="alert alert-success mt-3">
+                        <strong>✅ RESOLVED:</strong> Series pages now show complete cast and episodes data, generated at build-time.
+                    </div>
+                    
+                    <p>All series data, including episodes and cast information, is processed at build-time to ensure optimal performance and reliability:</p>
+                    
+                    <div class="card collapsible-section" id="series-episodes-details-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#series-episodes-details-content">
+                            Technical Details
+                        </div>
+                        <div id="series-episodes-details-content" class="collapse show">
+                            <div class="card-body">
+                                <h4 class="subsection-heading">Build-Time Processing</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Process:</div>
+                                    <ul>
+                                        <li>The series data pipeline consists of three main scripts:
+                                            <ul>
+                                                <li><code>build-series-cache.mjs</code>: Fetches basic series data from STAPI and enhances it with Memory Alpha content</li>
+                                                <li><code>build-series-characters.mjs</code>: Builds a cache of character data for each series using a combination of STAPI API data and manually curated lists</li>
+                                                <li><code>build-series-episodes.mjs</code>: Enhances the series data with episode information from STAPI, organized by season</li>
+                                            </ul>
+                                        </li>
+                                        <li>The scripts generate and update the following files:
+                                            <ul>
+                                                <li><code>src/data/series.json</code>: Contains basic series information and episode data</li>
+                                                <li><code>netlify/functions/series-characters.json</code>: Contains character data for each series</li>
+                                            </ul>
+                                        </li>
+                                        <li>Hero images are downloaded from Memory Alpha if not already in <code>/public/images/series-cache/</code></li>
+                                        <li>These scripts run as part of the build process: <code>node scripts/build-series-cache.mjs && node scripts/build-series-episodes.mjs && node scripts/build-series-characters.mjs && astro build</code></li>
+                                    </ul>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Runtime Safeguard</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Process:</div>
+                                    <ul>
+                                        <li>The <code>series-detail.js</code> Netlify function reads from cached JSON files</li>
+                                        <li>In development only, missing data is generated on-the-fly and then saved</li>
+                                        <li>In production, all data must be pre-generated at build time</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Rate Limiting</h4>
+                                <pre><code class="language-javascript">// From build-series-cache.mjs
+// Create a rate limiter to respect STAPI's rate limit (1 req/sec)
+const limit = pLimit(3); // Allow 3 concurrent requests
+
+// Use the limiter for API calls
+await limit(async () => {
+  try {
+    console.log(`Fetching detailed data for ${series.title} (${series.uid})...`);
+    
+    // 1. Get detailed series data
+    const seriesDetail = await stapiService.getSeriesByUid(series.uid);
+    
+    // 2. Get episodes for this series
+    console.log(`Fetching episodes for ${series.title}...`);
+    const episodes = await stapiService.getEpisodesBySeriesUid(series.uid);
+    
+    // 3. Get cast (characters) for this series
+    console.log(`Fetching cast for ${series.title}...`);
+    const cast = await stapiService.getSeriesCast(series.uid, 25);
+  } catch (error) {
+    console.error(`Error processing detailed data for ${series.title}:`, error);
+  }
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Series Data Sources Section -->
+                <section id="series-data-sources" class="content-section">
+                    <h2 class="section-heading">Series Data Sources</h2>
+                    <p class="added-date">⭐ Added 2025-04-19</p>
+                    
+                    <p>The application uses multiple sources for series data to ensure comprehensive and accurate information:</p>
+                    
+                    <div class="card collapsible-section" id="series-data-sources-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#series-data-sources-content">
+                            Data Sources Details
+                        </div>
+                        <div id="series-data-sources-content" class="collapse show">
+                            <div class="card-body">
+                                <h4 class="subsection-heading">STAPI API</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Provides:</div>
+                                    <ul>
+                                        <li>Series metadata (title, abbreviation, production years, etc.)</li>
+                                        <li>Episode information (title, air date, stardate, etc.)</li>
+                                        <li>Season information (season number, episode count, etc.)</li>
+                                    </ul>
+                                    <div class="alert alert-warning">
+                                        <strong>⚠️ Development Challenge:</strong> STAPI API has incomplete character data for series, requiring us to implement a fallback system with manually curated lists.
+                                    </div>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Memory Alpha Wiki</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Provides:</div>
+                                    <ul>
+                                        <li>Series descriptions and summaries</li>
+                                        <li>Series images</li>
+                                        <li>Additional metadata not available in STAPI</li>
+                                    </ul>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Manually Curated Lists</h4>
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Provides:</div>
+                                    <ul>
+                                        <li>The <code>scripts/build-series-characters.mjs</code> script contains manually curated lists of main cast members for each series</li>
+                                        <li>These lists are based on Google Knowledge Graph data and Memory Alpha information</li>
+                                        <li>Each entry includes character name, performer name, and search function for matching with STAPI data</li>
+                                    </ul>
+                                    <div class="alert alert-success">
+                                        <strong>✅ Solution:</strong> This hybrid approach ensures complete and accurate cast information for all series, even when STAPI data is incomplete.
+                                    </div>
+                                </div>
+                                
+                                <h4 class="subsection-heading">Series Data Processing Pipeline</h4>
+                                <div class="mermaid">
+graph TD
+    STAPI[STAPI API] --> SeriesCache[build-series-cache.mjs]
+    MemoryAlpha[Memory Alpha Wiki] --> SeriesCache
+    SeriesCache --> SeriesJSON[src/data/series.json]
+    
+    STAPI --> EpisodesScript[build-series-episodes.mjs]
+    EpisodesScript --> SeriesJSON
+    
+    STAPI --> CharactersScript[build-series-characters.mjs]
+    ManualLists[Manually Curated Lists] --> CharactersScript
+    CharactersScript --> CharactersJSON[series-characters.json]
+    
+    SeriesJSON --> SeriesPage[Series Detail Page]
+    CharactersJSON --> SeriesPage
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Component Details Section -->
+                <section id="component-details" class="content-section">
+                    <h2 class="section-heading">Component Details</h2>
+                    
+                    <!-- Frontend -->
+                    <section id="frontend" class="subsection">
+                        <h3 class="subsection-heading">1. Frontend (Astro.js)</h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>The frontend is built with Astro.js and Tailwind CSS. It consists of several key pages:</p>
+                                <ul>
+                                    <li><strong>Character List Page:</strong> Displays a list of characters with filtering and pagination</li>
+                                    <li><strong>Character Detail Page:</strong> Shows detailed information about a specific character</li>
+                                    <li><strong>Series List Page:</strong> Displays a list of Star Trek series with filtering and timeline view</li>
+                                    <li><strong>Series Detail Page:</strong> Shows detailed information about a specific series</li>
+                                </ul>
+                                <p>The frontend uses the ProgressiveImage component for all character images, which provides loading states and fallbacks.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Netlify Functions -->
+                    <section id="netlify-functions" class="subsection">
+                        <h3 class="subsection-heading">2. Netlify Functions</h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>The application uses several Netlify serverless functions:</p>
+                                <ul>
+                                    <li><strong>stapi-proxy.cjs:</strong> Proxies requests to the STAPI API for character data</li>
+                                    <li><strong>character-detail.cjs:</strong> Serves character detail pages</li>
+                                    <li><strong>character-enrichment.cjs:</strong> Enriches character data with Memory Alpha images</li>
+                                    <li><strong>memory-alpha-search.cjs:</strong> Searches Memory Alpha wiki</li>
+                                    <li><strong>proxy-image.js:</strong> Proxies image requests to avoid CORS issues</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- STAPI API Integration -->
+                    <section id="stapi-integration" class="subsection">
+                        <h3 class="subsection-heading">3. STAPI API Integration</h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>The STAPI API provides the base character and series data. The application interacts with it through the stapiService.js module, which provides methods for fetching characters, series, episodes, and more.</p>
+                                
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Key Methods:</div>
+                                    <ul>
+                                        <li><code>getCharacters(page, pageSize)</code>: Fetches characters with pagination</li>
+                                        <li><code>getCharacterByUid(uid)</code>: Gets a specific character by UID</li>
+                                        <li><code>getSeries()</code>: Fetches all series</li>
+                                        <li><code>getSeriesByUid(uid)</code>: Gets a specific series by UID</li>
+                                        <li><code>getAllCharacters()</code>: Fetches all characters (approximately 7,600)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Memory Alpha Integration -->
+                    <section id="memory-alpha" class="subsection">
+                        <h3 class="subsection-heading">4. Memory Alpha Integration</h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>Memory Alpha wiki provides images and additional information. The application interacts with it through the memory-alpha-search.cjs function, which searches Memory Alpha and extracts images and content.</p>
+                                
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Key Features:</div>
+                                    <ul>
+                                        <li>Uses the MediaWiki API to search Memory Alpha</li>
+                                        <li>Extracts images and content from search results</li>
+                                        <li>Handles rate limiting and retries</li>
+                                        <li>Provides fallbacks for missing images</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- ProgressiveImage Component -->
+                    <section id="progressive-image" class="subsection">
+                        <h3 class="subsection-heading">5. ProgressiveImage Component</h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p>The ProgressiveImage component is a custom web component that handles image loading with states and fallbacks:</p>
+                                
+                                <pre><code class="language-javascript">// From ProgressiveImage.js
+class ProgressiveImage extends HTMLElement {
+  // ...
+  
+  loadImage() {
+    this._loading = true;
+    this._error = false;
+    this.render();
+
+    if (!this._src) {
+      this._error = true;
+      this._loading = false;
+      this.render();
+      return;
+    }
+
+    const img = new window.Image();
+    img.src = this._src;
+    img.onload = () => {
+      this._loading = false;
+      this._error = false;
+      this.render();
+    };
+    img.onerror = () => {
+      console.warn(`Failed to load image: ${this._src}, falling back to: ${this._fallback}`);
+      this._loading = false;
+      this._error = true;
+      this.render();
+      
+      // Try to load the fallback image
+      if (this._fallback && this._fallback !== this._src) {
+        const fallbackImg = new window.Image();
+        fallbackImg.src = this._fallback;
+      }
+    };
+  }
+  
+  // ...
+}</code></pre>
+                                
+                                <div class="tech-details">
+                                    <div class="tech-details-header">Key Features:</div>
+                                    <ul>
+                                        <li>Shows a skeleton loader while the image is loading</li>
+                                        <li>Uses the wikiImage field as the primary image source</li>
+                                        <li>Falls back to generic images if the image fails to load</li>
+                                        <li>Preserves accessibility by passing through alt text</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </section>
+
+                <!-- Known Issues and Solutions Section -->
+                <section id="known-issues" class="content-section">
+                    <h2 class="section-heading">Known Issues and Solutions</h2>
+                    <p>This section documents recurring issues we've faced and their solutions to help with future development.</p>
+                    
+                    <div class="card collapsible-section" id="module-compatibility-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#module-compatibility-content">
+                            1. Module Compatibility Issues
+                        </div>
+                        <div id="module-compatibility-content" class="collapse show">
+                            <div class="card-body">
+                                <p><strong>Issue:</strong> ES Modules vs CommonJS compatibility problems in Netlify functions.</p>
+                                
+                                <p><strong>Symptoms:</strong></p>
+                                <ul>
+                                    <li>"Unexpected token 'export'" errors</li>
+                                    <li>"require() of ES Module" errors for node-fetch</li>
+                                    <li>Issues with file extensions (.js vs .cjs) for Netlify deployment</li>
+                                </ul>
+                                
+                                <p><strong>Solution:</strong></p>
+                                <ul>
+                                    <li>Use <code>.cjs</code> extension for all Netlify function files to explicitly indicate CommonJS format</li>
+                                    <li>Use dynamic imports for ES Module dependencies:
+                                        <pre><code class="language-javascript">const { default: fetch } = await import('node-fetch');</code></pre>
+                                    </li>
+                                    <li>Maintain duplicate utility files for both formats:
+                                        <ul>
+                                            <li><code>slugify.js</code> - ES Module version for frontend use</li>
+                                            <li><code>slugify.cjs</code> - CommonJS version for Netlify function use</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsible-section" id="netlify-routing-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#netlify-routing-content">
+                            2. Netlify Routing and Redirect Issues
+                        </div>
+                        <div id="netlify-routing-content" class="collapse show">
+                            <div class="card-body">
+                                <p><strong>Issue:</strong> Conflicting redirects causing incorrect routing and 404 errors.</p>
+                                
+                                <p><strong>Symptoms:</strong></p>
+                                <ul>
+                                    <li>API endpoints returning 404</li>
+                                    <li>Series detail pages redirecting back to index</li>
+                                    <li>Series detail pages showing raw JSON</li>
+                                    <li>Pagination not working</li>
+                                </ul>
+                                
+                                <p><strong>Solution:</strong></p>
+                                <ul>
+                                    <li>Order redirects in netlify.toml with specific routes before catch-all routes</li>
+                                    <li>Add <code>force = true</code> to critical redirect rules</li>
+                                    <li>Create a postbuild script to generate a merged <code>dist/_redirects</code> file</li>
+                                    <li>Ensure API/function routes are listed first and the SSR catch-all is last</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsible-section" id="build-time-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#build-time-content">
+                            3. Build Time Performance Issues
+                        </div>
+                        <div id="build-time-content" class="collapse show">
+                            <div class="card-body">
+                                <p><strong>Issue:</strong> Long build times when processing all 7,600+ characters.</p>
+                                
+                                <p><strong>Symptoms:</strong></p>
+                                <ul>
+                                    <li>Netlify builds taking 15+ minutes</li>
+                                    <li>Build timeouts</li>
+                                    <li>Deployment failures</li>
+                                </ul>
+                                
+                                <p><strong>Solution:</strong></p>
+                                <ul>
+                                    <li>Implement a hybrid approach:
+                                        <ul>
+                                            <li>Process only the first 48 important characters at build time</li>
+                                            <li>Process the rest at runtime when requested</li>
+                                        </ul>
+                                    </li>
+                                    <li>Create a one-off harvest script (scripts/build-characters-cache.mjs)</li>
+                                    <li>Use local caching to reduce API calls</li>
+                                    <li>Set <code>process.env.SKIP_CHAR_CACHE = 'false'</code> to use the cache</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsible-section" id="image-handling-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#image-handling-content">
+                            4. Image Handling Challenges
+                        </div>
+                        <div id="image-handling-content" class="collapse show">
+                            <div class="card-body">
+                                <p><strong>Issue:</strong> Problems with image loading and display.</p>
+                                
+                                <p><strong>Symptoms:</strong></p>
+                                <ul>
+                                    <li>Blank character images on production site</li>
+                                    <li>Images not loading due to STAPI 301 redirects</li>
+                                    <li>SVG and placeholder images causing display issues</li>
+                                </ul>
+                                
+                                <p><strong>Solution:</strong></p>
+                                <ul>
+                                    <li>Implement a reusable <code>ProgressiveImage</code> web component</li>
+                                    <li>Show skeleton loaders while images are loading</li>
+                                    <li>Use fallback images when loading fails</li>
+                                    <li>Skip SVG and placeholder images</li>
+                                    <li>Add validation to filter out problematic images</li>
+                                    <li>Use specific headers to bypass referrer policy restrictions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsible-section" id="data-handling-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#data-handling-content">
+                            5. Data Handling Issues
+                        </div>
+                        <div id="data-handling-content" class="collapse show">
+                            <div class="card-body">
+                                <p><strong>Issue:</strong> Inconsistent data formats and duplicate entries.</p>
+                                
+                                <p><strong>Symptoms:</strong></p>
+                                <ul>
+                                    <li>Inconsistent field names (e.g., <code>important</code> vs <code>isImportant</code>)</li>
+                                    <li>Duplicate character entries</li>
+                                    <li>Species data not being properly fetched and normalized</li>
+                                    <li>Null/undefined values causing display issues</li>
+                                </ul>
+                                
+                                <p><strong>Solution:</strong></p>
+                                <ul>
+                                    <li>Check for both property names (e.g., <code>c.important === true</code> and <code>c.isImportant === true</code>)</li>
+                                    <li>Implement deduplication logic based on UIDs</li>
+                                    <li>Add follow-up calls for characters with empty species data</li>
+                                    <li>Normalize and deduplicate species data</li>
+                                    <li>Add proper handling of null/undefined values</li>
+                                    <li>Use fallback text for missing data</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsible-section" id="client-side-card">
+                        <div class="card-header" data-bs-toggle="collapse" data-bs-target="#client-side-content">
+                            6. Client-Side Issues
+                        </div>
+                        <div id="client-side-content" class="collapse show">
+                            <div class="card-body">
+                                <p><strong>Issue:</strong> Problems with client-side functionality.</p>
+                                
+                                <p><strong>Symptoms:</strong></p>
+                                <ul>
+                                    <li>Search not working due to incorrect selectors</li>
+                                    <li>Pagination not being search-aware</li>
+                                    <li>UI controls flashing without debouncing</li>
+                                    <li>Incorrect API endpoint URLs</li>
+                                </ul>
+                                
+                                <p><strong>Solution:</strong></p>
+                                <ul>
+                                    <li>Update selectors to use data-name attributes</li>
+                                    <li>Make pagination search-aware by recalculating totalPages after every filter/search</li>
+                                    <li>Debounce user input with 250ms delay</li>
+                                    <li>Ensure correct API endpoint URLs in client-side scripts</li>
+                                    <li>Replace DOM scraping with JSON parsing in client scripts</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Troubleshooting Guide Section -->
+                <section id="troubleshooting" class="content-section">
+                    <h2 class="section-heading">Troubleshooting Guide</h2>
+                    <p>This guide addresses common issues that may arise when working with the Star Trek Timelines application.</p>
+                    
+                    <div class="troubleshooting-item">
+                        <h4 class="subsection-heading">1. Missing Character Images</h4>
+                        <p class="troubleshooting-symptom">Symptoms: Characters display with generic placeholder images instead of their actual images.</p>
+                        
+                        <p class="troubleshooting-cause">Possible Causes:</p>
+                        <ul>
+                            <li>Local image cache is not included in the deployment</li>
+                            <li>characters.json is not using local image paths</li>
+                            <li>Memory Alpha image URLs have changed</li>
+                        </ul>
+                        
+                        <p class="troubleshooting-solution">Solutions:</p>
+                        <ul>
+                            <li>Run <code>npm run cache-images</code> to download character images</li>
+                            <li>Run <code>npm run update-json</code> to update characters.json with local image paths</li>
+                            <li>Check the proxy-image.js function for errors in fetching from Memory Alpha</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="troubleshooting-item">
+                        <h4 class="subsection-heading">2. Slow Build Times</h4>
+                        <p class="troubleshooting-symptom">Symptoms: Netlify builds take a long time or time out.</p>
+                        
+                        <p class="troubleshooting-cause">Possible Causes:</p>
+                        <ul>
+                            <li>Too many characters being processed at build time</li>
+                            <li>Too many requests to external APIs</li>
+                        </ul>
+                        
+                        <p class="troubleshooting-solution">Solutions:</p>
+                        <ul>
+                            <li>Reduce the number of characters processed at build time</li>
+                            <li>Use the cached characters.json file</li>
+                            <li>Set <code>process.env.SKIP_CHAR_CACHE = 'false'</code> to use the cache</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="troubleshooting-item">
+                        <h4 class="subsection-heading">3. Character Detail Pages Not Loading</h4>
+                        <p class="troubleshooting-symptom">Symptoms: Character detail pages show "Not found" error.</p>
+                        
+                        <p class="troubleshooting-cause">Possible Causes:</p>
+                        <ul>
+                            <li>Netlify function routing issues</li>
+                            <li>Character not found in the local cache</li>
+                            <li>Memory Alpha enrichment failing</li>
+                        </ul>
+                        
+                        <p class="troubleshooting-solution">Solutions:</p>
+                        <ul>
+                            <li>Check netlify.toml for correct routing rules</li>
+                            <li>Ensure character-detail.cjs is correctly looking up characters by UID and slug</li>
+                            <li>Check character-enrichment.cjs for errors in fetching from Memory Alpha</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="troubleshooting-item">
+                        <h4 class="subsection-heading">4. API Rate Limiting</h4>
+                        <p class="troubleshooting-symptom">Symptoms: Requests to Memory Alpha or STAPI fail with 429 errors.</p>
+                        
+                        <p class="troubleshooting-cause">Possible Causes:</p>
+                        <ul>
+                            <li>Too many requests to external APIs</li>
+                            <li>No rate limiting in place</li>
+                        </ul>
+                        
+                        <p class="troubleshooting-solution">Solutions:</p>
+                        <ul>
+                            <li>Implement rate limiting in the memory-alpha-search.cjs function</li>
+                            <li>Use the local cache more aggressively</li>
+                            <li>Add retry logic with exponential backoff</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Project Infrastructure Section -->
+                <section id="infrastructure" class="content-section">
+                    <h2 class="section-heading">Project Infrastructure</h2>
+                    <p>The Star Trek Timelines application is hosted on Netlify with the following infrastructure:</p>
+                    
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="subsection-heading">Deployment Environment</h4>
+                            <div class="tech-details">
+                                <div class="tech-details-header">Netlify Configuration:</div>
+                                <ul>
+                                    <li><strong>Build Command:</strong> <code>npm run build</code></li>
+                                    <li><strong>Publish Directory:</strong> <code>dist</code></li>
+                                    <li><strong>Functions Directory:</strong> <code>netlify/functions</code></li>
+                                    <li><strong>Deployment:</strong> <strong>Automatic deployment from Git</strong> - The repository is connected to Netlify, which automatically deploys changes when they are pushed to the main branch. No manual deploy script is needed.</li>
+                                    <li><strong>Environment Variables:</strong>
+                                        <ul>
+                                            <li><code>SKIP_CHAR_CACHE</code>: Controls whether to use cached character data</li>
+                                            <li><code>NODE_VERSION</code>: Specifies the Node.js version for the build</li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <h4 class="subsection-heading">Netlify Functions</h4>
+                            <div class="tech-details">
+                                <div class="tech-details-header">Serverless Functions:</div>
+                                <ul>
+                                    <li><code>stapi-proxy.cjs</code>: Proxies requests to the STAPI API</li>
+                                    <li><code>character-detail.cjs</code>: Serves character detail pages</li>
+                                    <li><code>character-enrichment.cjs</code>: Enriches character data with Memory Alpha images</li>
+                                    <li><code>memory-alpha-search.cjs</code>: Searches Memory Alpha wiki</li>
+                                    <li><code>proxy-image.js</code>: Proxies image requests to avoid CORS issues</li>
+                                    <li><code>series-detail.js</code>: Serves series detail pages</li>
+                                    <li><code>stapi-series-proxy.js</code>: Proxies requests to the STAPI API for series data</li>
+                                </ul>
+                            </div>
+                            
+                            <h4 class="subsection-heading">Redirects Configuration</h4>
+                            <div class="tech-details">
+                                <div class="tech-details-header">netlify.toml:</div>
+                                <pre><code class="language-toml"># API endpoints
+[[redirects]]
+  from = "/api/characters"
+  to = "/.netlify/functions/stapi-proxy"
+  status = 200
+
+[[redirects]]
+  from = "/api/series/*"
+  to = "/.netlify/functions/series-detail"
+  status = 200
+
+# Character detail pages
+[[redirects]]
+  from = "/characters/*"
+  to = "/.netlify/functions/character-detail"
+  status = 200
+
+# Catch-all for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Conclusion Section -->
+                <section id="conclusion" class="content-section">
+                    <h2 class="section-heading">Conclusion</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <p>The Star Trek Timelines application uses a sophisticated architecture to handle a large dataset of characters and images. By using a hybrid approach of build-time and runtime processing, it balances performance with comprehensive data coverage. The local caching of images and data reduces dependency on external APIs and improves the user experience.</p>
+                            
+                            <p>The system is designed to be scalable and maintainable, with clear separation of concerns between components. The use of Netlify functions allows for serverless processing of data and images, reducing the load on the frontend.</p>
+                            
+                            <p>The diagrams throughout this documentation illustrate the key components and data flows in the system. They provide a visual representation of how the different parts of the application interact, from the frontend Astro.js components to the Netlify serverless functions and external APIs.</p>
+                            
+                            <p>The infrastructure section details the Netlify deployment configuration, including the serverless functions and redirect rules that enable the application to function. This information is crucial for understanding how the application is deployed and how it handles requests.</p>
+                            
+                            <p>This documentation provides a comprehensive overview of the system architecture, data flow, and component details. It should help developers understand how the application works and how to troubleshoot common issues.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Star Trek Timelines</h4>
+                    <p>System Architecture Documentation</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2025 Star Trek Timelines</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.0/highlight.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Initialize Highlight.js
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Initialize Mermaid.js
+            mermaid.initialize({
+                startOnLoad: false,
+                theme: 'default',
+                securityLevel: 'loose',
+                flowchart: {
+                    useMaxWidth: true,
+                    htmlLabels: true,
+                    curve: 'basis'
+                },
+                sequence: {
+                    diagramMarginX: 50,
+                    diagramMarginY: 10,
+                    boxMargin: 10,
+                    noteMargin: 10,
+                    messageMargin: 35,
+                    mirrorActors: true,
+                    bottomMarginAdj: 1,
+                    useMaxWidth: true
+                }
+            });
+            
+            // Force re-render all mermaid diagrams
+            setTimeout(() => {
+                document.querySelectorAll('.mermaid').forEach(el => {
+                    const content = el.textContent;
+                    el.innerHTML = '';
+                    mermaid.render(`mermaid-${Math.random().toString(36).substr(2, 9)}`, content, (svg) => {
+                        el.innerHTML = svg;
+                    });
+                });
+            }, 500);
+            
+            // Initialize Highlight.js
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+            
+            // Initialize collapsible sections
+            document.querySelectorAll('.collapsible-section .card-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = document.querySelector(header.dataset.bsTarget);
+                    if (content) {
+                        content.classList.toggle('show');
+                        header.parentElement.classList.toggle('collapsed');
+                    }
+                });
+            });
+            
+            // Initialize zoom controls
+            document.querySelectorAll('.zoom-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const wrapper = e.target.closest('.diagram-container').querySelector('.diagram-wrapper');
+                    let zoomLevel = parseFloat(wrapper.dataset.zoomLevel || 1);
+                    
+                    if (btn.classList.contains('zoom-in')) {
+                        zoomLevel = Math.min(zoomLevel + 0.1, 2);
+                    } else if (btn.classList.contains('zoom-out')) {
+                        zoomLevel = Math.max(zoomLevel - 0.1, 0.5);
+                    } else if (btn.classList.contains('zoom-reset')) {
+                        zoomLevel = 1;
+                    }
+                    
+                    wrapper.dataset.zoomLevel = zoomLevel;
+                    wrapper.style.transform = `scale(${zoomLevel})`;
+                });
+            });
+            
+            // Activate Bootstrap scrollspy
+            const scrollSpy = new bootstrap.ScrollSpy(document.body, {
+                target: '#sidebar'
+            });
+            
+            // Highlight active nav item
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+        });
+    </script>
