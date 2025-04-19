@@ -1,5 +1,5 @@
 // netlify/functions/series-detail.js
-const fs = require('fs');
+const fs = require('fs').promises; // Use promises version for async/await
 const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
@@ -40,28 +40,21 @@ exports.handler = async (event) => {
 
     // Load all series data from local JSON first
     let allSeries = [];
-    const seriesJsonPath = path.resolve(__dirname, '..', '..', 'src', 'data', 'series.json'); // Path relative to function location
+    // Use path relative to the working directory (/var/task)
+    const seriesJsonPath = path.resolve(process.cwd(), 'src', 'data', 'series.json');
     console.log(`[series-detail] Attempting to load series data from: ${seriesJsonPath}`);
     try {
-      if (fs.existsSync(seriesJsonPath)) {
-        allSeries = JSON.parse(fs.readFileSync(seriesJsonPath, 'utf8'));
-        console.log(`[series-detail] Successfully loaded ${allSeries.length} series from local JSON.`);
-      } else {
-        console.error(`[series-detail] Local series data NOT FOUND at ${seriesJsonPath}. Cannot proceed without base series data.`);
-        // Return 500 because this is a configuration error
-         return {
-            statusCode: 500,
-            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-            body: JSON.stringify({ error: 'Configuration Error', message: `Missing required file: src/data/series.json` })
-          };
-      }
+      const seriesData = await fs.readFile(seriesJsonPath, 'utf8');
+      allSeries = JSON.parse(seriesData);
+      console.log(`[series-detail] Successfully loaded ${allSeries.length} series from local JSON.`);
     } catch (error) {
       console.error(`[series-detail] Failed to load or parse local series data from ${seriesJsonPath}:`, error);
-      return { // Return 500 on parsing error
-        statusCode: 500,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-        body: JSON.stringify({ error: 'Internal Server Error', message: `Failed to parse src/data/series.json: ${error.message}` })
-      };
+      // Return 500 because this is a critical configuration error
+       return {
+          statusCode: 500,
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
+          body: JSON.stringify({ error: 'Configuration Error', message: `Failed to load required file: src/data/series.json` })
+        };
     }
 
     // Find the series by slug or UID from the loaded local data
@@ -126,30 +119,22 @@ exports.handler = async (event) => {
     series.seasonsCount = seasonsCount;
     series.episodesCount = episodes.length;
 
-    // --- Fetch Cast Data using Pre-built JSON ---
+    // --- Load Cast Data from Pre-built JSON ---
     let castMembers = [];
-    const seriesCharactersPath = path.resolve(__dirname, 'series-characters.json'); // Assume it's bundled next to the function
+    // Use path relative to the working directory (/var/task)
+    const seriesCharactersPath = path.resolve(process.cwd(), 'src', 'data', 'series-characters.json');
     console.log(`[series-detail] Attempting to load series characters data from: ${seriesCharactersPath}`);
     try {
-      let seriesCharactersData = {};
-      if (fs.existsSync(seriesCharactersPath)) {
-        try {
-          seriesCharactersData = JSON.parse(fs.readFileSync(seriesCharactersPath, 'utf8'));
-          console.log('[series-detail] Successfully loaded and parsed series-characters.json');
-        } catch (e) {
-          console.error('[series-detail] Error parsing series-characters.json:', e);
-          // Don't fail entirely, just proceed with empty cast
-        }
-      } else {
-         console.warn('[series-detail] series-characters.json not found at expected location:', seriesCharactersPath);
-      }
+      const seriesCharactersData = await fs.readFile(seriesCharactersPath, 'utf8');
+      const parsedData = JSON.parse(seriesCharactersData);
+      console.log('[series-detail] Successfully loaded and parsed series-characters.json');
 
       const seriesSlugForCast = series.slug || slugify(series.title);
       console.log(`[series-detail] Looking for cast key: ${seriesSlugForCast}`);
 
-      if (seriesCharactersData[seriesSlugForCast] && seriesCharactersData[seriesSlugForCast].length > 0) {
+      if (parsedData[seriesSlugForCast] && parsedData[seriesSlugForCast].length > 0) {
          console.log(`[series-detail] Found pre-fetched character data for ${seriesSlugForCast}.`);
-         castMembers = seriesCharactersData[seriesSlugForCast].map(char => ({
+         castMembers = parsedData[seriesSlugForCast].map(char => ({
              name: char.name,
              uid: char.uid,
              image: char.image,
@@ -162,7 +147,8 @@ exports.handler = async (event) => {
          console.warn(`[series-detail] No pre-fetched character data found for ${seriesSlugForCast} in series-characters.json. Cast list will be empty.`);
       }
     } catch (error) {
-      console.error(`[series-detail] Error processing cast for series ${series.title}:`, error);
+      console.error(`[series-detail] Failed to load or parse series-characters.json from ${seriesCharactersPath}:`, error);
+      // Don't fail the function, just proceed with empty castMembers
     }
     series.cast = castMembers;
     console.log(`[series-detail] Final cast list size for ${series.title}: ${series.cast.length}`);
