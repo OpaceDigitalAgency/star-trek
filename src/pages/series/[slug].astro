@@ -38,10 +38,16 @@ export async function getStaticPaths() {
 
         // --- Process Episodes ---
         if (Array.isArray(seriesData.episodes) && seriesData.episodes.length > 0) {
-          episodesBySeason = seriesData.episodes.reduce((acc, ep) => {
+          episodesBySeason = seriesData.episodes.reduce((acc, ep, index) => {
             // Normalize season key: Use season number if available, otherwise 'Unknown'
-            const seasonNum = ep.season?.seasonNumber;
+            const seasonObject = ep.season;
+            const seasonNum = seasonObject?.seasonNumber;
             const key = (typeof seasonNum === 'number' && !isNaN(seasonNum)) ? String(seasonNum) : "Unknown";
+
+            // Add specific logging for Discovery during build
+            if (slug === 'star-trek-discovery' && index < 5) { // Log first 5 episodes for brevity
+              console.log(`DISCO Episode ${index + 1} (${ep.title}): seasonObject=${JSON.stringify(seasonObject)}, seasonNum=${seasonNum}, key=${key}`);
+            }
 
             if (!acc[key]) acc[key] = [];
             acc[key].push(ep);
@@ -163,7 +169,7 @@ const seriesSchema = !notFound && seriesData
                     alt={`Poster for ${seriesData.title}`}
                     class="w-full h-full object-cover"
                     loading="lazy"
-                    onerror={`this.onerror=null; this.src='/images/placeholder-${slug}.jpg'; this.onerror=null; this.src='/images/stars-placeholder.jpg';`}
+                    onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';" // Simplified fallback
                   />
                 </div>
 
