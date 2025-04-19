@@ -1,78 +1,130 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import seriesList from '../../data/series.json';
-import seriesCharacters from '../../data/series-characters.json';
+import seriesList from '../../data/series.json'; // Used only for slugs initially
+import { slugify } from '../../utils/slugify.js'; // Import the utility
 
 export const prerender = true;
 
-// Generate all static paths for series slugs
+// Fetch all data needed for each series page at build time
 export async function getStaticPaths() {
-  return seriesList.map(series => ({
-    params: { slug: series.slug }
-  }));
+  const paths = await Promise.all(
+    seriesList.map(async (seriesStub) => {
+      const slug = seriesStub.slug;
+      let seriesData = null;
+      let episodesBySeason = {};
+      let castWithDetails = [];
+
+      try {
+        // Fetch comprehensive data from the Netlify function
+        // Use the full URL if running locally and function isn't served, or relative path for Netlify build
+        const fetchUrl = import.meta.env.DEV
+          ? `http://localhost:8888/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`
+          : `/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`;
+
+        const res = await fetch(fetchUrl);
+
+        if (!res.ok) {
+          console.error(`Failed to fetch series details for ${slug}: ${res.status} ${res.statusText}`);
+          // Allow build to continue but page will show "Not Found"
+          return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
+        }
+
+        const data = await res.json();
+        seriesData = data.series || data; // Adjust based on actual function response structure
+
+        // --- Process Episodes ---
+        if (Array.isArray(seriesData.episodes) && seriesData.episodes.length > 0) {
+          episodesBySeason = seriesData.episodes.reduce((acc, ep) => {
+            // Normalize season key: Use season number if available, otherwise 'Unknown'
+            const seasonNum = ep.season?.seasonNumber;
+            const key = (typeof seasonNum === 'number' && !isNaN(seasonNum)) ? String(seasonNum) : "Unknown";
+
+            if (!acc[key]) acc[key] = [];
+            acc[key].push(ep);
+            return acc;
+          }, {});
+
+          // Sort episodes within each season by episode number
+          Object.values(episodesBySeason).forEach(eps => {
+            eps.sort((a, b) => (a.episodeNumber ?? Infinity) - (b.episodeNumber ?? Infinity));
+          });
+        }
+
+        // --- Process Cast ---
+        // Assuming the function returns `cast` array with objects like { name, uid, performer, characterLink (optional) }
+        if (Array.isArray(seriesData.cast) && seriesData.cast.length > 0) {
+           castWithDetails = seriesData.cast.map(member => {
+            const characterSlug = member.characterLink ? member.characterLink.split('/').pop() : slugify(`${member.name}-${member.uid}`);
+            // Construct image path based on convention found in file list
+            const imagePath = member.uid
+              ? `/images/character-cache/${slugify(member.name)}-${member.uid}.jpg`
+              : '/images/generic-character.jpg'; // Fallback if UID is missing
+
+            return {
+              ...member,
+              characterSlug: characterSlug, // Slug for the character's page URL
+              imagePath: imagePath, // Path to the cached image
+            };
+          }).filter(member => member.name); // Ensure member has a name
+        }
+
+      } catch (error) {
+        console.error(`Error fetching or processing data for series ${slug}:`, error);
+        // Allow build to continue but page will show "Not Found"
+        return { params: { slug }, props: { seriesData: null, episodesBySeason: {}, castWithDetails: [] } };
+      }
+
+      // Pass fetched & processed data as props
+      return {
+        params: { slug },
+        props: { seriesData, episodesBySeason, castWithDetails }
+      };
+    })
+  );
+
+  return paths.filter(p => p); // Filter out any potential nulls from errors
 }
 
-// Get the current series data and cast for the slug
-const { slug } = Astro.params;
-let series = seriesList.find(s => s.slug === slug);
+// --- Component Script ---
+// Get data passed from getStaticPaths
+const { seriesData, episodesBySeason, castWithDetails } = Astro.props;
 
-// Handle missing series gracefully
-const notFound = !series;
+// Handle missing series gracefully (if fetch failed in getStaticPaths)
+const notFound = !seriesData;
+const slug = Astro.params.slug; // Still need slug for image path
 
-// Get cast for this series (may be undefined)
-let cast = seriesCharacters[slug] || [];
-
-// --- Hybrid fallback: If episodes or cast are missing, fetch from Netlify function at build time ---
-if (series && (!Array.isArray(series.episodes) || series.episodes.length === 0 || cast.length < 5)) {
-  try {
-    const res = await fetch(`/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`);
-    if (res.ok) {
-      const dynamic = await res.json();
-      // Merge in episodes if missing or incomplete
-      if (Array.isArray(dynamic.episodes) && dynamic.episodes.length > 0) {
-        series = { ...series, episodes: dynamic.episodes };
-      }
-      // Merge in cast if missing or incomplete
-      if (Array.isArray(dynamic.cast) && dynamic.cast.length > 0) {
-        cast = dynamic.cast;
-      }
-      // Prefer best available description/timeline
-      if (dynamic.wikiSummary && (!series.wikiSummary || series.wikiSummary.length < 40)) {
-        series = { ...series, wikiSummary: dynamic.wikiSummary };
-      }
-      if (dynamic.description && (!series.description || series.description.length < 40)) {
-        series = { ...series, description: dynamic.description };
-      }
-    }
-  } catch (err) {
-    // Fallback failed, do nothing
-  }
-}
+// Use seriesData for page content, fall back if needed
+const pageTitle = notFound ? "Series Not Found" : seriesData.title || "Untitled Series";
+const pageDescription = notFound
+  ? "No series found for this slug."
+  : seriesData.wikiSummary || seriesData.description || `Learn about the Star Trek series: ${pageTitle}.`;
 
 // JSON-LD schema for SEO
-const seriesSchema = series
+const seriesSchema = !notFound && seriesData
   ? {
       "@context": "https://schema.org",
       "@type": "TVSeries",
-      "name": series.title,
-      "alternateName": series.abbreviation || "",
-      "description": series.wikiSummary || series.description || "",
-      "url": series.wikiUrl || "",
-      "image": series.wikiImage || series.image || "/images/stars-placeholder.jpg",
-      "temporalCoverage": series.stardate || "",
-      "numberOfEpisodes": series.episodesCount || "?",
-      "numberOfSeasons": series.seasonsCount || "?",
-      "productionCompany": typeof series.productionCompany === "object"
-        ? series.productionCompany?.name || "Paramount"
-        : series.productionCompany || "Paramount",
+      "name": seriesData.title,
+      "alternateName": seriesData.abbreviation || "",
+      "description": seriesData.wikiSummary || seriesData.description || "",
+      "url": seriesData.wikiUrl || Astro.url.toString(), // Use actual page URL as fallback
+      // Use cached image path if available, otherwise fallback
+      "image": `/images/series-cache/${slug}.jpg`,
+      "temporalCoverage": seriesData.stardate || "",
+      "numberOfEpisodes": seriesData.episodesCount || (seriesData.episodes?.length ?? "?"),
+      "numberOfSeasons": seriesData.seasonsCount || (Object.keys(episodesBySeason)?.length ?? "?"),
+      "productionCompany": typeof seriesData.productionCompany === "object"
+        ? seriesData.productionCompany?.name || "Paramount"
+        : seriesData.productionCompany || "Paramount",
       "countryOfOrigin": "United States",
       "inLanguage": "English"
+      // Consider adding cast details if relevant for schema
     }
   : null;
 ---
 <Layout
-  title={notFound ? "Series Not Found" : series.title}
-  description={notFound ? "No series found for this slug." : (series.wikiSummary || series.description || "Learn about a Star Trek series.")}
+  title={pageTitle}
+  description={pageDescription}
   schemaData={seriesSchema}
 >
   <div class="container mx-auto px-4 py-12">
@@ -87,10 +139,10 @@ const seriesSchema = series
         {/* Main content container */}
         <div class="lcars-header mb-8">
           <div class="lcars-header-content">
-            <h1 class="text-3xl">{series.title}</h1>
+            <h1 class="text-3xl">{seriesData.title}</h1>
           </div>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div class="md:col-span-1">
             <div class="lcars-panel">
@@ -98,54 +150,56 @@ const seriesSchema = series
                 <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
                 <div class="flex-1 h-8 bg-starfleet-blue"></div>
               </div>
-              
+
               <div class="panel-content p-6">
                 <div class="series-image aspect-video overflow-hidden mb-4">
+                  {/* Use cached image path */}
                   <img
-                    src={series.wikiImage || series.image || "/images/stars-placeholder.jpg"}
-                    alt={series.title}
+                    src={`/images/series-cache/${slug}.jpg`}
+                    alt={`Poster for ${seriesData.title}`}
                     class="w-full h-full object-cover"
-                    on:error={(e) => { e.target.src = "/images/stars-placeholder.jpg"; }}
+                    loading="lazy"
+                    onerror={`this.onerror=null; this.src='/images/placeholder-${slug}.jpg'; this.onerror=null; this.src='/images/stars-placeholder.jpg';`}
                   />
                 </div>
-                
+
                 <div class="series-meta space-y-2 mt-6">
                   <div class="flex justify-between">
                     <span class="text-gray-400">Abbreviation:</span>
-                    <span class="text-white">{series.abbreviation || "N/A"}</span>
+                    <span class="text-white">{seriesData.abbreviation || "N/A"}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Air Date:</span>
-                    <span class="text-white">{series.years || "Unknown"}</span>
+                    <span class="text-white">{seriesData.years || "Unknown"}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Stardate:</span>
-                    <span class="text-white">{series.stardate || "Unknown"}</span>
+                    <span class="text-white">{seriesData.stardate || "Unknown"}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Seasons:</span>
-                    <span class="text-white">{series.seasonsCount ?? "?"}</span>
+                    <span class="text-white">{seriesData.seasonsCount ?? Object.keys(episodesBySeason).length ?? "?"}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Episodes:</span>
-                    <span class="text-white">{series.episodesCount ?? "?"}</span>
+                    <span class="text-white">{seriesData.episodesCount ?? Object.values(episodesBySeason).flat().length ?? "?"}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Network:</span>
-                    <span class="text-white">{series.originalBroadcaster?.name || "Various"}</span>
+                    <span class="text-white">{seriesData.originalBroadcaster?.name || "Various"}</span>
                   </div>
                   <div class="flex justify-between">
                     <span class="text-gray-400">Production:</span>
                     <span class="text-white">
-                      {typeof series.productionCompany === "object"
-                        ? series.productionCompany?.name || "Paramount"
-                        : series.productionCompany || "Paramount"}
+                      {typeof seriesData.productionCompany === "object"
+                        ? seriesData.productionCompany?.name || "Paramount"
+                        : seriesData.productionCompany || "Paramount"}
                     </span>
                   </div>
                 </div>
-                
-                {series.wikiUrl && (
-                  <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4">
+
+                {seriesData.wikiUrl && (
+                  <a href={seriesData.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4">
                     View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
                   </a>
                 )}
@@ -165,22 +219,28 @@ const seriesSchema = series
                 <h2 class="text-2xl text-starfleet-gold mb-4">Series Overview</h2>
                 
                 <div class="series-description text-gray-300 mb-6 space-y-4">
-                  <p innerHTML={series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years || "Unknown"}.`}></p>
+                  {/* Use set:html for potentially HTML content */}
+                  <Fragment set:html={seriesData.wikiSummary || seriesData.description || `<p>${seriesData.title} is a Star Trek series that aired from ${seriesData.years || "Unknown"}.</p>`} />
                 </div>
-                
+
                 {/* Timeline Placement Section */}
                 <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
                 <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
                   <p class="text-gray-300">
-                    {series.title} is set
-                    {series.stardate && series.stardate !== "Unknown" ? ` in the years ${series.stardate}, ` : " "}
+                    {seriesData.title} is set
+                    {seriesData.stardate && seriesData.stardate !== "Unknown" ? ` in the years ${seriesData.stardate}, ` : " "}
                     {(() => {
-                      if (series.title.includes("Original")) return "during the Five-Year Mission.";
-                      if (series.title.includes("Next Generation")) return "during the 24th century.";
-                      if (series.title.includes("Deep Space Nine")) return "during the Dominion War era.";
-                      if (series.title.includes("Voyager")) return "during the Delta Quadrant expedition.";
-                      if (series.title.includes("Enterprise")) return "in the early days of Starfleet.";
-                      if (series.title.includes("Picard")) return "in the post-Dominion War era.";
+                      const title = seriesData.title || "";
+                      if (title.includes("Original")) return "during the Five-Year Mission.";
+                      if (title.includes("Next Generation")) return "during the 24th century.";
+                      if (title.includes("Deep Space Nine")) return "during the Dominion War era.";
+                      if (title.includes("Voyager")) return "during the Delta Quadrant expedition.";
+                      if (title.includes("Enterprise")) return "in the early days of Starfleet.";
+                      if (title.includes("Picard")) return "in the post-Dominion War era.";
+                      if (title.includes("Discovery")) return "across multiple eras, primarily the 23rd and 32nd centuries.";
+                      if (title.includes("Lower Decks")) return "shortly after the Dominion War.";
+                      if (title.includes("Prodigy")) return "in the Delta Quadrant after Voyager's return.";
+                      if (title.includes("Strange New Worlds")) return "before the Original Series.";
                       return "in the Star Trek timeline.";
                     })()}
                   </p>
@@ -209,24 +269,25 @@ const seriesSchema = series
             <div class="panel-content p-6">
               <h2 class="text-2xl text-starfleet-gold mb-4">Cast</h2>
               <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {cast.length === 0 ? (
+                {castWithDetails.length === 0 ? (
                   <p class="text-gray-300 col-span-full">No cast information available.</p>
                 ) : (
-                  cast.map(member => (
+                  castWithDetails.map(member => (
                     <div class="cast-member text-center" style="min-width:0">
-                      <div class="aspect-square overflow-hidden rounded-lg mb-2">
-                        <img
-                          src={member.image || "/images/generic-character.jpg"}
-                          alt={member.name}
-                          class="w-full h-full object-cover"
-                          on:error={(e) => { e.target.src = "/images/generic-character.jpg"; }}
-                        />
-                      </div>
-                      <a href={member.url} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
-                        {member.name}
+                      <a href={`/characters/${member.characterSlug}/`} class="block group">
+                        <div class="aspect-square overflow-hidden rounded-lg mb-2 transition-transform duration-300 group-hover:scale-105">
+                          <img
+                            src={member.imagePath}
+                            alt={`Image of ${member.name}`}
+                            class="w-full h-full object-cover"
+                            loading="lazy"
+                            onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
+                          />
+                        </div>
+                        <span class="text-starfleet-gold group-hover:underline text-sm block truncate">{member.name}</span>
                       </a>
                       {member.performer && (
-                        <div class="text-xs text-gray-400">{member.performer}</div>
+                        <div class="text-xs text-gray-400 truncate" title={member.performer}>{member.performer}</div>
                       )}
                     </div>
                   ))
@@ -248,44 +309,36 @@ const seriesSchema = series
             <div class="panel-content p-6">
               <h2 class="text-2xl text-starfleet-gold mb-4">Episodes</h2>
               <div class="space-y-8">
-                {Array.isArray(series.episodes) && series.episodes.length > 0 ? (
-                  // Group episodes by season
-                  Object.entries(
-                    series.episodes.reduce((acc, ep) => {
-                      const season = ep.season ?? "Unknown";
-                      const key = typeof season === "object"
-                        ? season.title || season.name || season.number || JSON.stringify(season)
-                        : String(season);
-                      if (!acc[key]) acc[key] = [];
-                      acc[key].push(ep);
-                      return acc;
-                    }, {})
-                  )
-                  .sort(([a], [b]) => {
-                    if (a === "Unknown") return 1;
-                    if (b === "Unknown") return -1;
-                    return parseInt(a) - parseInt(b);
+                {Object.keys(episodesBySeason).length > 0 ? (
+                  // Iterate over pre-processed episodes grouped by season
+                  Object.entries(episodesBySeason)
+                  .sort(([keyA], [keyB]) => {
+                    // Sort numerically, placing "Unknown" last
+                    if (keyA === "Unknown") return 1;
+                    if (keyB === "Unknown") return -1;
+                    return parseInt(keyA) - parseInt(keyB);
                   })
-                  .map(([season, episodes]) => (
+                  .map(([seasonKey, episodes]) => (
                     <div class="season-section">
-                      <h3 class="season-header text-xl text-starfleet-gold">Season {season}</h3>
+                      <h3 class="season-header text-xl text-starfleet-gold">
+                        {seasonKey === "Unknown" ? "Specials / Unknown Season" : `Season ${seasonKey}`}
+                      </h3>
                       <div class="space-y-2">
-                        {episodes
-                          .sort((a, b) => (a.episodeNumber ?? 0) - (b.episodeNumber ?? 0))
-                          .map(episode => (
+                        {/* Episodes are already sorted within the season from getStaticPaths */}
+                        {episodes.map(episode => (
                             <div class="episode-grid">
                               <span class="episode-number">{episode.episodeNumber ?? "?"}</span>
                               <span class="episode-title">{episode.title || "Unknown Episode"}</span>
                               <span class="episode-date">
-                                {episode.airDate
-                                  ? new Date(episode.airDate).toLocaleDateString("en-US", {
+                                {episode.usAirDate || episode.airDate // Prefer US air date if available
+                                  ? new Date(episode.usAirDate || episode.airDate).toLocaleDateString("en-GB", { // Use GB format D/M/YYYY
                                       year: "numeric",
-                                      month: "long",
+                                      month: "numeric",
                                       day: "numeric"
                                     })
                                   : "Unknown"}
                               </span>
-                              <span class="episode-stardate">{episode.stardate || "Unknown"}</span>
+                              <span class="episode-stardate">{episode.stardateFrom || episode.stardate || "N/A"}</span>
                             </div>
                           ))}
                       </div>
@@ -393,102 +446,4 @@ const seriesSchema = series
   }
 </style>
 
-<script>
-  // Minimal client-side fallback: if cast or episodes are missing, fetch from Netlify function at runtime
-  document.addEventListener('DOMContentLoaded', function() {
-    const castEls = document.querySelectorAll('.cast-member');
-    const episodesContainer = document.getElementById('episodes-container');
-    const slug = window.location.pathname.split('/').filter(Boolean).pop();
-
-    const needsCast = castEls.length === 0;
-    const needsEpisodes = episodesContainer && episodesContainer.textContent.includes('No episodes available.');
-
-    if (needsCast || needsEpisodes) {
-      fetch('/.netlify/functions/series-detail?slug=' + encodeURIComponent(slug))
-        .then(res => res.ok ? res.json() : null)
-        .then(series => {
-          if (!series) return;
-          // Update cast if needed
-          if (needsCast && Array.isArray(series.cast) && series.cast.length > 0) {
-            const castGrid = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4.lg\\:grid-cols-6');
-            if (castGrid) {
-              castGrid.innerHTML = series.cast.map(member => `
-                <div class="cast-member text-center" style="min-width:0">
-                  <div class="aspect-square overflow-hidden rounded-lg mb-2">
-                    <img
-                      src="${member.image || '/images/generic-character.jpg'}"
-                      alt="${member.name}"
-                      class="w-full h-full object-cover"
-                      onerror="this.onerror=null;this.src='/images/generic-character.jpg';"
-                    />
-                  </div>
-                  <a href="${member.url}" target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
-                    ${member.name}
-                  </a>
-                  ${member.performer ? `<div class="text-xs text-gray-400">${member.performer}</div>` : ''}
-                </div>
-              `).join('');
-            }
-          }
-          // Update episodes if needed
-          if (needsEpisodes && Array.isArray(series.episodes) && series.episodes.length > 0) {
-            // Use the same displayEpisodes logic as in src/scripts/seriesDetail.js
-            var container = episodesContainer;
-            var seasons = series.episodes.reduce(function(acc, episode) {
-              var season = episode.season || 'Unknown';
-              var seasonKey = typeof season === 'object'
-                ? (season.title || season.name || season.number || JSON.stringify(season))
-                : String(season);
-              if (!acc[seasonKey]) acc[seasonKey] = [];
-              acc[seasonKey].push(episode);
-              return acc;
-            }, {});
-            Object.values(seasons).forEach(function(seasonEpisodes) {
-              seasonEpisodes.sort(function(a, b) {
-                return (a.episodeNumber || 0) - (b.episodeNumber || 0);
-              });
-            });
-            var html = Object.entries(seasons)
-              .sort(function([a], [b]) {
-                if (a === 'Unknown') return 1;
-                if (b === 'Unknown') return -1;
-                return parseInt(a) - parseInt(b);
-              })
-              .map(function([season, episodes]) {
-                var seasonDisplay = season;
-                if (season === 'Unknown') {
-                  seasonDisplay = 'Unknown';
-                } else if (season === 'null' || season === 'undefined') {
-                  seasonDisplay = 'Special';
-                } else if (typeof season === 'string' && season.startsWith('{')) {
-                  try {
-                    var seasonObj = JSON.parse(season);
-                    seasonDisplay = seasonObj.title || seasonObj.name || seasonObj.number || 'Special';
-                  } catch (e) {
-                    seasonDisplay = 'Special';
-                  }
-                }
-                return `
-                  <div class="season-section">
-                    <h3 class="season-header text-xl text-starfleet-gold">Season ${seasonDisplay}</h3>
-                    <div class="space-y-2">
-                      ${episodes.map(function(episode) {
-                        return `
-                          <div class="episode-grid">
-                            <span class="episode-number">${episode.episodeNumber || '?'}</span>
-                            <span class="episode-title">${episode.title || 'Unknown Episode'}</span>
-                            <span class="episode-date">${episode.airDate ? new Date(episode.airDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown'}</span>
-                            <span class="episode-stardate">${episode.stardate || 'Unknown'}</span>
-                          </div>
-                        `;
-                      }).join('')}
-                    </div>
-                  </div>
-                `;
-              }).join('');
-            container.innerHTML = html;
-          }
-        });
-    }
-  });
-</script>
+{/* Client-side script removed - all data is fetched at build time */}
