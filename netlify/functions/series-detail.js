@@ -1,22 +1,5 @@
-// netlify/functions/series-detail.js - Simplified for debugging
-const fs = require('fs').promises;
-const path = require('path');
-// Removed node-fetch import for now
-
-// Helper function to slugify text (kept for potential future use)
-function slugify(text) {
-  if (!text) return '';
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/&/g, '-and-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '');
-}
+// netlify/functions/series-detail.js - Ultra-Simplified for debugging
+// Removed fs, path, node-fetch imports
 
 exports.handler = async (event) => {
   let slug;
@@ -32,71 +15,40 @@ exports.handler = async (event) => {
       slug = slug.slice(0, -1);
     }
 
-    console.log(`[series-detail] DEBUG: Function triggered for slug: ${slug}`);
-    console.log(`[series-detail] DEBUG: process.cwd(): ${process.cwd()}`);
-    console.log(`[series-detail] DEBUG: __dirname: ${__dirname}`);
+    // This is the absolute minimum logging to check execution
+    console.log(`[series-detail] DEBUG: Function reached execution start for slug: ${slug}`);
 
-
-    // Load all series data from local JSON
-    let allSeries = [];
-    const seriesJsonPath = path.resolve(process.cwd(), 'src', 'data', 'series.json');
-    console.log(`[series-detail] DEBUG: Attempting to load series data from: ${seriesJsonPath}`);
-    try {
-      const seriesData = await fs.readFile(seriesJsonPath, 'utf8');
-      allSeries = JSON.parse(seriesData);
-      console.log(`[series-detail] DEBUG: Successfully loaded ${allSeries.length} series from local JSON.`);
-    } catch (error) {
-      console.error(`[series-detail] DEBUG: Failed to load or parse local series data:`, error);
-       return {
-          statusCode: 500,
-          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-          body: JSON.stringify({ error: 'Configuration Error', message: `Failed to load required file: src/data/series.json`, details: error.message })
-        };
-    }
-
-    // Find the series by slug
-    let series = allSeries.find(s => {
-      const seriesSlug = s.slug || slugify(s.title);
-      return seriesSlug === slug; // Only match by slug for simplicity
-    });
-
-    if (!series) {
-      console.warn(`[series-detail] DEBUG: Series not found locally with slug: ${slug}`);
-      return {
-        statusCode: 404,
-        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
-        body: JSON.stringify({ error: 'Series not found', message: `No series found locally with slug: ${slug}` })
-      };
-    }
-    console.log(`[series-detail] DEBUG: Found series: ${series.title}`);
-
-    // Return basic series data (episodes and cast will be empty for now)
+    // Return a hardcoded basic response
     const simplifiedSeriesData = {
-        ...series,
-        episodes: [], // Empty episodes
-        cast: [], // Empty cast
+        title: `Debug Series: ${slug}`,
+        slug: slug,
+        uid: 'DEBUG_UID',
+        description: 'This is a simplified debug response.',
+        episodes: [],
+        cast: [],
         seasonsCount: 0,
         episodesCount: 0
     };
 
-    console.log(`[series-detail] DEBUG: Returning simplified data for ${series.title}`);
+    console.log(`[series-detail] DEBUG: Returning hardcoded data for ${slug}`);
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': 'public, max-age=60', // Short cache for debugging
         'X-Series-Slug': slug,
-        'X-Series-Title': series.title || 'Unknown'
+        'X-Series-Title': simplifiedSeriesData.title
       },
       body: JSON.stringify(simplifiedSeriesData)
     };
 
   } catch (error) {
-    console.error('[series-detail] DEBUG: Unhandled error in handler:', error);
+    // Log any errors that occur even in this simplified version
+    console.error(`[series-detail] DEBUG: Unhandled error in simplified handler for slug ${slug}:`, error);
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store' },
-      body: JSON.stringify({ error: 'Internal Server Error', message: error.message, slug: slug || 'Unknown' }),
+      body: JSON.stringify({ error: 'Internal Server Error (Simplified)', message: error.message, slug: slug || 'Unknown' }),
     };
   }
 };
