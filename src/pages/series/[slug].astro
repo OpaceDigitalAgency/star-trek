@@ -1,175 +1,278 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { slugify } from '../../utils/slugify.js'; // Keep slugify if needed elsewhere or for client-side logic
+import seriesList from '../../data/series.json';
+import seriesCharacters from '../../data/series-characters.json';
 
-export const prerender = false;
+export const prerender = true;
 
-export async function get({ params }) {
-  // This function is needed for server-side rendering
-  // The actual data fetching happens client-side in the script
-  return {
-    props: {}
-  };
+// Generate all static paths for series slugs
+export async function getStaticPaths() {
+  return seriesList.map(series => ({
+    params: { slug: series.slug }
+  }));
 }
 
-// Create JSON-LD schema for series page (will be updated client-side)
-const seriesSchema = {
-  "@context": "https://schema.org",
-  "@type": "TVSeries",
-  "name": "Loading...", // Placeholder
-  "alternateName": "", // Placeholder
-  "description": "Loading series information...", // Placeholder
-  "url": "", // Placeholder
-  "image": "/images/stars-placeholder.jpg", // Placeholder
-  "temporalCoverage": "", // Placeholder
-  "numberOfEpisodes": "?", // Placeholder
-  "numberOfSeasons": "?", // Placeholder
-  "productionCompany": "", // Placeholder
-  "countryOfOrigin": "United States",
-  "inLanguage": "English"
-};
-// Create structured data for the series page
+// Get the current series data and cast for the slug
+const { slug } = Astro.params;
+const series = seriesList.find(s => s.slug === slug);
+
+// Handle missing series gracefully
+const notFound = !series;
+
+// Get cast for this series (may be undefined)
+const cast = seriesCharacters[slug] || [];
+
+// JSON-LD schema for SEO
+const seriesSchema = series
+  ? {
+      "@context": "https://schema.org",
+      "@type": "TVSeries",
+      "name": series.title,
+      "alternateName": series.abbreviation || "",
+      "description": series.wikiSummary || series.description || "",
+      "url": series.wikiUrl || "",
+      "image": series.wikiImage || series.image || "/images/stars-placeholder.jpg",
+      "temporalCoverage": series.stardate || "",
+      "numberOfEpisodes": series.episodesCount || "?",
+      "numberOfSeasons": series.seasonsCount || "?",
+      "productionCompany": typeof series.productionCompany === "object"
+        ? series.productionCompany?.name || "Paramount"
+        : series.productionCompany || "Paramount",
+      "countryOfOrigin": "United States",
+      "inLanguage": "English"
+    }
+  : null;
 ---
 <Layout
-  title="Star Trek Series Profile"
-  description="Learn about a Star Trek series."
+  title={notFound ? "Series Not Found" : series.title}
+  description={notFound ? "No series found for this slug." : (series.wikiSummary || series.description || "Learn about a Star Trek series.")}
   schemaData={seriesSchema}
 >
   <div class="container mx-auto px-4 py-12">
-    <!-- Main content container -->
-    <div class="lcars-header mb-8">
-      <div class="lcars-header-content">
-        <h1 id="series-title" class="text-3xl">Loading...</h1>
+    {notFound ? (
+      <div class="text-center text-red-500 text-2xl py-24">
+        <h1>Series Not Found</h1>
+        <p>Sorry, we couldn't find a series for this URL.</p>
+        <a href="/series/" class="text-starfleet-gold hover:underline mt-4 inline-block">Back to Series List</a>
       </div>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="md:col-span-1">
-        <div class="lcars-panel">
-          <div class="lcars-top-bar flex">
-            <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
-            <div class="flex-1 h-8 bg-starfleet-blue"></div>
+    ) : (
+      <>
+        {/* Main content container */}
+        <div class="lcars-header mb-8">
+          <div class="lcars-header-content">
+            <h1 class="text-3xl">{series.title}</h1>
           </div>
-          
-          <div class="panel-content p-6">
-            <div class="series-image aspect-video overflow-hidden mb-4">
-              <img
-                id="series-image"
-                src="/images/stars-placeholder.jpg"
-                alt="Loading series image"
-                class="w-full h-full object-cover"
-                onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
-              />
-            </div>
-            
-            <div class="series-meta space-y-2 mt-6">
-              <div class="flex justify-between">
-                <span class="text-gray-400">Abbreviation:</span>
-                <span id="series-abbreviation" class="text-white">Loading...</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Air Date:</span>
-                <span id="series-years" class="text-white">Loading...</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Stardate:</span>
-                <span id="series-stardate" class="text-white">Loading...</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Seasons:</span>
-                <span id="series-seasons" class="text-white">Loading...</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Episodes:</span>
-                <span id="series-episodes" class="text-white">Loading...</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Network:</span>
-                <span id="series-network" class="text-white">Loading...</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-gray-400">Production:</span>
-                <span id="series-production" class="text-white">Loading...</span>
-              </div>
-            </div>
-            
-            <a id="series-wiki-link" href="#" target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4 hidden">
-              View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      
-      <div class="md:col-span-2">
-        <div class="lcars-panel">
-          <div class="lcars-top-bar flex">
-            <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
-            <div class="flex-1 h-8 bg-starfleet-blue"></div>
-            <div class="w-16 h-8 bg-starfleet-red"></div>
-          </div>
-          
-          <div class="panel-content p-6">
-            <h2 class="text-2xl text-starfleet-gold mb-4">Series Overview</h2>
-            
-            <div id="series-description" class="series-description text-gray-300 mb-6 space-y-4">
-              <p>Loading series description...</p>
-            </div>
-            
-            <!-- Timeline Placement Section -->
-            <!-- This section displays where the series fits in the Star Trek chronology -->
-            <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
-            <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
-              <p id="series-timeline-info" class="text-gray-300">
-                Loading timeline information...
-              </p>
-            </div>
-            
-            <div class="mt-8">
-              <a href="/series/" class="inline-flex items-center text-starfleet-gold hover:underline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Back to Series
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cast Section -->
-    <div class="mt-12">
-      <div class="lcars-panel">
-        <div class="lcars-top-bar flex">
-          <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
-          <div class="flex-1 h-8 bg-starfleet-blue"></div>
-          <div class="w-16 h-8 bg-starfleet-red"></div>
         </div>
         
-        <div class="panel-content p-6">
-          <h2 class="text-2xl text-starfleet-gold mb-4">Cast</h2>
-          <div id="cast-container" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            <p class="text-gray-300 col-span-full">Loading cast...</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="md:col-span-1">
+            <div class="lcars-panel">
+              <div class="lcars-top-bar flex">
+                <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+                <div class="flex-1 h-8 bg-starfleet-blue"></div>
+              </div>
+              
+              <div class="panel-content p-6">
+                <div class="series-image aspect-video overflow-hidden mb-4">
+                  <img
+                    src={series.wikiImage || series.image || "/images/stars-placeholder.jpg"}
+                    alt={series.title}
+                    class="w-full h-full object-cover"
+                    on:error={(e) => { e.target.src = "/images/stars-placeholder.jpg"; }}
+                  />
+                </div>
+                
+                <div class="series-meta space-y-2 mt-6">
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Abbreviation:</span>
+                    <span class="text-white">{series.abbreviation || "N/A"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Air Date:</span>
+                    <span class="text-white">{series.years || "Unknown"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Stardate:</span>
+                    <span class="text-white">{series.stardate || "Unknown"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Seasons:</span>
+                    <span class="text-white">{series.seasonsCount ?? "?"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Episodes:</span>
+                    <span class="text-white">{series.episodesCount ?? "?"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Network:</span>
+                    <span class="text-white">{series.originalBroadcaster?.name || "Various"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Production:</span>
+                    <span class="text-white">
+                      {typeof series.productionCompany === "object"
+                        ? series.productionCompany?.name || "Paramount"
+                        : series.productionCompany || "Paramount"}
+                    </span>
+                  </div>
+                </div>
+                
+                {series.wikiUrl && (
+                  <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4">
+                    View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          <div class="md:col-span-2">
+            <div class="lcars-panel">
+              <div class="lcars-top-bar flex">
+                <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+                <div class="flex-1 h-8 bg-starfleet-blue"></div>
+                <div class="w-16 h-8 bg-starfleet-red"></div>
+              </div>
+              
+              <div class="panel-content p-6">
+                <h2 class="text-2xl text-starfleet-gold mb-4">Series Overview</h2>
+                
+                <div class="series-description text-gray-300 mb-6 space-y-4">
+                  <p innerHTML={series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years || "Unknown"}.`}></p>
+                </div>
+                
+                {/* Timeline Placement Section */}
+                <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
+                <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
+                  <p class="text-gray-300">
+                    {series.title} is set
+                    {series.stardate && series.stardate !== "Unknown" ? ` in the years ${series.stardate}, ` : " "}
+                    {(() => {
+                      if (series.title.includes("Original")) return "during the Five-Year Mission.";
+                      if (series.title.includes("Next Generation")) return "during the 24th century.";
+                      if (series.title.includes("Deep Space Nine")) return "during the Dominion War era.";
+                      if (series.title.includes("Voyager")) return "during the Delta Quadrant expedition.";
+                      if (series.title.includes("Enterprise")) return "in the early days of Starfleet.";
+                      if (series.title.includes("Picard")) return "in the post-Dominion War era.";
+                      return "in the Star Trek timeline.";
+                    })()}
+                  </p>
+                </div>
+                
+                <div class="mt-8">
+                  <a href="/series/" class="inline-flex items-center text-starfleet-gold hover:underline">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    Back to Series
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    <!-- Episodes Section -->
-    <div class="mt-12">
-      <div class="lcars-panel">
-        <div class="lcars-top-bar flex">
-          <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
-          <div class="flex-1 h-8 bg-starfleet-blue"></div>
-          <div class="w-16 h-8 bg-starfleet-red"></div>
-        </div>
-        
-        <div class="panel-content p-6">
-          <h2 class="text-2xl text-starfleet-gold mb-4">Episodes</h2>
-          <div id="episodes-container" class="space-y-8">
-            <p class="text-gray-300">Loading episodes...</p>
+        {/* Cast Section */}
+        <div class="mt-12">
+          <div class="lcars-panel">
+            <div class="lcars-top-bar flex">
+              <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+              <div class="flex-1 h-8 bg-starfleet-blue"></div>
+              <div class="w-16 h-8 bg-starfleet-red"></div>
+            </div>
+            
+            <div class="panel-content p-6">
+              <h2 class="text-2xl text-starfleet-gold mb-4">Cast</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {cast.length === 0 ? (
+                  <p class="text-gray-300 col-span-full">No cast information available.</p>
+                ) : (
+                  cast.map(member => (
+                    <div class="cast-member text-center" style="min-width:0">
+                      <div class="aspect-square overflow-hidden rounded-lg mb-2">
+                        <img
+                          src={member.image || "/images/generic-character.jpg"}
+                          alt={member.name}
+                          class="w-full h-full object-cover"
+                          on:error={(e) => { e.target.src = "/images/generic-character.jpg"; }}
+                        />
+                      </div>
+                      <a href={member.url} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
+                        {member.name}
+                      </a>
+                      {member.performer && (
+                        <div class="text-xs text-gray-400">{member.performer}</div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+
+        {/* Episodes Section */}
+        <div class="mt-12">
+          <div class="lcars-panel">
+            <div class="lcars-top-bar flex">
+              <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+              <div class="flex-1 h-8 bg-starfleet-blue"></div>
+              <div class="w-16 h-8 bg-starfleet-red"></div>
+            </div>
+            
+            <div class="panel-content p-6">
+              <h2 class="text-2xl text-starfleet-gold mb-4">Episodes</h2>
+              <div class="space-y-8">
+                {Array.isArray(series.episodes) && series.episodes.length > 0 ? (
+                  // Group episodes by season
+                  Object.entries(
+                    series.episodes.reduce((acc, ep) => {
+                      const season = ep.season ?? "Unknown";
+                      const key = typeof season === "object"
+                        ? season.title || season.name || season.number || JSON.stringify(season)
+                        : String(season);
+                      if (!acc[key]) acc[key] = [];
+                      acc[key].push(ep);
+                      return acc;
+                    }, {})
+                  )
+                  .sort(([a], [b]) => {
+                    if (a === "Unknown") return 1;
+                    if (b === "Unknown") return -1;
+                    return parseInt(a) - parseInt(b);
+                  })
+                  .map(([season, episodes]) => (
+                    <div class="season-section">
+                      <h3 class="season-header text-xl text-starfleet-gold">Season {season}</h3>
+                      <div class="space-y-2">
+                        {episodes
+                          .sort((a, b) => (a.episodeNumber ?? 0) - (b.episodeNumber ?? 0))
+                          .map(episode => (
+                            <div class="episode-grid">
+                              <span class="episode-number">{episode.episodeNumber ?? "?"}</span>
+                              <span class="episode-title">{episode.title || "Unknown Episode"}</span>
+                              <span class="episode-date">
+                                {episode.airDate
+                                  ? new Date(episode.airDate).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric"
+                                    })
+                                  : "Unknown"}
+                              </span>
+                              <span class="episode-stardate">{episode.stardate || "Unknown"}</span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p class="text-gray-300">No episodes available.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    )}
   </div>
 </Layout>
 
@@ -263,217 +366,4 @@ const seriesSchema = {
   }
 </style>
 
-<script is:inline>
-  // Helper functions
-  function formatDate(dateString) {
-    if (!dateString) return 'Unknown';
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return 'Unknown';
-      
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch (e) {
-      console.error('Error formatting date:', e);
-      return 'Unknown';
-    }
-  }
-
-  function displayEpisodes(episodes) {
-    var container = document.getElementById('episodes-container');
-    if (!container || !Array.isArray(episodes)) {
-      if (container) container.innerHTML = '<p class="text-gray-300">No episodes available.</p>';
-      return;
-    }
-
-    // Group episodes by season
-    var seasons = episodes.reduce(function(acc, episode) {
-      var season = episode.season || 'Unknown';
-      if (!acc[season]) acc[season] = [];
-      acc[season].push(episode);
-      return acc;
-    }, {});
-
-    // Sort episodes within each season
-    Object.values(seasons).forEach(function(seasonEpisodes) {
-      seasonEpisodes.sort(function(a, b) {
-        return (a.episodeNumber || 0) - (b.episodeNumber || 0);
-      });
-    });
-
-    // Generate HTML
-    var html = Object.entries(seasons)
-      .sort(function([a], [b]) {
-        if (a === 'Unknown') return 1;
-        if (b === 'Unknown') return -1;
-        return parseInt(a) - parseInt(b);
-      })
-      .map(function([season, episodes]) {
-        // Handle case where season is an object
-        const seasonDisplay = typeof season === 'object' ? 'Unknown' : season;
-        return `
-          <div class="season-section">
-            <h3 class="season-header text-xl text-starfleet-gold">Season ${seasonDisplay}</h3>
-            <div class="space-y-2">
-              ${episodes.map(function(episode) {
-                return `
-                  <div class="episode-grid">
-                    <span class="episode-number">${episode.episodeNumber || '?'}</span>
-                    <span class="episode-title">${episode.title || 'Unknown Episode'}</span>
-                    <span class="episode-date">${formatDate(episode.airDate)}</span>
-                    <span class="episode-stardate">${episode.stardate || 'Unknown'}</span>
-                  </div>
-                `;
-              }).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
-
-    container.innerHTML = html;
-  }
-
-  function updateUI(series) {
-    // Update basic info
-    document.getElementById('series-title').textContent = series.title;
-    
-    // Update image
-    var seriesImage = document.getElementById('series-image');
-    var imagePath = series.wikiImage || series.image || "/images/stars-placeholder.jpg";
-    seriesImage.src = imagePath;
-    seriesImage.alt = series.title;
-    seriesImage.onerror = function() {
-      if (imagePath !== "/images/stars-placeholder.jpg") {
-        seriesImage.src = "/images/stars-placeholder.jpg";
-      }
-    };
-
-    // Update metadata
-    document.getElementById('series-abbreviation').textContent = series.abbreviation || "N/A";
-    document.getElementById('series-years').textContent = series.years || "Unknown";
-    document.getElementById('series-stardate').textContent = series.stardate || "Unknown";
-    document.getElementById('series-seasons').textContent = series.seasonsCount || "?";
-    document.getElementById('series-episodes').textContent = series.episodesCount || series.episodes?.length || "?";
-    document.getElementById('series-network').textContent = series.originalNetwork || "Various";
-    document.getElementById('series-production').textContent =
-      typeof series.productionCompany === 'object' ? series.productionCompany?.name || "Paramount" : series.productionCompany || "Paramount";
-
-    // Update description
-    document.getElementById('series-description').innerHTML =
-      series.wikiSummary || series.description || series.title + ' is a Star Trek series that aired from ' + series.years + '.';
-
-    // Update timeline info
-    var timelineText = series.title + ' is set ';
-    if (series.stardate && series.stardate !== "Unknown") {
-      timelineText += 'in the years ' + series.stardate + ', ';
-    }
-    
-    var era = series.title.includes("Original") ? "Five-Year Mission" :
-              series.title.includes("Next Generation") ? "24th century" :
-              series.title.includes("Deep Space Nine") ? "Dominion War era" :
-              series.title.includes("Voyager") ? "Delta Quadrant expedition" :
-              series.title.includes("Enterprise") ? "early days of Starfleet" :
-              series.title.includes("Picard") ? "post-Dominion War era" :
-              "Star Trek timeline";
-    timelineText += 'during the ' + era + '.';
-    
-    document.getElementById('series-timeline-info').textContent = timelineText;
-
-    // Update wiki link
-    var wikiLink = document.getElementById('series-wiki-link');
-    if (series.wikiUrl) {
-      wikiLink.href = series.wikiUrl;
-      wikiLink.classList.remove('hidden');
-    } else {
-      wikiLink.classList.add('hidden');
-    }
-
-    // Display episodes
-    if (series.episodes && Array.isArray(series.episodes)) {
-      displayEpisodes(series.episodes);
-    }
-  }
-
-  function showError(error) {
-    console.error('Error:', error);
-    document.getElementById('series-title').textContent = "Error loading series data";
-    document.getElementById('series-description').innerHTML =
-      '<p>Could not load series information. Please try again later.</p>' +
-      '<p class="text-sm text-red-500 mt-2">Error: ' + error.message + '</p>';
-    document.getElementById('series-image').classList.add('hidden');
-    document.querySelector('.series-meta').classList.add('hidden');
-    document.querySelector('.timeline-info').classList.add('hidden');
-    document.getElementById('series-wiki-link').classList.add('hidden');
-    document.getElementById('episodes-container').innerHTML = '<p class="text-red-500">Failed to load episodes.</p>';
-  }
-
-  function displayCast(cast) {
-    const container = document.getElementById('cast-container');
-    if (!container || !Array.isArray(cast) || cast.length === 0) {
-      if (container) container.innerHTML = '<p class="text-gray-300 col-span-full">No cast information available.</p>';
-      return;
-    }
-
-    const html = cast.map(member => `
-      <div class="cast-member text-center">
-        <div class="aspect-square overflow-hidden rounded-lg mb-2">
-          <img
-            src="${member.image}"
-            alt="${member.name}"
-            class="w-full h-full object-cover"
-            onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
-          />
-        </div>
-        <a href="${member.url}" target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
-          ${member.name}
-        </a>
-      </div>
-    `).join('');
-
-    container.innerHTML = html;
-  }
-
-  // Initialize when DOM is ready
-  document.addEventListener('DOMContentLoaded', function() {
-    var slug = window.location.pathname.split('/').filter(Boolean).pop();
-    
-    if (!slug || slug === 'series') {
-      if (window.location.pathname !== '/series/' && window.location.pathname !== '/series') {
-        window.location.href = '/series/';
-      }
-      return;
-    }
-
-    // Try the new API endpoint first
-    fetch('/api/series/' + slug)
-      .then(function(response) {
-        if (!response.ok) {
-          console.log('New API endpoint failed, trying fallback...');
-          // If that fails, try the old Netlify function
-          return fetch('/.netlify/functions/series-detail?slug=' + slug);
-        }
-        return response;
-      })
-      .then(function(response) {
-        if (!response.ok) throw new Error('HTTP error! status: ' + response.status);
-        return response.json();
-      })
-      .then(function(series) {
-        console.log('Series data:', series);
-        updateUI(series);
-        if (series.cast) {
-          console.log('Cast data:', series.cast);
-          displayCast(series.cast);
-        } else {
-          console.log('No cast data available');
-        }
-      })
-      .catch(function(error) {
-        console.error('Error fetching series data:', error);
-        showError(error);
-      });
-  });
-</script>
+<!-- All client-side scripts and fetches removed: content is now fully server-rendered. -->

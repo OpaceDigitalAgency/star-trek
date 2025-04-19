@@ -3,12 +3,17 @@
 /**
  * This script prepares the project for deployment by:
  * 1. Ensuring characters.json is using local image paths
- * 2. Providing information about the deployment size
+ * 2. Building series characters data for each series
+ * 3. Providing information about the deployment size
  */
 
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 // Get the directory name
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -18,6 +23,20 @@ const charactersLocalJsonPath = path.join(__dirname, '..', 'src', 'data', 'chara
 const charactersJsonPath = path.join(__dirname, '..', 'src', 'data', 'characters.json');
 const netlifyFunctionsCharactersJsonPath = path.join(__dirname, '..', 'netlify', 'functions', 'characters.json');
 const characterCachePath = path.join(__dirname, '..', 'public', 'images', 'character-cache');
+const buildSeriesCharactersScript = path.join(__dirname, 'build-series-characters.mjs');
+
+async function runScript(scriptPath) {
+  console.log(`Running script: ${scriptPath}`);
+  try {
+    const { stdout, stderr } = await execAsync(`node ${scriptPath}`);
+    if (stdout) console.log(stdout);
+    if (stderr) console.error(stderr);
+    return true;
+  } catch (error) {
+    console.error(`Error running script ${scriptPath}:`, error.message);
+    return false;
+  }
+}
 
 async function prepareDeployment() {
   try {
@@ -49,6 +68,13 @@ async function prepareDeployment() {
       await fs.writeFile(netlifyFunctionsCharactersJsonPath, JSON.stringify(charactersLocal, null, 2));
     } catch (error) {
       console.log('Netlify functions characters.json not found, skipping update.');
+    }
+    
+    // Build series characters data
+    console.log('Building series characters data...');
+    const success = await runScript(buildSeriesCharactersScript);
+    if (!success) {
+      console.warn('Warning: Failed to build series characters data. Series pages may use fallback character data.');
     }
     
     // Calculate the size of the character-cache directory

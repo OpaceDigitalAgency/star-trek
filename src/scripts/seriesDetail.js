@@ -22,8 +22,12 @@ function displayEpisodes(episodes) {
   // Group episodes by season
   var seasons = episodes.reduce(function(acc, episode) {
     var season = episode.season || 'Unknown';
-    if (!acc[season]) acc[season] = [];
-    acc[season].push(episode);
+    // Convert season to string if it's an object
+    var seasonKey = typeof season === 'object' ?
+      (season.title || season.name || season.number || JSON.stringify(season)) :
+      String(season);
+    if (!acc[seasonKey]) acc[seasonKey] = [];
+    acc[seasonKey].push(episode);
     return acc;
   }, {});
 
@@ -42,9 +46,25 @@ function displayEpisodes(episodes) {
       return parseInt(a) - parseInt(b);
     })
     .map(function([season, episodes]) {
+      // Format season display value
+      var seasonDisplay = season;
+      if (season === 'Unknown') {
+        seasonDisplay = 'Unknown';
+      } else if (season === 'null' || season === 'undefined') {
+        seasonDisplay = 'Special';
+      } else if (typeof season === 'string' && season.startsWith('{')) {
+        // Handle stringified JSON objects
+        try {
+          var seasonObj = JSON.parse(season);
+          seasonDisplay = seasonObj.title || seasonObj.name || seasonObj.number || 'Special';
+        } catch (e) {
+          seasonDisplay = 'Special';
+        }
+      }
+      
       return `
         <div class="season-section">
-          <h3 class="season-header text-xl text-starfleet-gold">Season ${season}</h3>
+          <h3 class="season-header text-xl text-starfleet-gold">Season ${seasonDisplay}</h3>
           <div class="space-y-2">
             ${episodes.map(function(episode) {
               return `

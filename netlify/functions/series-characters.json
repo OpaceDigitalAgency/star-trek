@@ -1,0 +1,348 @@
+{
+  "star-trek-deep-space-nine": [
+    {
+      "name": "Benjamin Sisko",
+      "image": "/images/character-cache/benjamin-sisko-CHMA0000278202.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Benjamin_Sisko",
+      "performer": "Avery Brooks",
+      "description": null
+    },
+    {
+      "name": "Kira Nerys",
+      "image": "/images/character-cache/kira-CHMA0000206808.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Kira",
+      "performer": "Nana Visitor",
+      "description": null
+    },
+    {
+      "name": "Odo",
+      "image": "/images/character-cache/odo-CHMA0000128914.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Odo",
+      "performer": "René Auberjonois",
+      "description": null
+    },
+    {
+      "name": "Jadzia Dax",
+      "image": "/images/character-cache/jadzia-dax-CHMA0000128912.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Jadzia_Dax",
+      "performer": "Terry Farrell",
+      "description": null
+    },
+    {
+      "name": "Julian Bashir",
+      "image": "/images/character-cache/amsha-bashir-CHMA0000009983.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Amsha_Bashir",
+      "performer": "Alexander Siddig",
+      "description": null
+    },
+    {
+      "name": "Miles O'Brien",
+      "image": "/images/character-cache/conan-obrien-CHMA0000059322.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Conan_O'Brien",
+      "performer": "Colm Meaney",
+      "description": null
+    },
+    {
+      "name": "Quark",
+      "image": "/images/character-cache/quark-CHMA0000088217.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Quark",
+      "performer": "Armin Shimerman",
+      "description": null
+    },
+    {
+      "name": "Worf",
+      "image": "/images/character-cache/worf-CHMA0000123141.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Worf",
+      "performer": "Michael Dorn",
+      "description": null
+    }
+  ],
+  "star-trek-discovery": [
+    {
+      "name": "Michael Burnham",
+      "image": "/images/character-cache/gabrielle-burnham-CHMA0000239142.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Gabrielle_Burnham",
+      "performer": "Sonequa Martin-Green",
+      "description": null
+    },
+    {
+      "name": "Saru",
+      "image": "/images/character-cache/saru-CHMA0000226263.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Saru",
+      "performer": "Doug Jones",
+      "description": null
+    },
+    {
+      "name": "Paul Stamets",
+      "image": "/images/character-cache/paul-stamets-CHMA0000226794.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Paul_Stamets",
+      "performer": "Anthony Rapp",
+      "description": null
+    },
+    {
+      "name": "Sylvia Tilly",
+      "image": "/images/character-cache/sylvia-tilly-CHMA0000226813.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Sylvia_Tilly",
+      "performer": "Mary Wiseman",
+      "description": null
+    }
+  ],
+  "star-trek-enterprise": [
+    {
+      "name": "Jonathan Archer",
+      "image": "/images/character-cache/henry-archer-CHMA0000002940.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Henry_Archer",
+      "performer": "Scott Bakula",
+      "description": null
+    },
+    {
+      "name": "T'Pol",
+      "image": "/images/character-cache/tpol-CHMA0000172462.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/T'Pol",
+      "performer": "Jolene Blalock",
+      "description": null
+    },
+    {
+      "name": "Charles Tucker III",
+      "image": "/images/character-cache/charles-tucker-i-CHMA0000017194.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Charles_Tucker_I",
+      "performer": "Connor Trinneer",
+      "description": null
+    },
+    {
+      "name": "Malcolm Reed",
+      "image": "/images/character-cache/andrew-reeder-CHMA0000069619.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Andrew_Reeder",
+      "performer": "Dominic Keating",
+      "description": null
+    },
+    {
+      "name": "Hoshi Sato",
+      "image": "/images/character-cache/hoshi-sato-CHMA0000004137.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Hoshi_Sato",
+      "performer": "Linda Park",
+      "description": null
+    },
+    {
+      "name": "Travis Mayweather",
+      "image": "/images/character-cache/mayweather-CHMA0000022018.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Mayweather",
+      "performer": "Anthony Montgomery",
+      "description": null
+    },
+    {
+      "name": "Phlox",
+      "image": "/images/character-cache/phlox-CHMA0000004116.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Phlox",
+      "performer": "John Billingsley",
+      "description": null
+    }
+  ],
+  "star-trek-lower-decks": [
+    {
+      "name": "Beckett Mariner",
+      "image": "/images/character-cache/beckett-mariner-CHMA0000258062.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Beckett_Mariner",
+      "performer": "Tawny Newsome",
+      "description": null
+    },
+    {
+      "name": "Brad Boimler",
+      "image": "/images/character-cache/brad-boimler-CHMA0000258055.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Brad_Boimler",
+      "performer": "Jack Quaid",
+      "description": null
+    },
+    {
+      "name": "D'Vana Tendi",
+      "image": "/images/character-cache/dvana-tendi-CHMA0000258068.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/D'Vana_Tendi",
+      "performer": "Noël Wells",
+      "description": null
+    },
+    {
+      "name": "Sam Rutherford",
+      "image": "/images/character-cache/sam-rutherford-CHMA0000258060.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Sam_Rutherford",
+      "performer": "Eugene Cordero",
+      "description": null
+    },
+    {
+      "name": "Carol Freeman",
+      "image": "/images/character-cache/alonzo-freeman-CHMA0000270286.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Alonzo_Freeman",
+      "performer": "Dawnn Lewis",
+      "description": null
+    },
+    {
+      "name": "Jack Ransom",
+      "image": "/images/character-cache/jack-ransom-CHMA0000258056.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Jack_Ransom",
+      "performer": "Jerry O'Connell",
+      "description": null
+    }
+  ],
+  "star-trek-picard": [
+    {
+      "name": "Jean-Luc Picard",
+      "image": "/images/character-cache/jean-luc-picard-CHMA0000289509.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard",
+      "performer": "Patrick Stewart",
+      "description": null
+    },
+    {
+      "name": "Cristóbal Rios",
+      "image": "/images/character-cache/cristbal-rios-CHMA0000278190.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Crist%C3%B3bal_Rios",
+      "performer": "Santiago Cabrera",
+      "description": null
+    },
+    {
+      "name": "Agnes Jurati",
+      "image": "/images/character-cache/agnes-jurati-CHMA0000251267.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Agnes_Jurati",
+      "performer": "Alison Pill",
+      "description": null
+    },
+    {
+      "name": "Elnor",
+      "image": "/images/character-cache/elnor-CHMA0000253921.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Elnor",
+      "performer": "Evan Evagora",
+      "description": null
+    },
+    {
+      "name": "Seven of Nine",
+      "image": "/images/character-cache/gary-seven-CHMA0000084006.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Gary_Seven",
+      "performer": "Jeri Ryan",
+      "description": null
+    }
+  ],
+  "star-trek-prodigy": [],
+  "star-trek-strange-new-worlds": [],
+  "star-trek-the-animated-series": [],
+  "star-trek-the-next-generation": [
+    {
+      "name": "Data",
+      "image": "/images/character-cache/data-CHMA0000261620.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Data",
+      "performer": "Brent Spiner",
+      "description": null
+    },
+    {
+      "name": "William Riker",
+      "image": "/images/character-cache/william-t-riker-CHMA0000123073.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/William_T._Riker",
+      "performer": "Jonathan Frakes",
+      "description": null
+    },
+    {
+      "name": "Jean-Luc Picard",
+      "image": "/images/character-cache/jean-luc-picard-CHMA0000289509.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard",
+      "performer": "Patrick Stewart",
+      "description": null
+    },
+    {
+      "name": "Geordi La Forge",
+      "image": "/images/character-cache/geordi-la-forge-CHMA0000132570.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Geordi_La_Forge",
+      "performer": "LeVar Burton",
+      "description": null
+    },
+    {
+      "name": "Worf",
+      "image": "/images/character-cache/worf-CHMA0000123141.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Worf",
+      "performer": "Michael Dorn",
+      "description": null
+    },
+    {
+      "name": "Deanna Troi",
+      "image": "/images/character-cache/deanna-troi-CHMA0000123101.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Deanna_Troi",
+      "performer": "Marina Sirtis",
+      "description": null
+    },
+    {
+      "name": "Beverly Crusher",
+      "image": "/images/character-cache/beverly-crusher-CHMA0000123143.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Beverly_Crusher",
+      "performer": "Gates McFadden",
+      "description": null
+    },
+    {
+      "name": "Wesley Crusher",
+      "image": "/images/character-cache/wesley-crusher-CHMA0000128902.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Wesley_Crusher",
+      "performer": "Wil Wheaton",
+      "description": null
+    },
+    {
+      "name": "Tasha Yar",
+      "image": "/images/character-cache/natasha-yar-CHMA0000278224.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Natasha_Yar",
+      "performer": "Denise Crosby",
+      "description": null
+    }
+  ],
+  "star-trek-voyager": [
+    {
+      "name": "Kathryn Janeway",
+      "image": "/images/character-cache/henry-janeway-CHMA0000017737.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Henry_Janeway",
+      "performer": "Kate Mulgrew",
+      "description": null
+    },
+    {
+      "name": "Chakotay",
+      "image": "/images/character-cache/chakotay-CHMA0000128608.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Chakotay",
+      "performer": "Robert Beltran",
+      "description": null
+    },
+    {
+      "name": "Tuvok",
+      "image": "/images/character-cache/tuvok-CHMA0000278240.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Tuvok",
+      "performer": "Tim Russ",
+      "description": null
+    },
+    {
+      "name": "B'Elanna Torres",
+      "image": "/images/character-cache/belanna-torres-CHMA0000128611.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/B'Elanna_Torres",
+      "performer": "Roxann Dawson",
+      "description": null
+    },
+    {
+      "name": "Tom Paris",
+      "image": "/images/character-cache/linnis-paris-CHMA0000005062.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Linnis_Paris",
+      "performer": "Robert Duncan McNeill",
+      "description": null
+    },
+    {
+      "name": "Harry Kim",
+      "image": "/images/character-cache/albert-kim-CHMA0000243159.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Albert_Kim",
+      "performer": "Garrett Wang",
+      "description": null
+    },
+    {
+      "name": "The Doctor",
+      "image": "/images/character-cache/the-doctor-CHMA0000059844.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/The_Doctor",
+      "performer": "Robert Picardo",
+      "description": null
+    },
+    {
+      "name": "Seven of Nine",
+      "image": "/images/character-cache/gary-seven-CHMA0000084006.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Gary_Seven",
+      "performer": "Jeri Ryan",
+      "description": null
+    }
+  ]
+}
