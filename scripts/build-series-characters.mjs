@@ -665,20 +665,79 @@ async function buildSeriesCharactersCache() {
         for (const castMember of seriesCast[seriesSlug]) {
           // Try multiple search strategies
           let char = null;
+          const characterName = castMember.name.toLowerCase();
+          const performerName = castMember.performer.toLowerCase();
           
-          // Strategy 1: Use the original search function
-          const localChar = localCharactersData.find(castMember.search);
-          const mainChar = charactersData.find(castMember.search);
-          char = localChar || mainChar;
+          // Strategy 1: Direct UID match from filename pattern
+          // Extract potential UIDs from image filenames that match the character name
+          const potentialUIDs = [];
+          const nameWithoutApostrophes = characterName.replace(/'/g, '');
+          const simplifiedName = nameWithoutApostrophes.replace(/[^a-z0-9]/g, '-');
           
-          // Strategy 2: If not found, try exact name match
-          if (!char) {
-            console.log(`  Trying exact name match for ${castMember.name}...`);
-            char = localCharactersData.find(c => c.name === castMember.name) ||
-                   charactersData.find(c => c.name === castMember.name);
+          // Find image files that might match this character
+          const imageFiles = await fs.readdir(path.join(process.cwd(), 'public', 'images', 'character-cache'));
+          const matchingFiles = imageFiles.filter(file => {
+            const lowerFile = file.toLowerCase();
+            // Check for name matches in filename
+            const nameWords = simplifiedName.split('-').filter(word => word.length > 2);
+            return nameWords.some(word => lowerFile.includes(word)) && lowerFile.includes('chma');
+          });
+          
+          // Extract UIDs from matching filenames
+          matchingFiles.forEach(file => {
+            const uidMatch = file.match(/CHMA\d+/);
+            if (uidMatch) {
+              potentialUIDs.push(uidMatch[0]);
+            }
+          });
+          
+          // Try to find characters with these UIDs
+          if (potentialUIDs.length > 0) {
+            for (const uid of potentialUIDs) {
+              const uidChar = localCharactersData.find(c => c.uid === uid) ||
+                             charactersData.find(c => c.uid === uid);
+              if (uidChar) {
+                char = uidChar;
+                console.log(`  Found character by UID ${uid} from filename pattern`);
+                break;
+              }
+            }
           }
           
-          // Strategy 3: If not found, try performer name match
+          // Strategy 2: Use the original search function
+          if (!char) {
+            const localChar = localCharactersData.find(castMember.search);
+            const mainChar = charactersData.find(castMember.search);
+            char = localChar || mainChar;
+          }
+          
+          // Strategy 3: Try exact name match
+          if (!char) {
+            console.log(`  Trying exact name match for ${castMember.name}...`);
+            char = localCharactersData.find(c => c.name.toLowerCase() === characterName) ||
+                   charactersData.find(c => c.name.toLowerCase() === characterName);
+          }
+          
+          // Strategy 4: Try combined first/last name match
+          if (!char) {
+            console.log(`  Trying combined name match for ${castMember.name}...`);
+            const nameParts = characterName.split(/\s+/);
+            if (nameParts.length > 1) {
+              const firstName = nameParts[0];
+              const lastName = nameParts[nameParts.length - 1];
+              
+              char = localCharactersData.find(c => {
+                      const cName = c.name.toLowerCase();
+                      return cName.includes(firstName) && cName.includes(lastName);
+                    }) ||
+                     charactersData.find(c => {
+                      const cName = c.name.toLowerCase();
+                      return cName.includes(firstName) && cName.includes(lastName);
+                    });
+            }
+          }
+          
+          // Strategy 5: Try performer name match
           if (!char) {
             console.log(`  Trying performer match for ${castMember.performer}...`);
             // Look for any character performed by this actor
@@ -687,17 +746,53 @@ async function buildSeriesCharactersCache() {
                    charactersData.find(c => c.performer && performerRegex.test(c.performer));
           }
           
-          // Strategy 4: Try fuzzy name matching (more permissive)
+          // Strategy 6: Try fuzzy name matching (more permissive)
           if (!char) {
             console.log(`  Trying fuzzy name match for ${castMember.name}...`);
             // Split the name into parts and look for matches on any part
-            const nameParts = castMember.name.toLowerCase().split(/\s+|['-]/);
-            char = localCharactersData.find(c =>
-                     nameParts.some(part => part.length > 2 && c.name.toLowerCase().includes(part))
-                   ) ||
-                   charactersData.find(c =>
-                     nameParts.some(part => part.length > 2 && c.name.toLowerCase().includes(part))
-                   );
+            const nameParts = characterName.split(/\s+|['-]/);
+            
+            // First try to match all significant parts (length > 2)
+            const significantParts = nameParts.filter(part => part.length > 2);
+            char = localCharactersData.find(c => {
+                     const cName = c.name.toLowerCase();
+                     return significantParts.every(part => cName.includes(part));
+                   }) ||
+                   charactersData.find(c => {
+                     const cName = c.name.toLowerCase();
+                     return significantParts.every(part => cName.includes(part));
+                   });
+                   
+            // If still not found, try matching any significant part
+            if (!char) {
+              char = localCharactersData.find(c => {
+                       const cName = c.name.toLowerCase();
+                       return significantParts.some(part => cName.includes(part));
+                     }) ||
+                     charactersData.find(c => {
+                       const cName = c.name.toLowerCase();
+                       return significantParts.some(part => cName.includes(part));
+                     });
+            }
+          }
+          
+          // Strategy 7: Try matching by role/title
+          if (!char) {
+            console.log(`  Trying role/title match for ${castMember.name}...`);
+            const commonTitles = ['captain', 'commander', 'lieutenant', 'ensign', 'doctor', 'dr'];
+            const hasTitle = commonTitles.some(title => characterName.includes(title));
+            
+            if (hasTitle) {
+              // Extract the name without the title
+              let nameWithoutTitle = characterName;
+              for (const title of commonTitles) {
+                nameWithoutTitle = nameWithoutTitle.replace(title, '').trim();
+              }
+              
+              // Try to find a character with this name
+              char = localCharactersData.find(c => c.name.toLowerCase().includes(nameWithoutTitle)) ||
+                     charactersData.find(c => c.name.toLowerCase().includes(nameWithoutTitle));
+            }
           }
           
           if (char) {
