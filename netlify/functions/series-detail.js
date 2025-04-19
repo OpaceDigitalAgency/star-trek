@@ -36,21 +36,32 @@ exports.handler = async (event) => {
       slug = slug.slice(0, -1);
     }
 
-    console.log(`Processing series detail request for slug: ${slug}, original path: ${event.path}`);
+    console.log(`[series-detail] Processing request for slug: ${slug}`);
 
     // Load all series data from local JSON first
     let allSeries = [];
-    const seriesJsonPath = path.join(__dirname, '..', '..', 'src', 'data', 'series.json');
+    const seriesJsonPath = path.resolve(__dirname, '..', '..', 'src', 'data', 'series.json'); // Path relative to function location
+    console.log(`[series-detail] Attempting to load series data from: ${seriesJsonPath}`);
     try {
       if (fs.existsSync(seriesJsonPath)) {
         allSeries = JSON.parse(fs.readFileSync(seriesJsonPath, 'utf8'));
+        console.log(`[series-detail] Successfully loaded ${allSeries.length} series from local JSON.`);
       } else {
-        console.warn(`Local series data not found at ${seriesJsonPath}. STAPI fallback not implemented here.`);
-        // Consider adding STAPI fallback if needed, but local data is preferred
+        console.error(`[series-detail] Local series data NOT FOUND at ${seriesJsonPath}. Cannot proceed without base series data.`);
+        // Return 500 because this is a configuration error
+         return {
+            statusCode: 500,
+            headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
+            body: JSON.stringify({ error: 'Configuration Error', message: `Missing required file: src/data/series.json` })
+          };
       }
     } catch (error) {
-      console.error(`Failed to load or parse local series data from ${seriesJsonPath}:`, error);
-      // Handle error appropriately, maybe return 500 or try STAPI
+      console.error(`[series-detail] Failed to load or parse local series data from ${seriesJsonPath}:`, error);
+      return { // Return 500 on parsing error
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
+        body: JSON.stringify({ error: 'Internal Server Error', message: `Failed to parse src/data/series.json: ${error.message}` })
+      };
     }
 
     // Find the series by slug or UID from the loaded local data
@@ -62,14 +73,15 @@ exports.handler = async (event) => {
     // If not found in local data, return 404
     if (!series) {
       const availableSlugs = allSeries.map(s => s.slug || slugify(s.title));
-      console.error(`Series not found locally with slug: ${slug}`);
-      console.error(`Available local slugs: ${availableSlugs.join(', ')}`);
+      console.error(`[series-detail] Series not found locally with slug: ${slug}`);
+      console.error(`[series-detail] Available local slugs: ${availableSlugs.join(', ')}`);
       return {
         statusCode: 404,
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
         body: JSON.stringify({ error: 'Series not found', message: `No series found locally with slug or UID: ${slug}` })
       };
     }
+    console.log(`[series-detail] Found series: ${series.title} (UID: ${series.uid || 'N/A'})`);
 
     // --- Fetch and organize episodes using Series UID ---
     let episodes = [];
@@ -77,25 +89,21 @@ exports.handler = async (event) => {
 
     if (series.uid) {
       try {
-        console.log(`Fetching episodes for series UID ${series.uid}...`);
-        const epResponse = await fetch(`${STAPI_BASE_URL}/series/${series.uid}/episodes?pageSize=500`); // Fetch up to 500 episodes
+        console.log(`[series-detail] Fetching episodes for series UID ${series.uid}...`);
+        const epResponse = await fetch(`${STAPI_BASE_URL}/series/${series.uid}/episodes?pageSize=500`);
         if (epResponse.ok) {
           const epData = await epResponse.json();
           episodes = epData.episodes || [];
-          console.log(`Fetched ${episodes.length} episodes for series UID ${series.uid}.`);
+          console.log(`[series-detail] Fetched ${episodes.length} episodes for series UID ${series.uid}.`);
 
-          // Sort episodes correctly by season number then episode number
-          episodes.sort((a, b) => {
+          episodes.sort((a, b) => { // Sort correctly
             const seasonA = a.season?.seasonNumber ?? Infinity;
             const seasonB = b.season?.seasonNumber ?? Infinity;
-            if (seasonA !== seasonB) {
-              return seasonA - seasonB;
-            }
+            if (seasonA !== seasonB) return seasonA - seasonB;
             return (a.episodeNumber ?? Infinity) - (b.episodeNumber ?? Infinity);
           });
 
-          // Group episodes correctly by season number (for counting seasons)
-          const episodesBySeason = episodes.reduce((acc, ep) => {
+          const episodesBySeason = episodes.reduce((acc, ep) => { // Group for counting
             const seasonNum = ep.season?.seasonNumber;
             const key = (typeof seasonNum === 'number' && !isNaN(seasonNum)) ? String(seasonNum) : "Unknown";
             if (!acc[key]) acc[key] = [];
@@ -103,66 +111,64 @@ exports.handler = async (event) => {
             return acc;
           }, {});
           seasonsCount = Object.keys(episodesBySeason).filter(s => s !== 'Unknown').length;
+          console.log(`[series-detail] Calculated ${seasonsCount} seasons for UID ${series.uid}.`);
 
         } else {
-          console.error(`Failed to fetch episodes for series UID ${series.uid}: ${epResponse.status}`);
+          console.error(`[series-detail] Failed to fetch episodes for series UID ${series.uid}: ${epResponse.status}`);
         }
       } catch (error) {
-        console.error(`Error fetching episodes for series UID ${series.uid}:`, error);
+        console.error(`[series-detail] Error fetching episodes for series UID ${series.uid}:`, error);
       }
     } else {
-      console.warn(`Cannot fetch episodes: Series UID is missing for ${series.title}`);
+      console.warn(`[series-detail] Cannot fetch episodes: Series UID is missing for ${series.title}`);
     }
-    // Assign fetched/processed episodes to the series object
-    series.episodes = episodes; // Full sorted list is needed by Astro component
-    series.seasonsCount = seasonsCount; // Use calculated count
-    series.episodesCount = episodes.length; // Update episode count based on fetch
+    series.episodes = episodes;
+    series.seasonsCount = seasonsCount;
+    series.episodesCount = episodes.length;
 
     // --- Fetch Cast Data using Pre-built JSON ---
     let castMembers = [];
+    const seriesCharactersPath = path.resolve(__dirname, 'series-characters.json'); // Assume it's bundled next to the function
+    console.log(`[series-detail] Attempting to load series characters data from: ${seriesCharactersPath}`);
     try {
-      // Prioritize loading pre-fetched series characters data
-      // Correct path relative to the function file location
-      const seriesCharactersPath = path.resolve(__dirname, 'series-characters.json');
       let seriesCharactersData = {};
       if (fs.existsSync(seriesCharactersPath)) {
         try {
           seriesCharactersData = JSON.parse(fs.readFileSync(seriesCharactersPath, 'utf8'));
-          console.log('Loaded pre-fetched series characters data from series-characters.json');
+          console.log('[series-detail] Successfully loaded and parsed series-characters.json');
         } catch (e) {
-          console.error('Error parsing series-characters.json:', e);
+          console.error('[series-detail] Error parsing series-characters.json:', e);
+          // Don't fail entirely, just proceed with empty cast
         }
       } else {
-         console.warn('series-characters.json not found at expected location:', seriesCharactersPath);
+         console.warn('[series-detail] series-characters.json not found at expected location:', seriesCharactersPath);
       }
 
-      const seriesSlugForCast = series.slug || slugify(series.title); // Use consistent slug from found series
+      const seriesSlugForCast = series.slug || slugify(series.title);
+      console.log(`[series-detail] Looking for cast key: ${seriesSlugForCast}`);
+
       if (seriesCharactersData[seriesSlugForCast] && seriesCharactersData[seriesSlugForCast].length > 0) {
-         console.log(`Using pre-fetched character data for ${seriesSlugForCast}`);
+         console.log(`[series-detail] Found pre-fetched character data for ${seriesSlugForCast}.`);
          castMembers = seriesCharactersData[seriesSlugForCast].map(char => ({
              name: char.name,
-             uid: char.uid, // Crucial for image path
-             image: char.image, // May be pre-cached path or original URL
-             url: char.url, // Memory Alpha URL
+             uid: char.uid,
+             image: char.image,
+             url: char.url,
              performer: char.performer,
-             characterLink: char.characterLink // Link to character page if generated
+             characterLink: char.characterLink
          })).filter(c => c.uid); // Ensure UID is present
-         console.log(`Loaded ${castMembers.length} cast members from pre-fetched data.`);
-
+         console.log(`[series-detail] Loaded ${castMembers.length} cast members from pre-fetched data.`);
       } else {
-         console.warn(`No pre-fetched character data found for ${seriesSlugForCast} in series-characters.json. Cast list will be empty.`);
-         // Relying on the build step that creates series-characters.json is preferred.
+         console.warn(`[series-detail] No pre-fetched character data found for ${seriesSlugForCast} in series-characters.json. Cast list will be empty.`);
       }
-
     } catch (error) {
-      console.error(`Error processing cast for series ${series.title}:`, error);
+      console.error(`[series-detail] Error processing cast for series ${series.title}:`, error);
     }
-    // Assign fetched cast
     series.cast = castMembers;
-    console.log(`Final cast list size: ${series.cast.length}`);
-
+    console.log(`[series-detail] Final cast list size for ${series.title}: ${series.cast.length}`);
 
     // --- Return the series data ---
+    console.log(`[series-detail] Returning data for ${series.title}. Episodes: ${series.episodes.length}, Cast: ${series.cast.length}`);
     return {
       statusCode: 200,
       headers: {
@@ -171,18 +177,18 @@ exports.handler = async (event) => {
         'X-Series-Slug': slug,
         'X-Series-Title': series.title || 'Unknown'
       },
-      body: JSON.stringify(series) // Return the modified series object
+      body: JSON.stringify(series)
     };
   } catch (error) {
-    console.error('Error in series detail handler:', error);
+    console.error('[series-detail] Unhandled error in handler:', error);
     const errorResponse = {
       error: 'Internal Server Error',
       message: error.message,
-      slug: slug || 'Unknown', // Use slug if available
+      slug: slug || 'Unknown',
       path: event.path,
       timestamp: new Date().toISOString()
     };
-    console.error('Error details:', JSON.stringify(errorResponse));
+    console.error('[series-detail] Error details:', JSON.stringify(errorResponse));
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store' },
