@@ -668,20 +668,35 @@ async function buildSeriesCharactersCache() {
           const characterName = castMember.name.toLowerCase();
           const performerName = castMember.performer.toLowerCase();
           
-          // Strategy 1: Direct UID match from filename pattern
-          // Extract potential UIDs from image filenames that match the character name
-          const potentialUIDs = [];
+          // Strategy 1: Exact filename match
+          // Look for image files that exactly match the character name
           const nameWithoutApostrophes = characterName.replace(/'/g, '');
           const simplifiedName = nameWithoutApostrophes.replace(/[^a-z0-9]/g, '-');
+          const exactNamePattern = simplifiedName.toLowerCase();
           
           // Find image files that might match this character
           const imageFiles = await fs.readdir(path.join(process.cwd(), 'public', 'images', 'character-cache'));
-          const matchingFiles = imageFiles.filter(file => {
+          
+          // First try exact name match in filename
+          const exactMatches = imageFiles.filter(file => {
             const lowerFile = file.toLowerCase();
-            // Check for name matches in filename
-            const nameWords = simplifiedName.split('-').filter(word => word.length > 2);
-            return nameWords.some(word => lowerFile.includes(word)) && lowerFile.includes('chma');
+            return lowerFile.includes(exactNamePattern) && lowerFile.includes('chma');
           });
+          
+          // If we found exact matches, use those
+          let matchingFiles = exactMatches;
+          
+          // If no exact matches, fall back to word matching
+          if (matchingFiles.length === 0) {
+            const nameWords = simplifiedName.split('-').filter(word => word.length > 2);
+            matchingFiles = imageFiles.filter(file => {
+              const lowerFile = file.toLowerCase();
+              return nameWords.some(word => lowerFile.includes(word)) && lowerFile.includes('chma');
+            });
+          }
+          
+          // Extract potential UIDs from matching filenames
+          const potentialUIDs = [];
           
           // Extract UIDs from matching filenames
           matchingFiles.forEach(file => {
