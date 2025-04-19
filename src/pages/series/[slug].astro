@@ -38,17 +38,10 @@ export async function getStaticPaths() {
 
         // --- Process Episodes ---
         if (Array.isArray(seriesData.episodes) && seriesData.episodes.length > 0) {
-          episodesBySeason = seriesData.episodes.reduce((acc, ep, index) => {
-            // Normalize season key: Use season number if available, otherwise 'Unknown'
-            const seasonObject = ep.season;
-            const seasonNum = seasonObject?.seasonNumber;
+          // Group episodes correctly by season number (using data fetched by updated function)
+          episodesBySeason = seriesData.episodes.reduce((acc, ep) => {
+            const seasonNum = ep.season?.seasonNumber;
             const key = (typeof seasonNum === 'number' && !isNaN(seasonNum)) ? String(seasonNum) : "Unknown";
-
-            // Add specific logging for Discovery during build
-            if (slug === 'star-trek-discovery' && index < 5) { // Log first 5 episodes for brevity
-              console.log(`DISCO Episode ${index + 1} (${ep.title}): seasonObject=${JSON.stringify(seasonObject)}, seasonNum=${seasonNum}, key=${key}`);
-            }
-
             if (!acc[key]) acc[key] = [];
             acc[key].push(ep);
             return acc;
@@ -63,19 +56,30 @@ export async function getStaticPaths() {
         // --- Process Cast ---
         // Assuming the function returns `cast` array with objects like { name, uid, performer, characterLink (optional) }
         if (Array.isArray(seriesData.cast) && seriesData.cast.length > 0) {
+           // Process cast data, ensuring correct image path generation matching cache script
            castWithDetails = seriesData.cast.map(member => {
-            const characterSlug = member.characterLink ? member.characterLink.split('/').pop() : slugify(`${member.name}-${member.uid}`);
-            // Construct image path based on convention found in file list
-            const imagePath = member.uid
-              ? `/images/character-cache/${slugify(member.name)}-${member.uid}.jpg`
-              : '/images/generic-character.jpg'; // Fallback if UID is missing
+            const characterSlug = member.characterLink ? member.characterLink.split('/').pop() : slugify(`${member.name || member.uid}-${member.uid}`); // Use UID in slugify fallback
+
+            // Determine image extension from the provided image path (if available) or default to .jpg
+            let ext = '.jpg';
+            if (member.image && typeof member.image === 'string') {
+                const urlPart = member.image.split('?')[0]; // Remove query params
+                const detectedExt = path.extname(urlPart);
+                if (detectedExt) {
+                    ext = detectedExt;
+                }
+            }
+
+            // Construct image path matching cache-character-images.mjs logic
+            const filename = `${slugify(member.name || member.uid)}-${member.uid}${ext}`;
+            const imagePath = `/images/character-cache/${filename}`;
 
             return {
               ...member,
-              characterSlug: characterSlug, // Slug for the character's page URL
-              imagePath: imagePath, // Path to the cached image
+              characterSlug: characterSlug,
+              imagePath: imagePath,
             };
-          }).filter(member => member.name); // Ensure member has a name
+          }).filter(member => member.name && member.uid); // Ensure member has name and UID
         }
 
       } catch (error) {
@@ -119,9 +123,10 @@ const seriesSchema = !notFound && seriesData
       "description": seriesData.wikiSummary || seriesData.description || "",
       "url": seriesData.wikiUrl || Astro.url.toString(), // Use actual page URL as fallback
       // Use cached image path if available, otherwise fallback
-      "image": `/images/series-cache/${slug}.jpg`,
+      // Use series UID for image path, matching cache script
+      "image": seriesData.uid ? `/images/series-cache/${seriesData.uid}.jpg` : '/images/stars-placeholder.jpg', // Default extension .jpg assumed by cache script
       "temporalCoverage": seriesData.stardate || "",
-      "numberOfEpisodes": seriesData.episodesCount || (seriesData.episodes?.length ?? "?"),
+      "numberOfEpisodes": seriesData.episodesCount || (seriesData.episodes?.length ?? "?"), // Use count from function if available
       "numberOfSeasons": seriesData.seasonsCount || (Object.keys(episodesBySeason)?.length ?? "?"),
       "productionCompany": typeof seriesData.productionCompany === "object"
         ? seriesData.productionCompany?.name || "Paramount"
@@ -165,7 +170,8 @@ const seriesSchema = !notFound && seriesData
                 <div class="series-image aspect-video overflow-hidden mb-4">
                   {/* Use cached image path */}
                   <img
-                    src={`/images/series-cache/${slug}.jpg`}
+                    {/* Use series UID for image path, matching cache script */}
+                    src={seriesData.uid ? `/images/series-cache/${seriesData.uid}.jpg` : '/images/stars-placeholder.jpg'}
                     alt={`Poster for ${seriesData.title}`}
                     class="w-full h-full object-cover"
                     loading="lazy"
