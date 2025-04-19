@@ -1,163 +1,67 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import seriesList from '../../data/series.json';
-// Removed unused seriesCharacters import
-// import seriesCharacters from '../../data/series-characters.json';
-import { slugify } from '../../utils/slugify.js'; // Assuming slugify is needed for character links
+import seriesCharacters from '../../data/series-characters.json';
 
 export const prerender = true;
 
-const STAPI_BASE_URL = 'https://stapi.co/api/v1/rest';
-
-// Helper function to fetch all pages of results from STAPI
-async function fetchAllStapiPages(url) {
-  let results = [];
-  let pageNumber = 0;
-  let totalPages = 1;
-
-  try {
-    do {
-      const response = await fetch(`${url}&pageNumber=${pageNumber}`);
-      if (!response.ok) {
-        console.error(`STAPI Error (${response.status}): ${await response.text()}`);
-        break; // Stop fetching on error
-      }
-      const data = await response.json();
-      const pageData = data.episodes || data.characters || []; // Adapt based on endpoint
-      results = results.concat(pageData);
-      totalPages = data.page?.totalPages ?? 1;
-      pageNumber++;
-    } while (pageNumber < totalPages);
-  } catch (error) {
-    console.error(`Error fetching all pages from ${url}:`, error);
-  }
-  return results;
-}
-
-// Helper to normalize season number
-function normalizeSeason(episode) {
-  if (episode.seasonNumber && typeof episode.seasonNumber === 'number') {
-    return String(episode.seasonNumber);
-  }
-  if (episode.season?.seasonNumber && typeof episode.season.seasonNumber === 'number') {
-    return String(episode.season.seasonNumber);
-  }
-  // Handle cases where season might be an object without seasonNumber but has a title/name
-  if (typeof episode.season === 'object' && episode.season !== null) {
-    return episode.season.title || episode.season.name || "Special";
-  }
-  return "Unknown"; // Fallback
-}
-
-// Generate static paths and fetch data for each series
+// Generate all static paths for series slugs
 export async function getStaticPaths() {
-  const paths = await Promise.all(seriesList.map(async (seriesStub) => {
-    const slug = seriesStub.slug;
-    let series = seriesStub; // Start with basic data
-    let episodes = [];
-    let cast = [];
-
-    try {
-      // 1. Fetch Full Series Details (if needed, enrich stub)
-      // Example: Fetching full details if stub is missing description
-      if (!series.description && series.uid) {
-         const seriesRes = await fetch(`${STAPI_BASE_URL}/series?uid=${series.uid}`);
-         if (seriesRes.ok) {
-           const seriesData = await seriesRes.json();
-           if (seriesData.series) {
-             // Merge fetched details with stub, prioritizing fetched data for key fields
-             series = { ...seriesStub, ...seriesData.series, slug: seriesStub.slug }; // Keep original slug
-           }
-         }
-      }
-
-      // 2. Fetch All Episodes for the series using UID
-      if (series.uid) {
-        const episodesUrl = `${STAPI_BASE_URL}/episode/search?seriesUid=${series.uid}&pageSize=100`;
-        const rawEpisodes = await fetchAllStapiPages(episodesUrl);
-
-        episodes = rawEpisodes
-          .map(ep => ({
-            title: ep.title,
-            season: normalizeSeason(ep), // Use normalized season
-            episodeNumber: ep.episodeNumber,
-            airDate: ep.usAirDate || ep.ukAirDate, // Prefer US air date
-            stardate: ep.stardateFrom || ep.stardateTo, // Use start or end stardate
-            uid: ep.uid
-          }))
-          .sort((a, b) => {
-            const seasonA = a.season === "Unknown" || a.season === "Special" ? Infinity : parseInt(a.season);
-            const seasonB = b.season === "Unknown" || b.season === "Special" ? Infinity : parseInt(b.season);
-            if (seasonA !== seasonB) {
-              return seasonA - seasonB;
-            }
-            return (a.episodeNumber || 0) - (b.episodeNumber || 0);
-          });
-      } else {
-        console.warn(`No UID found for series: ${series.title}, cannot fetch episodes.`);
-      }
-
-      // 3. Fetch Main Cast (First page, ~50 characters)
-      if (series.title) {
-        // Use character search by series title - less precise but often works
-        const castUrl = `${STAPI_BASE_URL}/character/search?seriesTitle=${encodeURIComponent(series.title)}&pageSize=50`;
-        // Note: STAPI doesn't directly support filtering characters by series UID reliably via search.
-        // We fetch by title and hope for the best ordering, or use a pre-defined list if needed.
-        const castRes = await fetch(castUrl);
-        if (castRes.ok) {
-          const castData = await castRes.json();
-          cast = (castData.characters || [])
-            .filter(c => c.characterSpecies?.length > 0 || c.performer) // Basic filter for relevance
-            .map(c => ({
-              name: c.name,
-              // Attempt to find a performer name
-              performer: c.performers?.[0]?.name || c.performances?.[0]?.performer?.name || null,
-              // Construct a potential character page URL (adjust if your routes differ)
-              url: `/characters/${slugify(c.name)}-${c.uid}`, // Example URL structure
-              image: null, // Placeholder - Image fetching/caching is complex for build time
-              uid: c.uid
-            }));
-            // TODO: Implement image fetching/caching separately if required, maybe via a build script
-        } else {
-           console.error(`Failed to fetch cast for ${series.title}: ${castRes.status}`);
-        }
-      }
-
-    } catch (error) {
-      console.error(`Error fetching data for series ${slug}:`, error);
-      // Allow build to continue with potentially missing data, page will show "not found" or partial data
-    }
-
-    return {
-      params: { slug },
-      props: { series, episodes, cast } // Pass fetched data as props
-    };
+  return seriesList.map(series => ({
+    params: { slug: series.slug }
   }));
-
-  // Filter out any paths that failed catastrophically (e.g., series not found in initial list)
-  return paths.filter(p => p.props.series);
 }
 
-// Get props passed from getStaticPaths
-const { series, episodes, cast } = Astro.props;
+// Get the current series data and cast for the slug
+const { slug } = Astro.params;
+let series = seriesList.find(s => s.slug === slug);
 
-// Handle case where series data might be missing after fetch attempts
+// Handle missing series gracefully
 const notFound = !series;
 
-// JSON-LD schema for SEO (using potentially enriched series data)
+// Get cast for this series (may be undefined)
+let cast = seriesCharacters[slug] || [];
+
+// --- Hybrid fallback: If episodes or cast are missing, fetch from Netlify function at build time ---
+if (series && (!Array.isArray(series.episodes) || series.episodes.length === 0 || cast.length < 5)) {
+  try {
+    const res = await fetch(`/.netlify/functions/series-detail?slug=${encodeURIComponent(slug)}`);
+    if (res.ok) {
+      const dynamic = await res.json();
+      // Merge in episodes if missing or incomplete
+      if (Array.isArray(dynamic.episodes) && dynamic.episodes.length > 0) {
+        series = { ...series, episodes: dynamic.episodes };
+      }
+      // Merge in cast if missing or incomplete
+      if (Array.isArray(dynamic.cast) && dynamic.cast.length > 0) {
+        cast = dynamic.cast;
+      }
+      // Prefer best available description/timeline
+      if (dynamic.wikiSummary && (!series.wikiSummary || series.wikiSummary.length < 40)) {
+        series = { ...series, wikiSummary: dynamic.wikiSummary };
+      }
+      if (dynamic.description && (!series.description || series.description.length < 40)) {
+        series = { ...series, description: dynamic.description };
+      }
+    }
+  } catch (err) {
+    // Fallback failed, do nothing
+  }
+}
+
+// JSON-LD schema for SEO
 const seriesSchema = series
   ? {
       "@context": "https://schema.org",
       "@type": "TVSeries",
       "name": series.title,
       "alternateName": series.abbreviation || "",
-      "description": series.description || series.wikiSummary || "", // Prefer fetched description
-      "url": series.wikiUrl || Astro.url.pathname, // Use wikiUrl or current page
-      "image": series.image || series.wikiImage || "/images/stars-placeholder.jpg", // Prefer specific images
-      "temporalCoverage": series.stardate || (series.dateStart && series.dateEnd ? `${series.dateStart} / ${series.dateEnd}` : ""),
-      "numberOfEpisodes": episodes?.length || series.episodesCount || "?", // Use fetched count
-      // Calculate seasons count from fetched episodes
-      "numberOfSeasons": episodes ? new Set(episodes.map(ep => ep.season)).size : (series.seasonsCount || "?"),
+      "description": series.wikiSummary || series.description || "",
+      "url": series.wikiUrl || "",
+      "image": series.wikiImage || series.image || "/images/stars-placeholder.jpg",
+      "temporalCoverage": series.stardate || "",
+      "numberOfEpisodes": series.episodesCount || "?",
+      "numberOfSeasons": series.seasonsCount || "?",
       "productionCompany": typeof series.productionCompany === "object"
         ? series.productionCompany?.name || "Paramount"
         : series.productionCompany || "Paramount",
@@ -168,52 +72,78 @@ const seriesSchema = series
 ---
 <Layout
   title={notFound ? "Series Not Found" : series.title}
-  description={notFound ? "No series found for this slug." : (series.description || series.wikiSummary || `Learn about the Star Trek series: ${series.title}.`)}
+  description={notFound ? "No series found for this slug." : (series.wikiSummary || series.description || "Learn about a Star Trek series.")}
   schemaData={seriesSchema}
 >
   <div class="container mx-auto px-4 py-12">
     {notFound ? (
       <div class="text-center text-red-500 text-2xl py-24">
         <h1>Series Not Found</h1>
-        <p>Sorry, we couldn't find details for this series.</p>
+        <p>Sorry, we couldn't find a series for this URL.</p>
         <a href="/series/" class="text-starfleet-gold hover:underline mt-4 inline-block">Back to Series List</a>
       </div>
     ) : (
       <>
-        {/* Header */}
+        {/* Main content container */}
         <div class="lcars-header mb-8">
           <div class="lcars-header-content">
             <h1 class="text-3xl">{series.title}</h1>
           </div>
         </div>
-
+        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Left Panel: Image & Metadata */}
           <div class="md:col-span-1">
             <div class="lcars-panel">
               <div class="lcars-top-bar flex">
                 <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
                 <div class="flex-1 h-8 bg-starfleet-blue"></div>
               </div>
+              
               <div class="panel-content p-6">
                 <div class="series-image aspect-video overflow-hidden mb-4">
                   <img
-                    src={series.image || series.wikiImage || "/images/stars-placeholder.jpg"}
+                    src={series.wikiImage || series.image || "/images/stars-placeholder.jpg"}
                     alt={series.title}
                     class="w-full h-full object-cover"
-                    onerror="this.onerror=null;this.src='/images/stars-placeholder.jpg';"
+                    on:error={(e) => { e.target.src = "/images/stars-placeholder.jpg"; }}
                   />
                 </div>
+                
                 <div class="series-meta space-y-2 mt-6">
-                  {/* Metadata fields using fetched 'series' data */}
-                  <div class="flex justify-between"><span class="text-gray-400">Abbreviation:</span> <span class="text-white">{series.abbreviation || "N/A"}</span></div>
-                  <div class="flex justify-between"><span class="text-gray-400">Air Date:</span> <span class="text-white">{series.years || (series.dateStart ? `${new Date(series.dateStart).getFullYear()} - ${series.dateEnd ? new Date(series.dateEnd).getFullYear() : 'Present'}` : "Unknown")}</span></div>
-                  <div class="flex justify-between"><span class="text-gray-400">Stardate:</span> <span class="text-white">{series.stardate || "N/A"}</span></div>
-                  <div class="flex justify-between"><span class="text-gray-400">Seasons:</span> <span class="text-white">{seriesSchema?.numberOfSeasons ?? "?"}</span></div>
-                  <div class="flex justify-between"><span class="text-gray-400">Episodes:</span> <span class="text-white">{episodes?.length ?? series.episodesCount ?? "?"}</span></div>
-                  <div class="flex justify-between"><span class="text-gray-400">Network:</span> <span class="text-white">{series.originalBroadcaster?.name || "Various"}</span></div>
-                  <div class="flex justify-between"><span class="text-gray-400">Production:</span> <span class="text-white">{seriesSchema?.productionCompany || "Paramount"}</span></div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Abbreviation:</span>
+                    <span class="text-white">{series.abbreviation || "N/A"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Air Date:</span>
+                    <span class="text-white">{series.years || "Unknown"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Stardate:</span>
+                    <span class="text-white">{series.stardate || "Unknown"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Seasons:</span>
+                    <span class="text-white">{series.seasonsCount ?? "?"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Episodes:</span>
+                    <span class="text-white">{series.episodesCount ?? "?"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Network:</span>
+                    <span class="text-white">{series.originalBroadcaster?.name || "Various"}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-400">Production:</span>
+                    <span class="text-white">
+                      {typeof series.productionCompany === "object"
+                        ? series.productionCompany?.name || "Paramount"
+                        : series.productionCompany || "Paramount"}
+                    </span>
+                  </div>
                 </div>
+                
                 {series.wikiUrl && (
                   <a href={series.wikiUrl} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline inline-flex items-center mt-4">
                     View on Memory Alpha <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path><path d="M15 3h6v6"></path><path d="M10 14L21 3"></path></svg>
@@ -222,8 +152,7 @@ const seriesSchema = series
               </div>
             </div>
           </div>
-
-          {/* Right Panel: Overview & Timeline */}
+          
           <div class="md:col-span-2">
             <div class="lcars-panel">
               <div class="lcars-top-bar flex">
@@ -231,19 +160,32 @@ const seriesSchema = series
                 <div class="flex-1 h-8 bg-starfleet-blue"></div>
                 <div class="w-16 h-8 bg-starfleet-red"></div>
               </div>
+              
               <div class="panel-content p-6">
                 <h2 class="text-2xl text-starfleet-gold mb-4">Series Overview</h2>
+                
                 <div class="series-description text-gray-300 mb-6 space-y-4">
-                  {/* Use fetched description */}
-                  <p>{series.description || series.wikiSummary || `${series.title} is a Star Trek series.`}</p>
+                  <p innerHTML={series.wikiSummary || series.description || `${series.title} is a Star Trek series that aired from ${series.years || "Unknown"}.`}></p>
                 </div>
+                
+                {/* Timeline Placement Section */}
                 <h3 class="text-xl text-starfleet-gold mb-3">Timeline Placement</h3>
                 <div class="timeline-info bg-space-black bg-opacity-50 p-4 border-l-4 border-starfleet-blue mb-6">
                   <p class="text-gray-300">
-                    {/* Simplified timeline text */}
-                    {series.title} is primarily set {series.stardate ? `around stardate ${series.stardate}` : (series.years ? `between ${series.years}` : 'in the Star Trek timeline')}.
+                    {series.title} is set
+                    {series.stardate && series.stardate !== "Unknown" ? ` in the years ${series.stardate}, ` : " "}
+                    {(() => {
+                      if (series.title.includes("Original")) return "during the Five-Year Mission.";
+                      if (series.title.includes("Next Generation")) return "during the 24th century.";
+                      if (series.title.includes("Deep Space Nine")) return "during the Dominion War era.";
+                      if (series.title.includes("Voyager")) return "during the Delta Quadrant expedition.";
+                      if (series.title.includes("Enterprise")) return "in the early days of Starfleet.";
+                      if (series.title.includes("Picard")) return "in the post-Dominion War era.";
+                      return "in the Star Trek timeline.";
+                    })()}
                   </p>
                 </div>
+                
                 <div class="mt-8">
                   <a href="/series/" class="inline-flex items-center text-starfleet-gold hover:underline">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
@@ -255,121 +197,298 @@ const seriesSchema = series
           </div>
         </div>
 
-        {/* Cast Section - Render directly from fetched 'cast' prop */}
+        {/* Cast Section */}
         <div class="mt-12">
           <div class="lcars-panel">
-            <div class="lcars-top-bar flex"><div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div><div class="flex-1 h-8 bg-starfleet-blue"></div><div class="w-16 h-8 bg-starfleet-red"></div></div>
+            <div class="lcars-top-bar flex">
+              <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+              <div class="flex-1 h-8 bg-starfleet-blue"></div>
+              <div class="w-16 h-8 bg-starfleet-red"></div>
+            </div>
+            
             <div class="panel-content p-6">
-              <h2 class="text-2xl text-starfleet-gold mb-4">Main Cast</h2>
-              {cast && cast.length > 0 ? (
-                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {cast.map(member => (
+              <h2 class="text-2xl text-starfleet-gold mb-4">Cast</h2>
+              <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                {cast.length === 0 ? (
+                  <p class="text-gray-300 col-span-full">No cast information available.</p>
+                ) : (
+                  cast.map(member => (
                     <div class="cast-member text-center" style="min-width:0">
-                      <a href={member.url || '#'} target="_blank" rel="noopener noreferrer" class="block group">
-                        <div class="aspect-square overflow-hidden rounded-lg mb-2 bg-gray-800 group-hover:opacity-80 transition-opacity">
-                          {/* Image handling needs refinement - using placeholder for now */}
-                          <img
-                            src={member.image || "/images/generic-character.jpg"}
-                            alt={member.name}
-                            class="w-full h-full object-cover"
-                            onerror="this.onerror=null;this.src='/images/generic-character.jpg';"
-                            loading="lazy"
-                          />
-                        </div>
-                        <span class="text-starfleet-gold group-hover:underline text-sm">{member.name}</span>
+                      <div class="aspect-square overflow-hidden rounded-lg mb-2">
+                        <img
+                          src={member.image || "/images/generic-character.jpg"}
+                          alt={member.name}
+                          class="w-full h-full object-cover"
+                          on:error={(e) => { e.target.src = "/images/generic-character.jpg"; }}
+                        />
+                      </div>
+                      <a href={member.url} target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
+                        {member.name}
                       </a>
                       {member.performer && (
                         <div class="text-xs text-gray-400">{member.performer}</div>
                       )}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p class="text-gray-300">Cast information not available.</p>
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Episodes Section - Render directly from fetched 'episodes' prop */}
+        {/* Episodes Section */}
         <div class="mt-12">
           <div class="lcars-panel">
-            <div class="lcars-top-bar flex"><div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div><div class="flex-1 h-8 bg-starfleet-blue"></div><div class="w-16 h-8 bg-starfleet-red"></div></div>
+            <div class="lcars-top-bar flex">
+              <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
+              <div class="flex-1 h-8 bg-starfleet-blue"></div>
+              <div class="w-16 h-8 bg-starfleet-red"></div>
+            </div>
+            
             <div class="panel-content p-6">
               <h2 class="text-2xl text-starfleet-gold mb-4">Episodes</h2>
-              {episodes && episodes.length > 0 ? (
-                <div class="space-y-8">
-                  {/* Group episodes by season */}
-                  {Object.entries(
-                    episodes.reduce((acc, ep) => {
-                      const seasonKey = ep.season || "Unknown"; // Already normalized
-                      if (!acc[seasonKey]) acc[seasonKey] = [];
-                      acc[seasonKey].push(ep);
+              <div class="space-y-8">
+                {Array.isArray(series.episodes) && series.episodes.length > 0 ? (
+                  // Group episodes by season
+                  Object.entries(
+                    series.episodes.reduce((acc, ep) => {
+                      const season = ep.season ?? "Unknown";
+                      const key = typeof season === "object"
+                        ? season.title || season.name || season.number || JSON.stringify(season)
+                        : String(season);
+                      if (!acc[key]) acc[key] = [];
+                      acc[key].push(ep);
                       return acc;
                     }, {})
                   )
-                  // Sort seasons numerically, placing Unknown/Special last
                   .sort(([a], [b]) => {
-                      const seasonNumA = a === "Unknown" || a === "Special" ? Infinity : parseInt(a);
-                      const seasonNumB = b === "Unknown" || b === "Special" ? Infinity : parseInt(b);
-                      return seasonNumA - seasonNumB;
+                    if (a === "Unknown") return 1;
+                    if (b === "Unknown") return -1;
+                    return parseInt(a) - parseInt(b);
                   })
-                  .map(([season, seasonEpisodes]) => (
+                  .map(([season, episodes]) => (
                     <div class="season-section">
-                      <h3 class="season-header text-xl text-starfleet-gold">
-                        Season {season === "Unknown" || season === "Special" ? season : season}
-                      </h3>
+                      <h3 class="season-header text-xl text-starfleet-gold">Season {season}</h3>
                       <div class="space-y-2">
-                        {/* Episodes already sorted within getStaticPaths */}
-                        {seasonEpisodes.map(episode => (
-                          <div class="episode-grid">
-                            <span class="episode-number">{episode.episodeNumber ?? "?"}</span>
-                            <span class="episode-title">{episode.title || "Unknown Episode"}</span>
-                            <span class="episode-date">
-                              {episode.airDate
-                                ? new Date(episode.airDate).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
-                                : "Unknown"}
-                            </span>
-                            <span class="episode-stardate">{episode.stardate || ""}</span>
-                          </div>
-                        ))}
+                        {episodes
+                          .sort((a, b) => (a.episodeNumber ?? 0) - (b.episodeNumber ?? 0))
+                          .map(episode => (
+                            <div class="episode-grid">
+                              <span class="episode-number">{episode.episodeNumber ?? "?"}</span>
+                              <span class="episode-title">{episode.title || "Unknown Episode"}</span>
+                              <span class="episode-date">
+                                {episode.airDate
+                                  ? new Date(episode.airDate).toLocaleDateString("en-US", {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric"
+                                    })
+                                  : "Unknown"}
+                              </span>
+                              <span class="episode-stardate">{episode.stardate || "Unknown"}</span>
+                            </div>
+                          ))}
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p class="text-gray-300">Episode list not available.</p>
-              )}
+                  ))
+                ) : (
+                  <p class="text-gray-300">No episodes available.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </>
     )}
   </div>
-  {/* REMOVED client-side <script> block */}
 </Layout>
 
 <style>
-  /* Styles remain largely the same, ensure they match the new structure */
-  .series-image { border-radius: 6px; overflow: hidden; box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); }
-  .series-meta { border-top: 1px solid rgba(0, 178, 255, 0.3); padding-top: 1rem; }
-  .timeline-info { position: relative; }
-  .timeline-info::before { /* LCARS pattern */
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: repeating-linear-gradient( 45deg, rgba(0, 178, 255, 0.05), rgba(0, 178, 255, 0.05) 10px, rgba(0, 0, 0, 0) 10px, rgba(0, 0, 0, 0) 20px );
-    pointer-events: none;
+  .series-image {
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   }
-  .season-header { border-bottom: 2px solid var(--starfleet-gold); margin-bottom: 1rem; padding-bottom: 0.5rem; }
-  .episode-grid { display: grid; grid-template-columns: auto 1fr auto auto; gap: 1rem; align-items: center; padding: 0.5rem; border-radius: 4px; }
-  .episode-grid:hover { background: rgba(0, 178, 255, 0.1); }
-  .episode-number { font-family: "LCARS", monospace; color: var(--starfleet-gold); min-width: 3rem; text-align: right; }
-  .episode-title { color: #fff; }
-  .episode-date { color: #aaa; font-size: 0.9rem; white-space: nowrap; }
-  .episode-stardate { color: var(--starfleet-blue); font-family: "LCARS", monospace; font-size: 0.9rem; white-space: nowrap; }
+  
+  .series-meta {
+    border-top: 1px solid rgba(0, 178, 255, 0.3);
+    padding-top: 1rem;
+  }
+  
+  /* Timeline info styling */
+  /* Creates a container for the timeline information with relative positioning for the pattern overlay */
+  .timeline-info {
+    position: relative;
+  }
+  
+  /* Adds a decorative diagonal striped pattern overlay to the timeline info section */
+  /* This creates a subtle LCARS-inspired background pattern */
+  .timeline-info::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      45deg,
+      rgba(0, 178, 255, 0.05),
+      rgba(0, 178, 255, 0.05) 10px,
+      rgba(0, 0, 0, 0) 10px,
+      rgba(0, 0, 0, 0) 20px
+    );
+    pointer-events: none; /* Ensures the pattern doesn't interfere with interactions */
+  }
+
+  /* Episodes section styling */
+  .season-header {
+    border-bottom: 2px solid var(--starfleet-gold);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .episode-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .episode-grid:hover {
+    background: rgba(0, 178, 255, 0.1);
+  }
+
+  .episode-number {
+    font-family: "LCARS", monospace;
+    color: var(--starfleet-gold);
+    min-width: 3rem;
+  }
+
+  .episode-title {
+    color: #fff;
+  }
+
+  .episode-date {
+    color: #888;
+    font-size: 0.9rem;
+  }
+
+  .episode-stardate {
+    color: var(--starfleet-blue);
+    font-family: "LCARS", monospace;
+  }
 
   @media (max-width: 768px) {
-    .episode-grid { grid-template-columns: auto 1fr; gap: 0.5rem 1rem; }
-    .episode-date { grid-column: 2; grid-row: 2; justify-self: start; }
-    .episode-stardate { grid-column: 2; grid-row: 2; justify-self: end; color: #888; } /* Adjust stardate position/style on mobile */
+    .episode-grid {
+      grid-template-columns: auto 1fr;
+      gap: 0.5rem;
+    }
+
+    .episode-date, .episode-stardate {
+      grid-column: 2;
+      justify-self: start;
+    }
   }
 </style>
+
+<script>
+  // Minimal client-side fallback: if cast or episodes are missing, fetch from Netlify function at runtime
+  document.addEventListener('DOMContentLoaded', function() {
+    const castEls = document.querySelectorAll('.cast-member');
+    const episodesContainer = document.getElementById('episodes-container');
+    const slug = window.location.pathname.split('/').filter(Boolean).pop();
+
+    const needsCast = castEls.length === 0;
+    const needsEpisodes = episodesContainer && episodesContainer.textContent.includes('No episodes available.');
+
+    if (needsCast || needsEpisodes) {
+      fetch('/.netlify/functions/series-detail?slug=' + encodeURIComponent(slug))
+        .then(res => res.ok ? res.json() : null)
+        .then(series => {
+          if (!series) return;
+          // Update cast if needed
+          if (needsCast && Array.isArray(series.cast) && series.cast.length > 0) {
+            const castGrid = document.querySelector('.grid.grid-cols-2.md\\:grid-cols-4.lg\\:grid-cols-6');
+            if (castGrid) {
+              castGrid.innerHTML = series.cast.map(member => `
+                <div class="cast-member text-center" style="min-width:0">
+                  <div class="aspect-square overflow-hidden rounded-lg mb-2">
+                    <img
+                      src="${member.image || '/images/generic-character.jpg'}"
+                      alt="${member.name}"
+                      class="w-full h-full object-cover"
+                      onerror="this.onerror=null;this.src='/images/generic-character.jpg';"
+                    />
+                  </div>
+                  <a href="${member.url}" target="_blank" rel="noopener noreferrer" class="text-starfleet-gold hover:underline text-sm">
+                    ${member.name}
+                  </a>
+                  ${member.performer ? `<div class="text-xs text-gray-400">${member.performer}</div>` : ''}
+                </div>
+              `).join('');
+            }
+          }
+          // Update episodes if needed
+          if (needsEpisodes && Array.isArray(series.episodes) && series.episodes.length > 0) {
+            // Use the same displayEpisodes logic as in src/scripts/seriesDetail.js
+            var container = episodesContainer;
+            var seasons = series.episodes.reduce(function(acc, episode) {
+              var season = episode.season || 'Unknown';
+              var seasonKey = typeof season === 'object'
+                ? (season.title || season.name || season.number || JSON.stringify(season))
+                : String(season);
+              if (!acc[seasonKey]) acc[seasonKey] = [];
+              acc[seasonKey].push(episode);
+              return acc;
+            }, {});
+            Object.values(seasons).forEach(function(seasonEpisodes) {
+              seasonEpisodes.sort(function(a, b) {
+                return (a.episodeNumber || 0) - (b.episodeNumber || 0);
+              });
+            });
+            var html = Object.entries(seasons)
+              .sort(function([a], [b]) {
+                if (a === 'Unknown') return 1;
+                if (b === 'Unknown') return -1;
+                return parseInt(a) - parseInt(b);
+              })
+              .map(function([season, episodes]) {
+                var seasonDisplay = season;
+                if (season === 'Unknown') {
+                  seasonDisplay = 'Unknown';
+                } else if (season === 'null' || season === 'undefined') {
+                  seasonDisplay = 'Special';
+                } else if (typeof season === 'string' && season.startsWith('{')) {
+                  try {
+                    var seasonObj = JSON.parse(season);
+                    seasonDisplay = seasonObj.title || seasonObj.name || seasonObj.number || 'Special';
+                  } catch (e) {
+                    seasonDisplay = 'Special';
+                  }
+                }
+                return `
+                  <div class="season-section">
+                    <h3 class="season-header text-xl text-starfleet-gold">Season ${seasonDisplay}</h3>
+                    <div class="space-y-2">
+                      ${episodes.map(function(episode) {
+                        return `
+                          <div class="episode-grid">
+                            <span class="episode-number">${episode.episodeNumber || '?'}</span>
+                            <span class="episode-title">${episode.title || 'Unknown Episode'}</span>
+                            <span class="episode-date">${episode.airDate ? new Date(episode.airDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Unknown'}</span>
+                            <span class="episode-stardate">${episode.stardate || 'Unknown'}</span>
+                          </div>
+                        `;
+                      }).join('')}
+                    </div>
+                  </div>
+                `;
+              }).join('');
+            container.innerHTML = html;
+          }
+        });
+    }
+  });
+</script>
