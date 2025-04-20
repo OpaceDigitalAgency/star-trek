@@ -499,6 +499,7 @@
       "matchedWith": "Henry Janeway"
     }
   ],
+  "star-trek-starfleet-academy": [],
   "star-trek-strange-new-worlds": [
     {
       "name": "Christopher Pike",
@@ -751,6 +752,72 @@
       "performer": "Majel Barrett",
       "description": null,
       "matchedWith": "Lwaxana Troi"
+    }
+  ],
+  "star-trek-the-original-series": [
+    {
+      "name": "James T. Kirk",
+      "image": "/images/character-cache/anna-jameson-CHMA0000085311.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Anna_Jameson",
+      "performer": "William Shatner",
+      "description": null,
+      "matchedWith": "Anna Jameson"
+    },
+    {
+      "name": "Spock",
+      "image": "/images/character-cache/benjamin-spock-CHMA0000028941.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Benjamin_Spock",
+      "performer": "Leonard Nimoy",
+      "description": null,
+      "matchedWith": "Benjamin Spock"
+    },
+    {
+      "name": "Leonard McCoy",
+      "image": "/images/character-cache/leonard-mccoy-CHMA0000009622.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Leonard_McCoy",
+      "performer": "DeForest Kelley",
+      "description": null,
+      "matchedWith": "Leonard McCoy"
+    },
+    {
+      "name": "Montgomery Scott",
+      "image": "/images/character-cache/montgomery-scott-CHMA0000013035.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Montgomery_Scott",
+      "performer": "James Doohan",
+      "description": null,
+      "matchedWith": "Montgomery Scott"
+    },
+    {
+      "name": "Nyota Uhura",
+      "image": "/images/character-cache/nyota-uhura-CHMA0000023576.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Nyota_Uhura",
+      "performer": "Nichelle Nichols",
+      "description": null,
+      "matchedWith": "Nyota Uhura"
+    },
+    {
+      "name": "Hikaru Sulu",
+      "image": "/images/character-cache/hikaru-sulu-CHMA0000012837.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Hikaru_Sulu",
+      "performer": "George Takei",
+      "description": null,
+      "matchedWith": "Hikaru Sulu"
+    },
+    {
+      "name": "Pavel Chekov",
+      "image": "/images/character-cache/pavel-chekov-CHMA0000003172.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Pavel_Chekov",
+      "performer": "Walter Koenig",
+      "description": null,
+      "matchedWith": "Pavel Chekov"
+    },
+    {
+      "name": "Christine Chapel",
+      "image": "/images/character-cache/christine-chapel-CHMA0000006230.jpg",
+      "url": "https://memory-alpha.fandom.com/wiki/Christine_Chapel",
+      "performer": "Majel Barrett",
+      "description": null,
+      "matchedWith": "Christine Chapel"
     }
   ],
   "star-trek-voyager": [

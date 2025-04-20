@@ -149,20 +149,57 @@ async function buildSeriesCache() {
     const response = await axios.get(`${STAPI_BASE_URL}/series/search?pageSize=100`);
     let allSeries = response.data.series || [];
     
-    // Filter out irrelevant entries and ensure we have the main series
-    const mainSeries = [
-      "Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
-      "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
-      "Star Trek: Picard", "Star Trek: The Animated Series", "Star Trek: Strange New Worlds",
-      "Star Trek: Lower Decks", "Star Trek: Prodigy"
+    // Filter to only include Star Trek series (exclude movies, etc.)
+    allSeries = allSeries.filter(series => {
+      // Include any series with "Star Trek" in the title
+      if (series.title && series.title.includes('Star Trek')) {
+        return true;
+      }
+      
+      // Special case for TOS which might be listed as just "Star Trek"
+      if (series.title === 'Star Trek' && series.abbreviation === 'TOS') {
+        // Normalize the title to "Star Trek: The Original Series"
+        series.title = 'Star Trek: The Original Series';
+        return true;
+      }
+      
+      return false;
+    });
+    
+    console.log(`Filtered to ${allSeries.length} Star Trek series`);
+    
+    // Log all found series for debugging
+    allSeries.forEach(series => {
+      console.log(`Found series: ${series.title} (${series.abbreviation}) - ${series.seasonsCount} seasons, ${series.episodesCount} episodes`);
+    });
+    
+    // Check for missing important series
+    const expectedSeries = [
+      "Star Trek: The Original Series",
+      "Star Trek: The Next Generation",
+      "Star Trek: Deep Space Nine",
+      "Star Trek: Voyager",
+      "Star Trek: Enterprise",
+      "Star Trek: Discovery",
+      "Star Trek: Picard",
+      "Star Trek: The Animated Series",
+      "Star Trek: Strange New Worlds",
+      "Star Trek: Lower Decks",
+      "Star Trek: Prodigy"
     ];
     
-    allSeries = allSeries.filter(series => mainSeries.includes(series.title));
+    // Check which expected series are missing
+    const missingSeries = expectedSeries.filter(title =>
+      !allSeries.some(series => series.title === title)
+    );
     
-    // If STAPI fails or returns insufficient data, use fallback
-    if (allSeries.length < 5) {
-      console.log('STAPI returned insufficient data, using fallback...');
-      allSeries = [
+    // If any expected series are missing, add them from fallback data
+    if (missingSeries.length > 0) {
+      console.log(`Missing ${missingSeries.length} expected series: ${missingSeries.join(', ')}`);
+      console.log('Adding missing series from fallback data...');
+      
+      // Fallback data for all series
+      const fallbackSeries = [
         {
           title: "Star Trek: The Original Series",
           uid: "SRMA0000001",
@@ -257,8 +294,8 @@ async function buildSeriesCache() {
           abbreviation: "SNW",
           productionStartYear: 2022,
           productionEndYear: null,
-          seasonsCount: 2,
-          episodesCount: 20,
+          seasonsCount: 3,
+          episodesCount: 30,
           originalNetwork: "Paramount+",
           productionCompany: "CBS Studios"
         },
@@ -285,6 +322,17 @@ async function buildSeriesCache() {
           productionCompany: "CBS Studios"
         }
       ];
+      
+      // Add only the missing series to the allSeries array
+      for (const missingTitle of missingSeries) {
+        const fallbackSerie = fallbackSeries.find(s => s.title === missingTitle);
+        if (fallbackSerie) {
+          console.log(`Adding fallback data for ${missingTitle}`);
+          allSeries.push(fallbackSerie);
+        } else {
+          console.warn(`No fallback data available for ${missingTitle}`);
+        }
+      }
     }
     
     // Map STAPI data to our format
