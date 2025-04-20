@@ -485,6 +485,7 @@ const charactersSchema = {
         const start = pageIndex * PAGE_SIZE;
         const end = start + PAGE_SIZE;
         allCharacters = filteredCharacters.slice(start, end);
+        currentPage = pageNumber;
 
         render();
       } catch (error) {
@@ -591,12 +592,6 @@ const charactersSchema = {
                 container.classList.remove('hidden');
                 countBadge.textContent = `${totalCharacters} characters found`;
             }
-
-            // Update pagination display
-            pageNum.textContent = currentPage;
-            totalNum.textContent = totalPages;
-            prevBtn.disabled = currentPage <= 1;
-            nextBtn.disabled = currentPage >= totalPages;
 
             // Update species dropdown if needed
             if (!currentFilters.species) {
@@ -714,10 +709,7 @@ const charactersSchema = {
     prevBtn.addEventListener('click', async () => {
       if (currentPage > 1 && !isLoading) {
         try {
-          const prevPageNum = currentPage - 1;
-          await fetchPageIfNeeded(prevPageNum);
-          currentPage = prevPageNum;
-          render();
+          await fetchPageIfNeeded(currentPage - 1);
         } catch (error) {
           console.error('Error navigating to previous page:', error);
         }
@@ -727,10 +719,7 @@ const charactersSchema = {
     nextBtn.addEventListener('click', async () => {
       if (currentPage < totalPages && !isLoading) {
         try {
-          const nextPageNum = currentPage + 1;
-          await fetchPageIfNeeded(nextPageNum);
-          currentPage = nextPageNum;
-          render();
+          await fetchPageIfNeeded(currentPage + 1);
         } catch (error) {
           console.error('Error navigating to next page:', error);
         }
