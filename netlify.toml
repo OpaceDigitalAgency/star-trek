@@ -1,4 +1,4 @@
-[build]
+continue as you were[build]
   command = "npm run build"
   publish = "dist"
 
@@ -26,12 +26,7 @@
   node_bundler = "esbuild"
   included_files = ["netlify/functions/characters.json", "src/data/series.json", "src/data/characters.json", "src/data/characters-local.json"]
 
-# Define redirects for Memory Alpha proxy
-[[redirects]]
-  from = "/api/proxy-image"
-  to = "/.netlify/functions/proxy-image"
-  status = 200
-
+# API and function redirects
 [[redirects]]
   from = "/api/series"
   to = "/.netlify/functions/stapi-series-proxy"
@@ -82,6 +77,12 @@
   from = "/series/*"
   to = "/series/:splat"
   status = 200
+
+[[redirects]]
+  from = "/images/*"
+  to = "/images/:splat"
+  status = 200
+  force = true
 
 [[redirects]]
   from = "/*"

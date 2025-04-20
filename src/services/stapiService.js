@@ -413,56 +413,14 @@ export const stapiService = {
   },
   
   // Parse Memory Alpha HTML to extract image URL with proper parameters
+  // This is now simplified to just return a generic image since we're using local cache
   extractMemoryAlphaImageWithParams(html) {
     try {
       if (!html) return null;
       
-      const $ = cheerio.load(html);
-      
-      // Helper function to check if an image URL is valid (not SVG or placeholder)
-      const isValidImageUrl = (url) => {
-        if (!url) return false;
-        
-        // Skip SVG images
-        if (url.toLowerCase().endsWith('.svg')) return false;
-        
-        // Skip placeholder images
-        if (url.toLowerCase().includes('placeholder')) return false;
-        
-        return true;
-      };
-      
-      // Try to find the og:image meta tag first (usually the best quality)
-      const ogImage = $('meta[property="og:image"]').attr('content');
-      if (ogImage && isValidImageUrl(ogImage)) {
-        // Use the proxy for the image
-        const cleanedUrl = this.cleanWikiaImageUrl(ogImage);
-        return this.proxyImageUrl(cleanedUrl);
-      }
-      
-      // Try to find the main image - look for infobox image
-      const infoboxImage = $('.pi-image img').first();
-      if (infoboxImage.length) {
-        let src = infoboxImage.attr('src');
-        if (src && isValidImageUrl(src)) {
-          // Use the proxy for the image
-          const cleanedUrl = this.cleanWikiaImageUrl(src);
-          return this.proxyImageUrl(cleanedUrl);
-        }
-      }
-      
-      // Look for any image in the article content
-      const contentImage = $('.mw-parser-output img').first();
-      if (contentImage.length) {
-        let src = contentImage.attr('src');
-        if (src && isValidImageUrl(src)) {
-          // Use the proxy for the image
-          const cleanedUrl = this.cleanWikiaImageUrl(src);
-          return this.proxyImageUrl(cleanedUrl);
-        }
-      }
-      
-      return null;
+      // Instead of trying to extract and proxy images from Memory Alpha,
+      // we'll just return a generic image since we're using local cache now
+      return '/images/generic-character.jpg';
     } catch (error) {
       console.error('Error extracting Memory Alpha image:', error);
       return null;
@@ -492,30 +450,29 @@ export const stapiService = {
     }
   },
   
-  // Proxy image URL through our Netlify function
-  proxyImageUrl(url) {
-    if (!url) return null;
+  // Get local image URL for a character
+  getLocalImageUrl(character) {
+    if (!character || !character.uid) return '/images/generic-character.jpg';
     
-    // First check if we have a local cached version of this image
     try {
-      // Check if characters-local.json exists and use it if available
-      if (fs.existsSync(charactersLocalJsonPath)) {
-        const localData = JSON.parse(fs.readFileSync(charactersLocalJsonPath, 'utf8'));
-        
-        // Find if any character has this image URL
-        const character = localData.find(c => c.wikiImage && c.wikiImage.includes(url));
-        if (character && character.wikiImage && character.wikiImage.startsWith('/images/character-cache/')) {
-          // Return the local cached image path
-          return character.wikiImage;
-        }
-      }
+      // Create a slug from the character name
+      const nameSlug = character.name ?
+        character.name.toString()
+          .toLowerCase()
+          .trim()
+          .replace(/\s+/g, '-')
+          .replace(/&/g, '-and-')
+          .replace(/[^\w\-]+/g, '')
+          .replace(/\-\-+/g, '-')
+          .replace(/^-+/, '')
+          .replace(/-+$/, '') : 'unknown';
+      
+      // Format: /images/character-cache/[name-slug]-[uid].jpg
+      return `/images/character-cache/${nameSlug}-${character.uid}.jpg`;
     } catch (error) {
-      console.error('Error checking local image cache:', error);
+      console.error('Error creating local image URL:', error);
+      return '/images/generic-character.jpg';
     }
-    
-    // If no local cached version, use the proxy
-    const proxyPath = '/.netlify/functions/proxy-image';
-    return `${proxyPath}?url=${encodeURIComponent(url)}`;
   },
   
   // Combined method to get Memory Alpha content with proper image URL

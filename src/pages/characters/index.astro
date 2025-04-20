@@ -670,8 +670,15 @@ const charactersSchema = {
                       return ''; // Skip invalid characters
                   }
                   
-                  // Try to use local cached image first, then wikiImage, then imageUrl, then fallback to generic
-                  const imageUrl = c.wikiImage || c.imageUrl || '/images/generic-character.jpg';
+                  // Use local cached image if available, otherwise fallback to generic
+                  let imageUrl = '/images/generic-character.jpg';
+                  
+                  // If we have a UID, try to use the local cached image
+                  if (c.uid) {
+                    // Format: /images/character-cache/[name-slug]-[uid].jpg
+                    const nameSlug = c.name ? (typeof slugify !== 'undefined' ? slugify(c.name) : 'unknown') : 'unknown';
+                    imageUrl = `/images/character-cache/${nameSlug}-${c.uid}.jpg`;
+                  }
                   
                   // Create a slug that includes both the character name and UID
                   // Debug logging for slugify and character fields
