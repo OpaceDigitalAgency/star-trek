@@ -415,11 +415,28 @@ const charactersSchema = {
 
       isLoading = true;
       container.style.opacity = '0.5'; // Indicate loading
+      
+      // Show loading message
+      container.innerHTML = '<p class="text-center text-white col-span-full">Loading page ' + pageNumber + '...</p>';
+      
+      // Disable pagination buttons during loading
+      prevBtn.disabled = true;
+      nextBtn.disabled = true;
 
       try {
+        console.log(`Fetching page ${pageNumber} (index ${pageIndex}) with filters:`, currentFilters);
+        
         // Fetch using current filters
         const data = await stapiClient.getCharacters(pageIndex, PAGE_SIZE, currentFilters);
+        
+        if (!data || !Array.isArray(data.characters)) {
+          console.error(`Invalid data returned for page ${pageNumber}:`, data);
+          throw new Error('Invalid data returned from API');
+        }
+        
         allCharacters = data.characters || [];
+        console.log(`Received ${allCharacters.length} characters for page ${pageNumber}`);
+        
         // Update totals if provided
         if (data.page?.totalPages && data.page.totalPages !== totalPages) {
           totalPages = data.page.totalPages;
@@ -427,13 +444,16 @@ const charactersSchema = {
         if (data.page?.totalElements && data.page.totalElements !== totalCharacters) {
           totalCharacters = data.page.totalElements;
         }
+        
+        return data; // Return the data for the caller to use
       } catch (error) {
         console.error(`Failed to fetch page ${pageIndex} with filters:`, error);
-        // Handle error display if needed
+        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading characters. Please try again.</p>';
+        throw error; // Re-throw to let the caller handle it
       } finally {
         isLoading = false;
         container.style.opacity = '1';
-        render(); // Re-render with potentially new data or updated totals
+        // Don't call render() here - let the caller decide when to render
       }
     }
 
@@ -508,7 +528,14 @@ const charactersSchema = {
                   }
                   
                   // Try to use local cached image first, then wikiImage, then fallback to generic
-                  const imageUrl = c.wikiImage || '/images/generic-character.jpg';
+                  // Make sure to handle both relative and absolute URLs
+                  let imageUrl = c.wikiImage || '/images/generic-character.jpg';
+                  
+                  // If the image URL is a relative path starting with /images/character-cache/,
+                  // it's a cached image, so use it directly
+                  if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
+                    // The URL is already correct, no need to modify it
+                  }
                   
                   // Create a slug that includes both the character name and UID
                   // Debug logging for slugify and character fields
@@ -575,26 +602,48 @@ const charactersSchema = {
 
     prevBtn.addEventListener('click', async () => {
       if (currentPage > 1 && !isLoading) {
-        const prevPageNum = currentPage - 1;
-        // Fetch the previous page data before decrementing currentPage
-        await fetchPageIfNeeded(prevPageNum);
-        // Only decrement if fetch didn't fail
-        currentPage--;
-        render();
+        try {
+          isLoading = true;
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          
+          const prevPageNum = currentPage - 1;
+          // Fetch the previous page data before decrementing currentPage
+          await fetchPageIfNeeded(prevPageNum);
+          // Only decrement if fetch didn't fail
+          currentPage = prevPageNum;
+          render();
+        } catch (error) {
+          console.error("Error navigating to previous page:", error);
+        } finally {
+          isLoading = false;
+          // render() will update button states
+        }
       }
     });
 
     nextBtn.addEventListener('click', async () => {
-       if (currentPage < totalPages && !isLoading) {
-           const nextPageNum = currentPage + 1;
-           // Fetch if needed *before* incrementing currentPage visually
-           await fetchPageIfNeeded(nextPageNum);
-           // Only increment if fetch didn't fail catastrophically and page exists
-           if (currentPage < totalPages) { // Check totalPages again in case fetch failed
-               currentPage++;
-               render(); // Render the new page slice
-           }
-       }
+      if (currentPage < totalPages && !isLoading) {
+        try {
+          isLoading = true;
+          prevBtn.disabled = true;
+          nextBtn.disabled = true;
+          
+          const nextPageNum = currentPage + 1;
+          // Fetch if needed *before* incrementing currentPage visually
+          await fetchPageIfNeeded(nextPageNum);
+          // Only increment if fetch didn't fail catastrophically and page exists
+          if (currentPage < totalPages) { // Check totalPages again in case fetch failed
+            currentPage = nextPageNum;
+            render(); // Render the new page slice
+          }
+        } catch (error) {
+          console.error("Error navigating to next page:", error);
+        } finally {
+          isLoading = false;
+          // render() will update button states
+        }
+      }
     });
 
     // Initial Render on Load

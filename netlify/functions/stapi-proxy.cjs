@@ -29,10 +29,21 @@ exports.handler = async (event) => {
         // Use local JSON for global search/filter
         const fs = require('fs');
         const path = require('path');
-        const filePath = path.join(__dirname, 'characters.json');
+        // Try to load characters-local.json first (which has cached image paths)
+        // Fall back to characters.json if characters-local.json is not available
         let allChars = [];
         try {
-            allChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            // First try to load from src/data/characters-local.json
+            const localFilePath = path.join(process.cwd(), 'src', 'data', 'characters-local.json');
+            if (fs.existsSync(localFilePath)) {
+                console.log('Loading characters from characters-local.json');
+                allChars = JSON.parse(fs.readFileSync(localFilePath, 'utf-8'));
+            } else {
+                // Fall back to netlify/functions/characters.json
+                const filePath = path.join(__dirname, 'characters.json');
+                console.log('Loading characters from characters.json');
+                allChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            }
         } catch (err) {
             console.error('Failed to load local characters.json:', err);
             return {

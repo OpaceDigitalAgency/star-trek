@@ -63,7 +63,25 @@ async function updateAllSeriesData() {
     process.exit(1);
   }
   
-  // Step 4: Build the series characters cache
+  // Step 4: Cache the character images
+  const characterImagesScript = path.join(__dirname, 'cache-character-images.mjs');
+  const characterImagesSuccess = await runScript(characterImagesScript);
+  
+  if (!characterImagesSuccess) {
+    console.error('Failed to cache character images.');
+    process.exit(1);
+  }
+  
+  // Step 5: Update Netlify functions characters.json with characters-local.json data
+  const updateNetlifyCharactersScript = path.join(__dirname, 'update-netlify-characters.mjs');
+  const updateNetlifyCharactersSuccess = await runScript(updateNetlifyCharactersScript);
+  
+  if (!updateNetlifyCharactersSuccess) {
+    console.error('Failed to update Netlify functions characters.json.');
+    process.exit(1);
+  }
+  
+  // Step 6: Build the series characters cache
   const seriesCharactersScript = path.join(__dirname, 'build-series-characters.mjs');
   const seriesCharactersSuccess = await runScript(seriesCharactersScript);
   

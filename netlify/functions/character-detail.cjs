@@ -1,6 +1,28 @@
-const data = require('../../src/data/characters.json');
+const fs = require('fs');
+const path = require('path');
 const { slugify } = require('../../src/utils/slugify.cjs');
 // We'll use dynamic import for node-fetch since it's an ES module
+
+// Try to load characters-local.json first (which has cached image paths)
+// Fall back to characters.json if characters-local.json is not available
+let data = [];
+try {
+  // First try to load from src/data/characters-local.json
+  const localFilePath = path.join(process.cwd(), 'src', 'data', 'characters-local.json');
+  if (fs.existsSync(localFilePath)) {
+    console.log('Loading characters from characters-local.json');
+    data = JSON.parse(fs.readFileSync(localFilePath, 'utf-8'));
+  } else {
+    // Fall back to src/data/characters.json
+    const filePath = path.join(process.cwd(), 'src', 'data', 'characters.json');
+    console.log('Loading characters from characters.json');
+    data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  }
+} catch (err) {
+  console.error('Failed to load character data:', err);
+  // Fall back to require if fs methods fail
+  data = require('../../src/data/characters.json');
+}
 
 exports.handler = async function(event, context) {
   const slug = event.path.replace(/^\/characters\/|\/$/g, '');

@@ -13,7 +13,8 @@
     "update-json": "node scripts/update-characters-json.mjs",
     "prepare-images": "npm run cache-images && npm run update-json",
     "update-series-data": "node scripts/update-all-series-data.mjs",
-    "prepare-deploy": "node scripts/prepare-deployment.mjs",
+    "update-netlify-characters": "node scripts/update-netlify-characters.mjs",
+    "prepare-deploy": "node scripts/prepare-deployment.mjs && npm run update-netlify-characters",
     "deploy": "npm run prepare-deploy && netlify deploy"
   },
   "dependencies": {

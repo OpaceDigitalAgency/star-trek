@@ -198,6 +198,7 @@ const characterSchema = {
               <img
                 src={character.wikiImage || character.image || "/images/generic-character.jpg"}
                 alt={character.name}
+                onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
                 class="w-full h-full object-cover"
                 onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
               />
