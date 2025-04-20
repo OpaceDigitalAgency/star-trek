@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Star Trek Timelines System Architecture Diagrams</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #004C99;
+        }
+        .diagram-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .diagram-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #0099ff;
+        }
+        .diagram {
+            width: 100%;
+            overflow-x: auto;
+        }
+        .diagram img {
+            max-width: 100%;
+        }
+        .description {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(0, 153, 255, 0.05);
+            border-left: 4px solid #0099ff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Star Trek Timelines System Architecture Diagrams</h1>
+    <p>This page contains the key diagrams that illustrate the system architecture of the Star Trek Timelines application.</p>
+
+    <div class="diagram-container">
+        <div class="diagram-title">1. System Architecture Overview</div>
+        <div class="diagram">
+            <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+                <!-- User Browser -->
+                <rect x="350" y="50" width="100" height="50" rx="5" fill="#f8f9fa" stroke="#333" />
+                <text x="400" y="80" text-anchor="middle">User Browser</text>
+                
+                <!-- Frontend -->
+                <rect x="350" y="150" width="100" height="50" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="400" y="180" text-anchor="middle">Frontend</text>
+                <line x1="400" y1="100" x2="400" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Pages -->
+                <rect x="150" y="250" width="120" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="210" y="275" text-anchor="middle">Character List</text>
+                
+                <rect x="300" y="250" width="120" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="360" y="275" text-anchor="middle">Character Detail</text>
+                
+                <rect x="450" y="250" width="120" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="510" y="275" text-anchor="middle">Series List</text>
+                
+                <rect x="600" y="250" width="120" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="660" y="275" text-anchor="middle">Series Detail</text>
+                
+                <line x1="400" y1="200" x2="210" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="400" y1="200" x2="360" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="400" y1="200" x2="510" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="400" y1="200" x2="660" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Netlify Functions -->
+                <rect x="150" y="350" width="120" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="210" y="375" text-anchor="middle">stapi-proxy.cjs</text>
+                
+                <rect x="300" y="350" width="120" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="360" y="375" text-anchor="middle">character-detail.cjs</text>
+                
+                <rect x="450" y="350" width="120" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="510" y="375" text-anchor="middle">character-enrich.cjs</text>
+                
+                <rect x="600" y="350" width="120" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="660" y="375" text-anchor="middle">proxy-image.js</text>
+                
+                <line x1="210" y1="290" x2="210" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="360" y1="290" x2="360" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="360" y1="390" x2="450" y2="390" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- External APIs -->
+                <rect x="150" y="450" width="120" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="210" y="475" text-anchor="middle">STAPI API</text>
+                
+                <rect x="450" y="450" width="120" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="510" y="475" text-anchor="middle">Memory Alpha</text>
+                
+                <line x1="210" y1="390" x2="210" y2="450" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="510" y1="390" x2="510" y2="450" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="660" y1="390" x2="510" y2="450" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Local Cache -->
+                <rect x="300" y="450" width="120" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="360" y="475" text-anchor="middle">Local Cache</text>
+                
+                <line x1="360" y1="390" x2="360" y2="450" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Build Time Processing -->
+                <rect x="100" y="520" width="600" height="60" rx="5" fill="#f8d7da" stroke="#dc3545" />
+                <text x="400" y="550" text-anchor="middle">Build Time Processing</text>
+                <text x="400" y="570" font-size="12" text-anchor="middle">First 48 characters processed at build time</text>
+                
+                <!-- Arrow definitions -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+        <div class="description">
+            <p>This diagram shows the overall system architecture of the Star Trek Timelines application. The components highlighted in yellow (Netlify Functions) have been sources of recurring issues, particularly with module compatibility and routing.</p>
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <div class="diagram-title">2. Data Flow Diagram</div>
+        <div class="diagram">
+            <svg width="800" height="500" xmlns="http://www.w3.org/2000/svg">
+                <!-- Participants -->
+                <rect x="50" y="50" width="100" height="40" rx="5" fill="#f8f9fa" stroke="#333" />
+                <text x="100" y="75" text-anchor="middle">User Browser</text>
+                
+                <rect x="200" y="50" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="250" y="75" text-anchor="middle">Frontend</text>
+                
+                <rect x="350" y="50" width="100" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="400" y="75" text-anchor="middle">Netlify Functions</text>
+                
+                <rect x="500" y="50" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="550" y="75" text-anchor="middle">Local Cache</text>
+                
+                <rect x="650" y="50" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="700" y="75" text-anchor="middle">STAPI API</text>
+                
+                <!-- Lifelines -->
+                <line x1="100" y1="90" x2="100" y2="450" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                <line x1="250" y1="90" x2="250" y2="450" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                <line x1="400" y1="90" x2="400" y2="450" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                <line x1="550" y1="90" x2="550" y2="450" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                <line x1="700" y1="90" x2="700" y2="450" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                
+                <!-- Sequence -->
+                <line x1="100" y1="120" x2="250" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="175" y="115" text-anchor="middle" font-size="12">Request character list</text>
+                
+                <line x1="250" y1="150" x2="400" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="325" y="145" text-anchor="middle" font-size="12">Request character data</text>
+                
+                <!-- Alt box -->
+                <rect x="50" y="170" width="700" height="150" rx="5" fill="none" stroke="#333" stroke-dasharray="5,5" />
+                <text x="70" y="190" font-size="12">Alt: Data in cache?</text>
+                <line x1="50" y1="200" x2="750" y2="200" stroke="#333" stroke-width="1" stroke-dasharray="5,5" />
+                
+                <!-- If in cache -->
+                <line x1="400" y1="220" x2="550" y2="220" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="475" y="215" text-anchor="middle" font-size="12">Check cache</text>
+                
+                <line x1="550" y1="250" x2="400" y2="250" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+                <text x="475" y="245" text-anchor="middle" font-size="12">Return cached data</text>
+                
+                <!-- If not in cache -->
+                <text x="70" y="280" font-size="12">Else:</text>
+                
+                <line x1="400" y1="300" x2="700" y2="300" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="550" y="295" text-anchor="middle" font-size="12">Fetch character data</text>
+                
+                <line x1="700" y1="330" x2="400" y2="330" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+                <text x="550" y="325" text-anchor="middle" font-size="12">Return character data</text>
+                
+                <!-- End alt box -->
+                
+                <line x1="400" y1="370" x2="250" y2="370" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+                <text x="325" y="365" text-anchor="middle" font-size="12">Return enriched data</text>
+                
+                <line x1="250" y1="400" x2="100" y2="400" stroke="#333" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead)" />
+                <text x="175" y="395" text-anchor="middle" font-size="12">Display character list</text>
+                
+                <!-- Arrow definitions -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+        <div class="description">
+            <p>This diagram illustrates the data flow between components when a user requests character data. The system first checks the local cache before making external API requests, which helps reduce dependency on external services and improves performance.</p>
+            <p>⚠️ <strong>Recurring Issue:</strong> We've had issues with pagination logic, where the client-side code incorrectly assumed all characters were loaded at once.</p>
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <div class="diagram-title">3. Image Caching System</div>
+        <div class="diagram">
+            <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+                <!-- Build Time -->
+                <rect x="50" y="50" width="700" height="250" rx="5" fill="#f8f9fa" stroke="#333" />
+                <text x="100" y="80" font-size="16" font-weight="bold">Build Time</text>
+                
+                <rect x="100" y="100" width="150" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="175" y="125" text-anchor="middle">build-characters-cache.mjs</text>
+                
+                <rect x="100" y="180" width="150" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="175" y="205" text-anchor="middle">Fetch Character Data</text>
+                
+                <rect x="300" y="180" width="150" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="375" y="205" text-anchor="middle">Enrich with Memory Alpha</text>
+                
+                <rect x="500" y="180" width="150" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="575" y="205" text-anchor="middle">cache-character-images.mjs</text>
+                
+                <rect x="100" y="240" width="150" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="175" y="265" text-anchor="middle">Store in character-cache/</text>
+                
+                <rect x="300" y="240" width="150" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="375" y="265" text-anchor="middle">update-characters-json.mjs</text>
+                
+                <rect x="500" y="240" width="150" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="575" y="265" text-anchor="middle">Update characters.json</text>
+                
+                <line x1="175" y1="140" x2="175" y2="180" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="250" y1="200" x2="300" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="450" y1="200" x2="500" y2="200" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="575" y1="220" x2="575" y2="240" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="175" y1="220" x2="175" y2="240" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="250" y1="260" x2="300" y2="260" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="450" y1="260" x2="500" y2="260" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Runtime -->
+                <rect x="50" y="330" width="700" height="250" rx="5" fill="#f8f9fa" stroke="#333" />
+                <text x="100" y="360" font-size="16" font-weight="bold">Runtime</text>
+                
+                <rect x="100" y="380" width="150" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="175" y="405" text-anchor="middle">ProgressiveImage Component</text>
+                
+                <rect x="350" y="380" width="150" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="425" y="405" text-anchor="middle">Image in Cache?</text>
+                
+                <rect x="200" y="460" width="150" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="275" y="485" text-anchor="middle">Serve from Local Cache</text>
+                
+                <rect x="500" y="460" width="150" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="575" y="485" text-anchor="middle">proxy-image.js Function</text>
+                
+                <rect x="500" y="520" width="150" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="575" y="545" text-anchor="middle">Fetch from Memory Alpha</text>
+                
+                <line x1="250" y1="400" x2="350" y2="400" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="425" y1="420" x2="275" y2="460" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="320" y="440" text-anchor="middle" font-size="12">Yes</text>
+                <line x1="425" y1="420" x2="575" y2="460" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="530" y="440" text-anchor="middle" font-size="12">No</text>
+                <line x1="575" y1="500" x2="575" y2="520" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Arrow definitions -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+        <div class="description">
+            <p>This diagram shows how images are cached and served in the system. At build time, important character images are downloaded from Memory Alpha and stored locally. At runtime, the ProgressiveImage component first checks the local cache before requesting images from Memory Alpha via the proxy-image.js function.</p>
+            <p>⚠️ <strong>Development Challenge:</strong> Production builds initially showed blank character images because they couldn't access the enriched characters.json with wikiImage fields.</p>
+        </div>
+    </div>
+
+    <div class="diagram-container">
+        <div class="diagram-title">4. Build vs. Runtime Processing</div>
+        <div class="diagram">
+            <svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+                <!-- Build Time Processing -->
+                <rect x="50" y="50" width="700" height="150" rx="5" fill="#f8f9fa" stroke="#333" />
+                <text x="100" y="80" font-size="16" font-weight="bold">Build Time Processing</text>
+                
+                <rect x="100" y="100" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="150" y="125" text-anchor="middle">Build Start</text>
+                
+                <rect x="250" y="100" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="300" y="125" text-anchor="middle">Fetch Important Characters</text>
+                
+                <rect x="400" y="100" width="100" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="450" y="125" text-anchor="middle">Enrich with Memory Alpha</text>
+                
+                <rect x="550" y="100" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="600" y="125" text-anchor="middle">Cache Images Locally</text>
+                
+                <rect x="250" y="150" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="300" y="175" text-anchor="middle">Update characters.json</text>
+                
+                <rect x="400" y="150" width="100" height="40" rx="5" fill="#ffecb3" stroke="#e6b800" />
+                <text x="450" y="175" text-anchor="middle">Deploy to Netlify</text>
+                
+                <line x1="200" y1="120" x2="250" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="350" y1="120" x2="400" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="500" y1="120" x2="550" y2="120" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="600" y1="140" x2="350" y2="150" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="350" y1="150" x2="400" y2="170" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Runtime Processing -->
+                <rect x="50" y="230" width="700" height="150" rx="5" fill="#f8f9fa" stroke="#333" />
+                <text x="100" y="260" font-size="16" font-weight="bold">Runtime Processing</text>
+                
+                <rect x="100" y="280" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="150" y="305" text-anchor="middle">User Requests Character</text>
+                
+                <rect x="250" y="280" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="300" y="305" text-anchor="middle">In Cache?</text>
+                
+                <rect x="400" y="230" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="450" y="255" text-anchor="middle">Serve from Cache</text>
+                
+                <rect x="400" y="330" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="450" y="355" text-anchor="middle">Fetch from STAPI</text>
+                
+                <rect x="550" y="330" width="100" height="40" rx="5" fill="#e6f7ff" stroke="#0099ff" />
+                <text x="600" y="355" text-anchor="middle">Enrich with Memory Alpha</text>
+                
+                <rect x="650" y="280" width="100" height="40" rx="5" fill="#d1e7dd" stroke="#198754" />
+                <text x="700" y="305" text-anchor="middle">Serve to User</text>
+                
+                <line x1="200" y1="300" x2="250" y2="300" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="350" y1="280" x2="400" y2="250" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="370" y="260" text-anchor="middle" font-size="12">Yes</text>
+                <line x1="350" y1="320" x2="400" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <text x="370" y="340" text-anchor="middle" font-size="12">No</text>
+                <line x1="500" y1="350" x2="550" y2="350" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="500" y1="250" x2="700" y2="280" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                <line x1="650" y1="350" x2="700" y2="320" stroke="#333" stroke-width="2" marker-end="url(#arrowhead)" />
+                
+                <!-- Arrow definitions -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+                    </marker>
+                </defs>
+            </svg>
+        </div>
+        <div class="description">
+            <p>This diagram contrasts what happens during build time versus runtime processing. At build time, only the first 48 important characters are processed and cached. At runtime, when a user requests a character, the system first checks if it's in the cache. If not, it fetches the data from STAPI, enriches it with Memory Alpha information, and serves it to the user.</p>
+            <p>🔄 <strong>Recurring Issue:</strong> Netlify build times were a major challenge. Processing all 7,600+ characters at build time caused builds to take 15+ minutes or time out completely.</p>
+        </div>
+    </div>
+
+    <a href="system-architecture.html" style="display: block; margin-top: 30px; text-align: center; padding: 10px; background-color: #0099ff; color: white; text-decoration: none; border-radius: 5px;">Back to Full Documentation</a>
+</body>
+</html>

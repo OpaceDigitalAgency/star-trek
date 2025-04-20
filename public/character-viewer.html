@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Trek Character Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --starfleet-blue: #0099ff;
+      --starfleet-blue-dark: #004C99;
+      --starfleet-red: #ff3d3d;
+      --starfleet-gold: #ffcc00;
+      --klingon-red: #9A1515;
+      --space-black: #030a17;
+      --space-deep: #010a1f;
+      --console-green: #39FF88;
+      --console-blue: #00B2FF;
+      --neon-blue: #00f6ff;
+      --holodeck-grid: rgba(0, 178, 255, 0.2);
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      font-family: 'Space Grotesk', 'Helvetica Neue', sans-serif;
+      background: radial-gradient(circle at 50% 50%, var(--space-black), var(--space-deep));
+      color: white;
+      overflow-x: hidden;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: baseline;
+    }
+    
+    .logo-trek {
+      color: var(--starfleet-gold);
+      font-weight: bold;
+      font-size: 1.5rem;
+      margin-right: 0.5rem;
+    }
+    
+    .logo-timelines {
+      color: white;
+      font-size: 1.2rem;
+    }
+    
+    .search-container {
+      margin-bottom: 2rem;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--starfleet-blue);
+      border-radius: 4px;
+      color: white;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    
+    .character-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      background-color: rgba(3, 10, 23, 0.7);
+      border: 1px solid var(--console-blue);
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 0 15px rgba(0, 178, 255, 0.3);
+    }
+    
+    .character-image {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .character-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+    
+    .character-details h1 {
+      color: var(--starfleet-gold);
+      margin-top: 0;
+      border-bottom: 1px solid var(--starfleet-blue);
+      padding-bottom: 0.5rem;
+    }
+    
+    .detail-item {
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      border-left: 3px solid var(--starfleet-blue);
+      background: rgba(0, 153, 255, 0.1);
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .detail-item h3 {
+      margin: 0 0 0.25rem 0;
+      color: var(--starfleet-gold);
+    }
+    
+    .detail-item p {
+      margin: 0;
+      color: #ccc;
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      background-color: var(--starfleet-blue);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      text-decoration: none;
+      margin-top: 1rem;
+      transition: background-color 0.3s;
+    }
+    
+    .back-button:hover {
+      background-color: var(--starfleet-blue-dark);
+    }
+    
+    .back-button svg {
+      margin-right: 0.5rem;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--console-blue);
+    }
+    
+    .error {
+      text-align: center;
+      padding: 2rem;
+      color: var(--starfleet-red);
+    }
+    
+    .wiki-link {
+      display: inline-flex;
+      align-items: center;
+      color: var(--starfleet-gold);
+      text-decoration: none;
+      margin-top: 1rem;
+    }
+    
+    .wiki-link:hover {
+      text-decoration: underline;
+    }
+    
+    .wiki-link svg {
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <span class="logo-trek">STAR TREK</span>
+        <span class="logo-timelines">TIMELINES</span>
+      </div>
+    </div>
+    
+    <div class="search-container">
+      <input 
+        type="text" 
+        id="character-id" 
+        class="search-input" 
+        placeholder="Enter character ID (e.g., CHMA0000215045) or full slug (e.g., 0413-theta-CHMA0000215045)"
+      >
+      <button id="load-button" class="back-button" style="margin-top: 1rem;">Load Character</button>
+    </div>
+    
+    <div id="character-display">
+      <div class="loading">Enter a character ID above and click "Load Character"</div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const characterIdInput = document.getElementById('character-id');
+      const loadButton = document.getElementById('load-button');
+      const characterDisplay = document.getElementById('character-display');
+      
+      // Pre-fill with the example character if provided in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const prefilledId = urlParams.get('id');
+      if (prefilledId) {
+        characterIdInput.value = prefilledId;
+        loadCharacter(prefilledId);
+      }
+      
+      loadButton.addEventListener('click', () => {
+        const characterId = characterIdInput.value.trim();
+        if (characterId) {
+          loadCharacter(characterId);
+        }
+      });
+      
+      characterIdInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const characterId = characterIdInput.value.trim();
+          if (characterId) {
+            loadCharacter(characterId);
+          }
+        }
+      });
+      
+      async function loadCharacter(idOrSlug) {
+        try {
+          characterDisplay.innerHTML = '<div class="loading">Loading character data...</div>';
+          
+          // Load the characters JSON file
+          const response = await fetch('/src/data/characters.json');
+          if (!response.ok) {
+            throw new Error('Failed to load characters data');
+          }
+          
+          const characters = await response.json();
+          
+          // Try to find the character by different methods
+          let character = null;
+          
+          // 1. Try direct UID match
+          character = characters.find(c => c.uid === idOrSlug);
+          
+          // 2. If not found, try to extract UID from slug format
+          if (!character && idOrSlug.includes('-')) {
+            const uidMatch = idOrSlug.match(/(CHMA\d+)$/);
+            if (uidMatch) {
+              const uid = uidMatch[1];
+              character = characters.find(c => c.uid === uid);
+            }
+          }
+          
+          // 3. If still not found, try to match by name
+          if (!character) {
+            const nameSlug = idOrSlug.replace(/-CHMA\d+$/, '');
+            character = characters.find(c => {
+              const simplifiedName = c.name.toLowerCase().replace(/[^\w\s]/g, '');
+              return simplifiedName.includes(nameSlug.toLowerCase());
+            });
+          }
+          
+          if (character) {
+            renderCharacter(character);
+          } else {
+            characterDisplay.innerHTML = `
+              <div class="error">
+                <h2>Character Not Found</h2>
+                <p>No character found with ID or slug: ${idOrSlug}</p>
+              </div>
+            `;
+          }
+        } catch (error) {
+          console.error('Error loading character:', error);
+          characterDisplay.innerHTML = `
+            <div class="error">
+              <h2>Error Loading Character</h2>
+              <p>${error.message}</p>
+            </div>
+          `;
+        }
+      }
+      
+      function renderCharacter(character) {
+        const imageUrl = character.wikiImage || '/images/generic-character.jpg';
+        
+        let speciesHtml = '';
+        if (character.characterSpecies && character.characterSpecies.length > 0) {
+          speciesHtml = `
+            <div class="detail-item">
+              <h3>Species</h3>
+              <p>${character.characterSpecies.map(s => s.name).join(', ')}</p>
+            </div>
+          `;
+        } else if (character.species && character.species.length > 0) {
+          speciesHtml = `
+            <div class="detail-item">
+              <h3>Species</h3>
+              <p>${character.species.map(s => s.name).join(', ')}</p>
+            </div>
+          `;
+        }
+        
+        let genderHtml = '';
+        if (character.gender) {
+          genderHtml = `
+            <div class="detail-item">
+              <h3>Gender</h3>
+              <p>${character.gender}</p>
+            </div>
+          `;
+        }
+        
+        let birthHtml = '';
+        if (character.yearOfBirth) {
+          birthHtml = `
+            <div class="detail-item">
+              <h3>Year of Birth</h3>
+              <p>${character.yearOfBirth}</p>
+            </div>
+          `;
+        }
+        
+        let deathHtml = '';
+        if (character.yearOfDeath) {
+          deathHtml = `
+            <div class="detail-item">
+              <h3>Year of Death</h3>
+              <p>${character.yearOfDeath}</p>
+            </div>
+          `;
+        }
+        
+        let titleHtml = '';
+        if (character.title) {
+          titleHtml = `
+            <div class="detail-item">
+              <h3>Rank/Title</h3>
+              <p>${character.title}</p>
+            </div>
+          `;
+        }
+        
+        let wikiLinkHtml = '';
+        if (character.wikiUrl) {
+          wikiLinkHtml = `
+            <a href="${character.wikiUrl}" target="_blank" class="wiki-link">
+              View on Memory Alpha
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"></path>
+                <path d="M15 3h6v6"></path>
+                <path d="M10 14L21 3"></path>
+              </svg>
+            </a>
+          `;
+        }
+        
+        characterDisplay.innerHTML = `
+          <div class="character-container">
+            <div>
+              <div class="character-image">
+                <img
+                  src="${imageUrl}"
+                  alt="${character.name}"
+                  onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
+                />
+              </div>
+              ${wikiLinkHtml}
+            </div>
+            
+            <div class="character-details">
+              <h1>${character.name}</h1>
+              
+              <div class="details-grid">
+                ${genderHtml}
+                ${speciesHtml}
+                ${titleHtml}
+                ${birthHtml}
+                ${deathHtml}
+              </div>
+              
+              <a href="/characters/" class="back-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+                Back to Characters
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    });
+  </script>
+</body>
+</html>

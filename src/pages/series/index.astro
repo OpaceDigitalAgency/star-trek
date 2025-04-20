@@ -4,6 +4,94 @@ import { stapiService, extractYears, extractStardateYears } from '../../services
 import ProgressiveImage from '../../components/ProgressiveImage.js';
 import { slugify } from '../../utils/slugify.js';
 
+// Make sure the ProgressiveImage component is available in the client
+const progressiveImageScript = `
+  // Use a regular script approach instead of import
+  if (!customElements.get('progressive-image')) {
+    class ProgressiveImage extends HTMLElement {
+      constructor() {
+        super();
+        this._src = '';
+        this._fallback = '';
+        this._alt = '';
+        this._loading = true;
+        this._error = false;
+      }
+      
+      static get observedAttributes() {
+        return ['src', 'fallback', 'alt'];
+      }
+      
+      attributeChangedCallback(name, oldValue, newValue) {
+        if (oldValue !== newValue) {
+          this['_' + name] = newValue;
+          if (name === 'src') {
+            this.loadImage();
+          }
+        }
+      }
+      
+      connectedCallback() {
+        this._src = this.getAttribute('src') || '';
+        this._fallback = this.getAttribute('fallback') || '/images/stars-placeholder.jpg';
+        this._alt = this.getAttribute('alt') || '';
+        this.loadImage();
+      }
+      
+      loadImage() {
+        this._loading = true;
+        this._error = false;
+        this.render();
+        
+        if (!this._src) {
+          this._error = true;
+          this._loading = false;
+          this.render();
+          return;
+        }
+        
+        const img = new Image();
+        img.src = this._src;
+        img.onload = () => {
+          this._loading = false;
+          this._error = false;
+          this.render();
+        };
+        img.onerror = () => {
+          console.warn(\`Failed to load image: \${this._src}, falling back to: \${this._fallback}\`);
+          this._loading = false;
+          this._error = true;
+          this.render();
+          
+          // Try to load the fallback image
+          if (this._fallback && this._fallback !== this._src) {
+            const fallbackImg = new Image();
+            fallbackImg.src = this._fallback;
+          }
+        };
+      }
+      
+      render() {
+        if (this._loading) {
+          this.innerHTML = \`
+            <div class="skeleton-loader w-full h-full bg-gray-800 animate-pulse rounded"></div>
+          \`;
+        } else if (this._error) {
+          this.innerHTML = \`
+            <img src="\${this._fallback}" alt="\${this._alt}" class="w-full h-full object-cover" />
+          \`;
+        } else {
+          this.innerHTML = \`
+            <img src="\${this._src}" alt="\${this._alt}" class="w-full h-full object-cover" />
+          \`;
+        }
+      }
+    }
+    
+    customElements.define('progressive-image', ProgressiveImage);
+  }
+`;
+
 // SEO metadata for pagination
 const currentPage = 1; // Initial page is always 1 for SSR
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
@@ -255,6 +343,8 @@ const seriesListSchema = {
   description="Explore all Star Trek series from The Original Series to Discovery, Picard and beyond. Get episode guides, character information, and timeline placement."
   schemaData={seriesListSchema}
 >
+  <script is:inline set:html={progressiveImageScript}></script>
+  
   <!-- TEMP: ARIA live region for dynamic updates -->
   <div id="aria-live-region" aria-live="polite" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
     Timeline updated.
@@ -444,13 +534,12 @@ const seriesListSchema = {
               <div class="card-body bg-space-black bg-opacity-90 p-0 border-x border-b border-starfleet-blue">
                 <div class="card-date-badge">{primaryDate}</div>
                 <div class="card-image-container">
-                  <img
+                  <progressive-image
                     src={imageUrl}
+                    fallback={`/images/placeholder-${abbr.toLowerCase()}.jpg`}
                     alt={series.title}
                     class="w-full h-full object-cover card-image"
-                    loading="lazy"
-                    onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
-                  />
+                  ></progressive-image>
                   <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-space-black to-transparent p-3">
                     <span class="text-console-green text-sm font-mono font-bold">{secondaryDate}</span>
                   </div>
@@ -691,13 +780,33 @@ const seriesListSchema = {
         const decade = yearText ? Math.floor(parseInt(yearText) / 10) * 10 : null;
         
         // Apply company filter
-        if (companyVal && companyVal !== 'all' && !company.includes(companyVal.toLowerCase())) {
-          shouldShow = false;
+        if (companyVal && companyVal !== 'all') {
+          // Get the company text from the card
+          const companyText = card.querySelector('.card-company')?.textContent?.toLowerCase() || '';
+          // Also check the description which might contain company info
+          const descText = card.querySelector('.card-description')?.textContent?.toLowerCase() || '';
+          
+          // Check if either contains the selected company
+          if (!companyText.includes(companyVal.toLowerCase()) &&
+              !descText.includes(companyVal.toLowerCase()) &&
+              !company.includes(companyVal.toLowerCase())) {
+            shouldShow = false;
+          }
         }
         
         // Apply network filter
-        if (networkVal && networkVal !== 'all' && !network.includes(networkVal.toLowerCase())) {
-          shouldShow = false;
+        if (networkVal && networkVal !== 'all') {
+          // Get the network text from the card
+          const networkText = card.querySelector('.card-network')?.textContent?.toLowerCase() || '';
+          // Also check the meta which might contain network info
+          const metaText = card.querySelector('.card-meta')?.textContent?.toLowerCase() || '';
+          
+          // Check if either contains the selected network
+          if (!networkText.includes(networkVal.toLowerCase()) &&
+              !metaText.includes(networkVal.toLowerCase()) &&
+              !network.includes(networkVal.toLowerCase())) {
+            shouldShow = false;
+          }
         }
         
         // Apply decade filter
@@ -751,13 +860,27 @@ const seriesListSchema = {
         
         if (!aCard || !bCard) return 0;
         
-        const aYear = viewMode === 'chronology'
-          ? parseInt(aCard.querySelector('.card-date-badge')?.textContent || '0')
-          : parseInt(aCard.querySelector('.card-meta')?.textContent?.match(/\d{4}/) || '0');
+        // Extract years for sorting
+        let aYear = 0;
+        let bYear = 0;
+        
+        if (viewMode === 'chronology') {
+          // For chronology view, use the date badge (in-universe year)
+          aYear = parseInt(aCard.querySelector('.card-date-badge')?.textContent || '0');
+          bYear = parseInt(bCard.querySelector('.card-date-badge')?.textContent || '0');
+        } else {
+          // For release view, try to extract the production start year
+          // First try from the meta text which contains production years
+          const aMatch = aCard.querySelector('.card-meta')?.textContent?.match(/(\d{4})/);
+          const bMatch = bCard.querySelector('.card-meta')?.textContent?.match(/(\d{4})/);
           
-        const bYear = viewMode === 'chronology'
-          ? parseInt(bCard.querySelector('.card-date-badge')?.textContent || '0')
-          : parseInt(bCard.querySelector('.card-meta')?.textContent?.match(/\d{4}/) || '0');
+          if (aMatch) aYear = parseInt(aMatch[1]);
+          if (bMatch) bYear = parseInt(bMatch[1]);
+          
+          // If not found, try from the date badge as fallback
+          if (!aYear) aYear = parseInt(aCard.querySelector('.card-date-badge')?.textContent || '0');
+          if (!bYear) bYear = parseInt(bCard.querySelector('.card-date-badge')?.textContent || '0');
+        }
           
         return aYear - bYear;
       });
