@@ -60,6 +60,12 @@
    - Made pagination search-aware
    - Debounced user input with 250ms delay
 
+5. Fix character images on series detail pages:
+   - Improved character matching logic in build-series-characters.mjs
+   - Enhanced fallback logic in series/[slug].astro
+   - Updated series characters cache with correct image paths
+   - Added character-specific and series-specific placeholder images
+
 ## Backlog
 - Implement Fuse.js for fuzzy, accent-insensitive search
 - Use astro:assets to generate optimized WebP placeholders
@@ -202,6 +208,20 @@
    - Added better error messages with troubleshooting suggestions
    - Improved caching headers for better performance
    - Added debugging information to help identify issues
+
+### Fix Character Images on Series Detail Pages (COMPLETED)
+1. ✅ Improve character matching logic in build-series-characters.mjs:
+  - Reordered matching strategies to prioritize exact name matches
+  - Made combined first/last name matching more strict
+  - Added similarity scoring for better matching
+  - Added a new strategy to check for character UIDs in image filenames
+2. ✅ Enhance fallback logic in series/[slug].astro:
+  - Updated to use character-specific placeholders when available
+  - Added series-specific placeholders as a secondary fallback
+  - Improved error handling for image loading
+3. ✅ Update series characters cache:
+  - Ran the update-all-series-data.mjs script to rebuild the series characters cache
+  - Verified that characters now have correct image paths in series-characters.json
 
 ### Fix Series Detail Pages 404 Error (COMPLETED)
 1. ✅ Fix missing redirects in dist/_redirects file:

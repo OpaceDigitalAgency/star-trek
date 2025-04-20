@@ -2,904 +2,1060 @@
   "star-trek-deep-space-nine": [
     {
       "name": "Benjamin Sisko",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Benjamin_A._Ziff",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F4a%2FSisko_toasts_promotion.jpg%2Frevision%2Flatest%3Fcb%3D20201230190550%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Benjamin_Sisko",
       "performer": "Avery Brooks",
       "description": null,
-      "matchedWith": "Benjamin A. Ziff"
+      "matchedWith": "Benjamin Sisko",
+      "isAnimated": false
     },
     {
       "name": "Kira Nerys",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Kira",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fc9%2FKira_Nerys%252C_2381.jpg%2Frevision%2Flatest%3Fcb%3D20220929222107%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Kira_Nerys",
       "performer": "Nana Visitor",
       "description": null,
-      "matchedWith": "Kira"
+      "matchedWith": "Kira Nerys",
+      "isAnimated": false
     },
     {
       "name": "Odo",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Clement_Theodore_Perthes",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Ff%2Ff0%2FOdo%252C_2375.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20230623121605%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Odo",
       "performer": "René Auberjonois",
       "description": null,
-      "matchedWith": "Clement Theodore Perthes"
+      "matchedWith": "Odo",
+      "isAnimated": false
     },
     {
       "name": "Jadzia Dax",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Audrid_Dax",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Ff%2Ff1%2FJadzia_Dax%252C_2369.jpg%2Frevision%2Flatest%3Fcb%3D20190827144145%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Jadzia_Dax",
       "performer": "Terry Farrell",
       "description": null,
-      "matchedWith": "Audrid Dax"
+      "matchedWith": "Jadzia Dax",
+      "isAnimated": false
     },
     {
       "name": "Julian Bashir",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Amsha_Bashir",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe2%2FJulian_Bashir%252C_2375.jpg%2Frevision%2Flatest%3Fcb%3D20120329211646%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Julian_Bashir",
       "performer": "Alexander Siddig",
       "description": null,
-      "matchedWith": "Amsha Bashir"
+      "matchedWith": "Julian Bashir",
+      "isAnimated": false
     },
     {
       "name": "Miles O'Brien",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Conan_O'Brien",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fde%2FMiles_O%2527Brien%252C_2375.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20170409165558%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Miles_O'Brien",
       "performer": "Colm Meaney",
       "description": null,
-      "matchedWith": "Conan O'Brien"
+      "matchedWith": "Miles O'Brien",
+      "isAnimated": false
     },
     {
       "name": "Quark",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F67%2FQuark%252C_2381.jpg%2Frevision%2Flatest%3Fcb%3D20220929222517%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Quark",
       "performer": "Armin Shimerman",
       "description": null,
-      "matchedWith": "Quark"
+      "matchedWith": "Quark",
+      "isAnimated": false
     },
     {
       "name": "Worf",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fdb%2FWorf%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20240408163139%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Worf",
       "performer": "Michael Dorn",
       "description": null,
-      "matchedWith": "Worf"
+      "matchedWith": "Worf",
+      "isAnimated": false
     },
     {
       "name": "Ezri Dax",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F1%2F13%2FEzri_Dax%252C_2375.jpg%2Frevision%2Flatest%3Fcb%3D20200609080506%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Ezri_Dax",
       "performer": "Nicole de Boer",
       "description": null,
-      "matchedWith": "Ezri Dax"
+      "matchedWith": "Ezri Dax",
+      "isAnimated": false
     },
     {
       "name": "Jake Sisko",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Jake_Kurland",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe1%2FJake_Sisko%252C_2375.jpg%2Frevision%2Flatest%3Fcb%3D20060808165356%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Jake_Sisko",
       "performer": "Cirroc Lofton",
       "description": null,
-      "matchedWith": "Jake Kurland"
+      "matchedWith": "Jake Sisko",
+      "isAnimated": false
     },
     {
       "name": "Rom",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/A'trom",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F1%2F1b%2FRom%252C_2381.png%2Frevision%2Flatest%3Fcb%3D20231006031410%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Rom",
       "performer": "Max Grodénchik",
       "description": null,
-      "matchedWith": "A'trom"
+      "matchedWith": "Rom",
+      "isAnimated": false
     },
     {
       "name": "Nog",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F7b%2FNog%252C_2369.jpg%2Frevision%2Flatest%3Fcb%3D20090823164304%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Nog",
       "performer": "Aron Eisenberg",
       "description": null,
-      "matchedWith": "Nog"
+      "matchedWith": "Nog",
+      "isAnimated": false
     },
     {
       "name": "Garak",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F00%2FElim_Garak%252C_2375.jpg%2Frevision%2Flatest%3Fcb%3D20120329230204%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Elim_Garak",
       "performer": "Andrew Robinson",
       "description": null,
-      "matchedWith": "Elim Garak"
+      "matchedWith": "Elim Garak",
+      "isAnimated": false
     },
     {
       "name": "Dukat",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F79%2FDukat%252C_2375.jpg%2Frevision%2Flatest%3Fcb%3D20120418042102%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Dukat",
       "performer": "Marc Alaimo",
       "description": null,
-      "matchedWith": "Dukat"
+      "matchedWith": "Dukat",
+      "isAnimated": false
     }
   ],
   "star-trek-discovery": [
     {
       "name": "Michael Burnham",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Carmichael",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F6e%2FMichael_Burnham%252C_33rd_century.png%2Frevision%2Flatest%3Fcb%3D20240530232959%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Michael_Burnham",
       "performer": "Sonequa Martin-Green",
       "description": null,
-      "matchedWith": "Carmichael"
+      "matchedWith": "Michael Burnham",
+      "isAnimated": false
     },
     {
       "name": "Saru",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F02%2FSaru%252C_3191.jpg%2Frevision%2Flatest%3Fcb%3D20240531013744%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Saru",
       "performer": "Doug Jones",
       "description": null,
-      "matchedWith": "Saru"
+      "matchedWith": "Saru",
+      "isAnimated": false
     },
     {
       "name": "Paul Stamets",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Big_Paulie",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F77%2FPaul_Stamets%252C_3190.png%2Frevision%2Flatest%3Fcb%3D20231112064346%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Paul_Stamets",
       "performer": "Anthony Rapp",
       "description": null,
-      "matchedWith": "Big Paulie"
+      "matchedWith": "Paul Stamets",
+      "isAnimated": false
     },
     {
       "name": "Sylvia Tilly",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Sylvia",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F5d%2FSylvia_Tilly%252C_3189.png%2Frevision%2Flatest%3Fcb%3D20210111162742%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Sylvia_Tilly",
       "performer": "Mary Wiseman",
       "description": null,
-      "matchedWith": "Sylvia"
+      "matchedWith": "Sylvia Tilly",
+      "isAnimated": false
     },
     {
       "name": "Cleveland Booker",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fd1%2FCleveland_Booker%252C_33rd_century.png%2Frevision%2Flatest%3Fcb%3D20240530081726%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Cleveland_Booker",
       "performer": "David Ajala",
       "description": null,
-      "matchedWith": "Cleveland Booker"
+      "matchedWith": "Cleveland Booker",
+      "isAnimated": false
     },
     {
       "name": "Christopher Pike",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Christopher",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F08%2FChristopher_Pike%252C_2267.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20110706235444%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Christopher_Pike",
       "performer": "Anson Mount",
       "description": null,
-      "matchedWith": "Christopher"
+      "matchedWith": "Christopher Pike",
+      "isAnimated": false
     },
     {
       "name": "Spock",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Benjamin_Spock",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fb%2Fb1%2FSpock%252C_2387.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20211211154448%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Spock",
       "performer": "Ethan Peck",
       "description": null,
-      "matchedWith": "Benjamin Spock"
+      "matchedWith": "Spock",
+      "isAnimated": false
     },
     {
       "name": "Philippa Georgiou",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fc9%2FPhilippa_Georgiou.jpg%2Frevision%2Flatest%3Fcb%3D20180119210733%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Philippa_Georgiou",
       "performer": "Michelle Yeoh",
       "description": null,
-      "matchedWith": "Philippa Georgiou"
+      "matchedWith": "Philippa Georgiou",
+      "isAnimated": false
     },
     {
       "name": "Hugh Culber",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Hugh",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F02%2FHugh_Culber%252C_3190.jpg%2Frevision%2Flatest%3Fcb%3D20211127004850%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Hugh_Culber",
       "performer": "Wilson Cruz",
       "description": null,
-      "matchedWith": "Hugh"
+      "matchedWith": "Hugh Culber",
+      "isAnimated": false
     },
     {
       "name": "Jett Reno",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/B._Moreno",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Ff%2Ffd%2FJett_Reno%252C_3191.png%2Frevision%2Flatest%3Fcb%3D20240411081543%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Jett_Reno",
       "performer": "Tig Notaro",
       "description": null,
-      "matchedWith": "B. Moreno"
+      "matchedWith": "Jett Reno",
+      "isAnimated": false
     },
     {
       "name": "Adira Tal",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fa%2Fa4%2FAdira%252C_3190.jpg%2Frevision%2Flatest%3Fcb%3D20211203010911%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Adira_Tal",
       "performer": "Blu del Barrio",
       "description": null,
-      "matchedWith": "Adira Tal"
+      "matchedWith": "Adira Tal",
+      "isAnimated": false
     },
     {
       "name": "Gray Tal",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Ahni_Jetal",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F8%2F8e%2FGray_Tal.jpg%2Frevision%2Flatest%3Fcb%3D20210111032614%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Gray_Tal",
       "performer": "Ian Alexander",
       "description": null,
-      "matchedWith": "Ahni Jetal"
+      "matchedWith": "Gray Tal",
+      "isAnimated": false
     }
   ],
   "star-trek-enterprise": [
     {
       "name": "Jonathan Archer",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Henry_Archer",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F94%2FJonathan_Archer%252C_2161.jpg%2Frevision%2Flatest%3Fcb%3D20220111141851%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Jonathan_Archer",
       "performer": "Scott Bakula",
       "description": null,
-      "matchedWith": "Henry Archer"
+      "matchedWith": "Jonathan Archer",
+      "isAnimated": false
     },
     {
       "name": "T'Pol",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe9%2FT%2527Pol%252C_2161.jpg%2Frevision%2Flatest%3Fcb%3D20060615162333%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/T'Pol",
       "performer": "Jolene Blalock",
       "description": null,
-      "matchedWith": "T'Pol"
+      "matchedWith": "T'Pol",
+      "isAnimated": false
     },
     {
       "name": "Charles Tucker III",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Charles",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F57%2FTrip_Tucker%252C_2161.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220511115131%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Charles_Tucker_III",
       "performer": "Connor Trinneer",
       "description": null,
-      "matchedWith": "Charles"
+      "matchedWith": "Charles Tucker III",
+      "isAnimated": false
     },
     {
       "name": "Malcolm Reed",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Andrew_Reeder",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F9e%2FMalcolm_Reed%252C_2161.jpg%2Frevision%2Flatest%3Fcb%3D20080914165259%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Malcolm_Reed",
       "performer": "Dominic Keating",
       "description": null,
-      "matchedWith": "Andrew Reeder"
+      "matchedWith": "Malcolm Reed",
+      "isAnimated": false
     },
     {
       "name": "Hoshi Sato",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F98%2FHoshi_Sato%252C_2161.jpg%2Frevision%2Flatest%3Fcb%3D20120416024504%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Hoshi_Sato",
       "performer": "Linda Park",
       "description": null,
-      "matchedWith": "Hoshi Sato"
+      "matchedWith": "Hoshi Sato",
+      "isAnimated": false
     },
     {
       "name": "Travis Mayweather",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Mayweather",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F0c%2FTravis_Mayweather%252C_2161.jpg%2Frevision%2Flatest%3Fcb%3D20120416024042%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Travis_Mayweather",
       "performer": "Anthony Montgomery",
       "description": null,
-      "matchedWith": "Mayweather"
+      "matchedWith": "Travis Mayweather",
+      "isAnimated": false
     },
     {
       "name": "Phlox",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Feezal_Phlox",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F70%2FPhlox%252C_2161.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220511120507%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Phlox",
       "performer": "John Billingsley",
       "description": null,
-      "matchedWith": "Feezal Phlox"
+      "matchedWith": "Phlox",
+      "isAnimated": false
     },
     {
       "name": "Shran",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F9c%2FShran%252C_2161.jpg%2Frevision%2Flatest%3Fcb%3D20190415145833%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Thy'lek_Shran",
       "performer": "Jeffrey Combs",
       "description": null,
-      "matchedWith": "Thy'lek Shran"
+      "matchedWith": "Thy'lek Shran",
+      "isAnimated": false
     },
     {
       "name": "Porthos",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F1%2F13%2FPorthos%252C_2151.jpg%2Frevision%2Flatest%3Fcb%3D20120415190630%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Porthos",
       "performer": "Beagles",
       "description": null,
-      "matchedWith": "Porthos"
+      "matchedWith": "Porthos",
+      "isAnimated": false
     }
   ],
   "star-trek-lower-decks": [
     {
       "name": "Beckett Mariner",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fd4%2FLieutenant_Mariner.png%2Frevision%2Flatest%3Fcb%3D20230907073058%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Beckett_Mariner",
       "performer": "Tawny Newsome",
       "description": null,
-      "matchedWith": "Beckett Mariner"
+      "matchedWith": "Beckett Mariner",
+      "isAnimated": true
     },
     {
       "name": "Brad Boimler",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Arthur_Clinton_Bradley",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe1%2FBrad_Boimler%252C_2259.png%2Frevision%2Flatest%3Fcb%3D20230724003924%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Brad_Boimler",
       "performer": "Jack Quaid",
       "description": null,
-      "matchedWith": "Arthur Clinton Bradley"
+      "matchedWith": "Brad Boimler",
+      "isAnimated": true
     },
     {
       "name": "D'Vana Tendi",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F05%2FD%2527Vana_Tendi%252C_lt_jg.png%2Frevision%2Flatest%3Fcb%3D20230907073606%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/D'Vana_Tendi",
       "performer": "Noël Wells",
       "description": null,
-      "matchedWith": "D'Vana Tendi"
+      "matchedWith": "D'Vana Tendi",
+      "isAnimated": true
     },
     {
       "name": "Sam Rutherford",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/E._Sampson",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fb%2Fb2%2FRutherford_minus_implant.png%2Frevision%2Flatest%3Fcb%3D20241219195401%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Sam_Rutherford",
       "performer": "Eugene Cordero",
       "description": null,
-      "matchedWith": "E. Sampson"
+      "matchedWith": "Sam Rutherford",
+      "isAnimated": true
     },
     {
       "name": "Carol Freeman",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Alonzo_Freeman",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F7c%2FCarol_Freeman.jpg%2Frevision%2Flatest%3Fcb%3D20200807150652%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Carol_Freeman",
       "performer": "Dawnn Lewis",
       "description": null,
-      "matchedWith": "Alonzo Freeman"
+      "matchedWith": "Carol Freeman",
+      "isAnimated": true
     },
     {
       "name": "Jack Ransom",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Andrew_Jackson",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F46%2FCaptain_Jack_Ransom.png%2Frevision%2Flatest%3Fcb%3D20241221184916%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Jack_Ransom",
       "performer": "Jerry O'Connell",
       "description": null,
-      "matchedWith": "Andrew Jackson"
+      "matchedWith": "Jack Ransom",
+      "isAnimated": true
     },
     {
       "name": "T'Ana",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/D.C._Fontana",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F6d%2FT%2527Ana.png%2Frevision%2Flatest%3Fcb%3D20200820100005%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/T'Ana",
       "performer": "Gillian Vigman",
       "description": null,
-      "matchedWith": "D.C. Fontana"
+      "matchedWith": "T'Ana",
+      "isAnimated": true
     },
     {
       "name": "Shaxs",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F34%2FShaxs.png%2Frevision%2Flatest%3Fcb%3D20200813123204%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Shaxs",
       "performer": "Fred Tatasciore",
       "description": null,
-      "matchedWith": "Shaxs"
+      "matchedWith": "Shaxs",
+      "isAnimated": true
     }
   ],
   "star-trek-picard": [
     {
       "name": "Jean-Luc Picard",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Elise_Picard",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fcc%2FJean-Luc_Picard%252C_2401.jpg%2Frevision%2Flatest%3Fcb%3D20230224174740%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard",
       "performer": "Patrick Stewart",
       "description": null,
-      "matchedWith": "Elise Picard"
+      "matchedWith": "Jean-Luc Picard",
+      "isAnimated": false
     },
     {
       "name": "Raffi Musiker",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F65%2FRaffaela_Musiker%252C_2402.png%2Frevision%2Flatest%3Fcb%3D20230422022236%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Raffaela_Musiker",
       "performer": "Michelle Hurd",
       "description": null,
-      "matchedWith": "Raffaela Musiker"
+      "matchedWith": "Raffaela Musiker",
+      "isAnimated": false
     },
     {
       "name": "Cristóbal Rios",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fef%2FCristobal_Rios%252C_2024.jpg%2Frevision%2Flatest%3Fcb%3D20220521121629%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Crist%C3%B3bal_Rios",
       "performer": "Santiago Cabrera",
       "description": null,
-      "matchedWith": "Cristóbal Rios"
+      "matchedWith": "Cristóbal Rios",
+      "isAnimated": false
     },
     {
       "name": "Agnes Jurati",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fa%2Fac%2FJurati_Borg_Queen.jpg%2Frevision%2Flatest%3Fcb%3D20220507082240%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Agnes_Jurati",
       "performer": "Alison Pill",
       "description": null,
-      "matchedWith": "Agnes Jurati"
+      "matchedWith": "Agnes Jurati",
+      "isAnimated": false
     },
     {
       "name": "Elnor",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fd4%2FElnor%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20220305065530%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Elnor",
       "performer": "Evan Evagora",
       "description": null,
-      "matchedWith": "Elnor"
+      "matchedWith": "Elnor",
+      "isAnimated": false
     },
     {
       "name": "Seven of Nine",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Claudia_Hansen",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F34%2FSeven_of_Nine%252C_2402.jpg%2Frevision%2Flatest%3Fcb%3D20230421002227%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Seven_of_Nine",
       "performer": "Jeri Ryan",
       "description": null,
-      "matchedWith": "Claudia Hansen"
+      "matchedWith": "Seven of Nine",
+      "isAnimated": false
     },
     {
       "name": "Laris",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Dathan_Alaris",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F8%2F8f%2FLaris%252C_2401.jpg%2Frevision%2Flatest%3Fcb%3D20220410082936%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Laris",
       "performer": "Orla Brady",
       "description": null,
-      "matchedWith": "Dathan Alaris"
+      "matchedWith": "Laris",
+      "isAnimated": false
     },
     {
       "name": "Soji Asha",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Asha",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fee%2FSoji_Asha_Raritan_IV.png%2Frevision%2Flatest%3Fcb%3D20220305070125%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Soji_Asha",
       "performer": "Isa Briones",
       "description": null,
-      "matchedWith": "Asha"
+      "matchedWith": "Soji Asha",
+      "isAnimated": false
     },
     {
       "name": "Q",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Ff%2Ff4%2FQ%252C_2402.jpg%2Frevision%2Flatest%3Fcb%3D20230421020701%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Q",
       "performer": "John de Lancie",
       "description": null,
-      "matchedWith": "Q"
+      "matchedWith": "Q",
+      "isAnimated": false
     },
     {
       "name": "William Riker",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F39%2FSite-community-image%2Frevision%2Flatest%3Fcb%3D20241212154521%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Bernie_Williams",
       "performer": "Jonathan Frakes",
       "description": null,
-      "matchedWith": "Bernie Williams"
+      "matchedWith": "Bernie Williams",
+      "isAnimated": false
     },
     {
       "name": "Deanna Troi",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F59%2FDeanna_Troi%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20240116071618%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Deanna_Troi",
       "performer": "Marina Sirtis",
       "description": null,
-      "matchedWith": "Deanna Troi"
+      "matchedWith": "Deanna Troi",
+      "isAnimated": false
     }
   ],
   "star-trek-prodigy": [
     {
       "name": "Dal R'El",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Alan-a-Dale",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F1%2F17%2FDal_R%2527El.png%2Frevision%2Flatest%3Fcb%3D20211028154916%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Dal_R'El",
       "performer": "Brett Gray",
       "description": null,
-      "matchedWith": "Alan-a-Dale"
+      "matchedWith": "Dal R'El",
+      "isAnimated": true
     },
     {
       "name": "Gwyndala",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F59%2FGwyndala%252C_2385.png%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20240703142459%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Gwyndala",
       "performer": "Ella Purnell",
       "description": null,
-      "matchedWith": "Gwyndala"
+      "matchedWith": "Gwyndala",
+      "isAnimated": true
     },
     {
       "name": "Rok-Tahk",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Alidar_Jarok",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fa%2Fa8%2FRok-Tahk.jpg%2Frevision%2Flatest%3Fcb%3D20211029051939%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Rok-Tahk",
       "performer": "Rylee Alazraqui",
       "description": null,
-      "matchedWith": "Alidar Jarok"
+      "matchedWith": "Rok-Tahk",
+      "isAnimated": true
     },
     {
       "name": "Zero",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Medusan",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F8%2F85%2FZero%252C_2385.png%2Frevision%2Flatest%3Fcb%3D20241205084340%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Zero",
       "performer": "Angus Imrie",
       "description": null,
-      "matchedWith": "Medusan"
+      "matchedWith": "Zero",
+      "isAnimated": true
     },
     {
       "name": "Jankom Pog",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fc5%2FJankom_Pog.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20211028141500%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Jankom_Pog",
       "performer": "Jason Mantzoukas",
       "description": null,
-      "matchedWith": "Jankom Pog"
+      "matchedWith": "Jankom Pog",
+      "isAnimated": true
     },
     {
       "name": "Murf",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Mr._Murfy_No_Shoes",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F2%2F24%2FMurf.jpg%2Frevision%2Flatest%3Fcb%3D20211028162913%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Murf",
       "performer": "Dee Bradley Baker",
       "description": null,
-      "matchedWith": "Mr. Murfy No Shoes"
+      "matchedWith": "Murf",
+      "isAnimated": true
     },
     {
       "name": "Hologram Janeway",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F64%2FHenry_Janeway.jpg%2Frevision%2Flatest%3Fcb%3D20070329224927%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Henry_Janeway",
       "performer": "Kate Mulgrew",
       "description": null,
-      "matchedWith": "Henry Janeway"
+      "matchedWith": "Henry Janeway",
+      "isAnimated": true
     }
   ],
-  "star-trek-starfleet-academy": [],
+  "star-trek-starfleet-academy": [
+    {
+      "name": "Cadet Tyson",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F42%2FNeil_deGrasse_Tyson_-_VOY_S3_Real_Science_documentary.jpg%2Frevision%2Flatest%3Fcb%3D20120621161405%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Neil_deGrasse_Tyson",
+      "performer": "Tig Notaro",
+      "description": null,
+      "matchedWith": "Neil deGrasse Tyson",
+      "isAnimated": false
+    },
+    {
+      "name": "Cadet Lucia Nandy",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F39%2FSite-community-image%2Frevision%2Flatest%3Fcb%3D20241212154521%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Luciano_Pavarotti",
+      "performer": "Kerrice Brooks",
+      "description": null,
+      "matchedWith": "Luciano Pavarotti",
+      "isAnimated": false
+    },
+    {
+      "name": "Cadet Tilly",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F5d%2FSylvia_Tilly%252C_3189.png%2Frevision%2Flatest%3Fcb%3D20210111162742%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Sylvia_Tilly",
+      "performer": "Mary Wiseman",
+      "description": null,
+      "matchedWith": "Sylvia Tilly",
+      "isAnimated": false
+    },
+    {
+      "name": "Admiral Janeway",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F39%2FSite-community-image%2Frevision%2Flatest%3Fcb%3D20241212154521%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Janeway",
+      "performer": "Kate Mulgrew",
+      "description": null,
+      "matchedWith": "Janeway",
+      "isAnimated": false
+    },
+    {
+      "name": "Commander Tricia Miller",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F95%2FMiller.jpg%2Frevision%2Flatest%3Fcb%3D20210308024650%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Miller",
+      "performer": "Hana Hatae",
+      "description": null,
+      "matchedWith": "Miller",
+      "isAnimated": false
+    }
+  ],
   "star-trek-strange-new-worlds": [
     {
       "name": "Christopher Pike",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Christopher",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F08%2FChristopher_Pike%252C_2267.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20110706235444%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Christopher_Pike",
       "performer": "Anson Mount",
       "description": null,
-      "matchedWith": "Christopher"
+      "matchedWith": "Christopher Pike",
+      "isAnimated": false
     },
     {
       "name": "Spock",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fb%2Fb1%2FSpock%252C_2387.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20211211154448%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Spock",
       "performer": "Ethan Peck",
       "description": null,
-      "matchedWith": "Spock"
+      "matchedWith": "Spock",
+      "isAnimated": false
     },
     {
       "name": "Una Chin-Riley",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Hindaki_Shibunawa",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F39%2FUna_Chin-Riley%252C_2259.png%2Frevision%2Flatest%3Fcb%3D20220505091817%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Una_Chin-Riley",
       "performer": "Rebecca Romijn",
       "description": null,
-      "matchedWith": "Hindaki Shibunawa"
+      "matchedWith": "Una Chin-Riley",
+      "isAnimated": false
     },
     {
       "name": "La'an Noonien-Singh",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/A._Singh",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Ff%2Ff6%2FLa%2527an_Noonien-Singh.png%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220530211511%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/La'an_Noonien-Singh",
       "performer": "Christina Chong",
       "description": null,
-      "matchedWith": "A. Singh"
+      "matchedWith": "La'an Noonien-Singh",
+      "isAnimated": false
     },
     {
       "name": "Nyota Uhura",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe1%2FNyota_Uhura%252C_2293.jpg%2Frevision%2Flatest%3Fcb%3D20120316182015%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Nyota_Uhura",
       "performer": "Celia Rose Gooding",
       "description": null,
-      "matchedWith": "Nyota Uhura"
+      "matchedWith": "Nyota Uhura",
+      "isAnimated": false
     },
     {
       "name": "Erica Ortegas",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Erica_Jong",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F09%2FErica_Ortegas.png%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220530202545%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Erica_Ortegas",
       "performer": "Melissa Navia",
       "description": null,
-      "matchedWith": "Erica Jong"
+      "matchedWith": "Erica Ortegas",
+      "isAnimated": false
     },
     {
       "name": "Joseph M'Benga",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Joseph",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F6f%2FM%2527Benga%252C_2268.jpg%2Frevision%2Flatest%3Fcb%3D20090208000527%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Joseph_M'Benga",
       "performer": "Babs Olusanmokun",
       "description": null,
-      "matchedWith": "Joseph"
+      "matchedWith": "Joseph M'Benga",
+      "isAnimated": false
     },
     {
       "name": "Christine Chapel",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F66%2FChristine_Chapel%252C_2286.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220530210439%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Christine_Chapel",
       "performer": "Jess Bush",
       "description": null,
-      "matchedWith": "Christine Chapel"
+      "matchedWith": "Christine Chapel",
+      "isAnimated": false
     },
     {
       "name": "Hemmer",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fa%2Faf%2FHemmer.png%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220530203236%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Hemmer",
       "performer": "Bruce Horak",
       "description": null,
-      "matchedWith": "Hemmer"
+      "matchedWith": "Hemmer",
+      "isAnimated": false
     }
   ],
   "star-trek-the-animated-series": [
     {
       "name": "James T. Kirk",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F98%2FJames_Kirk%252C_2371.jpg%2Frevision%2Flatest%3Fcb%3D20210519003111%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/James_T._Kirk",
       "performer": "William Shatner",
       "description": null,
-      "matchedWith": "James T. Kirk"
+      "matchedWith": "James T. Kirk",
+      "isAnimated": true
     },
     {
       "name": "Spock",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fb%2Fb1%2FSpock%252C_2387.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20211211154448%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Spock",
       "performer": "Leonard Nimoy",
       "description": null,
-      "matchedWith": "Spock"
+      "matchedWith": "Spock",
+      "isAnimated": true
     },
     {
       "name": "Leonard McCoy",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fda%2FLeonard_McCoy%252C_2364.jpg%2Frevision%2Flatest%3Fcb%3D20161120231114%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Leonard_McCoy",
       "performer": "DeForest Kelley",
       "description": null,
-      "matchedWith": "Leonard McCoy"
+      "matchedWith": "Leonard McCoy",
+      "isAnimated": true
     },
     {
       "name": "Montgomery Scott",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe2%2FMontgomery_Scott%252C_2369.jpg%2Frevision%2Flatest%3Fcb%3D20141125013310%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Montgomery_Scott",
       "performer": "James Doohan",
       "description": null,
-      "matchedWith": "Montgomery Scott"
+      "matchedWith": "Montgomery Scott",
+      "isAnimated": true
     },
     {
       "name": "Nyota Uhura",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe1%2FNyota_Uhura%252C_2293.jpg%2Frevision%2Flatest%3Fcb%3D20120316182015%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Nyota_Uhura",
       "performer": "Nichelle Nichols",
       "description": null,
-      "matchedWith": "Nyota Uhura"
+      "matchedWith": "Nyota Uhura",
+      "isAnimated": true
     },
     {
       "name": "Hikaru Sulu",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fec%2FHikaru_Sulu%252C_2293.jpg%2Frevision%2Flatest%3Fcb%3D20120316190450%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Hikaru_Sulu",
       "performer": "George Takei",
       "description": null,
-      "matchedWith": "Hikaru Sulu"
+      "matchedWith": "Hikaru Sulu",
+      "isAnimated": true
     },
     {
       "name": "Pavel Chekov",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F56%2FPavel_Chekov%252C_2293-B.jpg%2Frevision%2Flatest%3Fcb%3D20120121073525%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Pavel_Chekov",
       "performer": "Walter Koenig",
       "description": null,
-      "matchedWith": "Pavel Chekov"
+      "matchedWith": "Pavel Chekov",
+      "isAnimated": true
     },
     {
       "name": "Christine Chapel",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F66%2FChristine_Chapel%252C_2286.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220530210439%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Christine_Chapel",
       "performer": "Majel Barrett",
       "description": null,
-      "matchedWith": "Christine Chapel"
+      "matchedWith": "Christine Chapel",
+      "isAnimated": true
     },
     {
       "name": "M'Ress",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F50%2FM%2527Ress_at_communications_station.jpg%2Frevision%2Flatest%3Fcb%3D20081111033627%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/M'Ress",
       "performer": "Majel Barrett",
       "description": null,
-      "matchedWith": "M'Ress"
+      "matchedWith": "M'Ress",
+      "isAnimated": true
     },
     {
       "name": "Arex",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F33%2FArex%252C_2270.jpg%2Frevision%2Flatest%3Fcb%3D20061126053910%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Arex",
       "performer": "James Doohan",
       "description": null,
-      "matchedWith": "Arex"
+      "matchedWith": "Arex",
+      "isAnimated": true
     }
   ],
   "star-trek-the-next-generation": [
     {
       "name": "Jean-Luc Picard",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fcc%2FJean-Luc_Picard%252C_2401.jpg%2Frevision%2Flatest%3Fcb%3D20230224174740%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Jean-Luc_Picard",
       "performer": "Patrick Stewart",
       "description": null,
-      "matchedWith": "Jean-Luc Picard"
+      "matchedWith": "Jean-Luc Picard",
+      "isAnimated": false
     },
     {
       "name": "William T. Riker",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F8%2F8d%2FWilliam_Riker%252C_25th_century_dress_uniform.png%2Frevision%2Flatest%3Fcb%3D20230216141935%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/William_T._Riker",
       "performer": "Jonathan Frakes",
       "description": null,
-      "matchedWith": "William T. Riker"
+      "matchedWith": "William T. Riker",
+      "isAnimated": false
     },
     {
       "name": "Data",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F7a%2FData%252C_2379.jpg%2Frevision%2Flatest%3Fcb%3D20180924192941%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Data",
       "performer": "Brent Spiner",
       "description": null,
-      "matchedWith": "Data"
+      "matchedWith": "Data",
+      "isAnimated": false
     },
     {
       "name": "Deanna Troi",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F59%2FDeanna_Troi%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20240116071618%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Deanna_Troi",
       "performer": "Marina Sirtis",
       "description": null,
-      "matchedWith": "Deanna Troi"
+      "matchedWith": "Deanna Troi",
+      "isAnimated": false
     },
     {
       "name": "Worf",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fdb%2FWorf%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20240408163139%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Worf",
       "performer": "Michael Dorn",
       "description": null,
-      "matchedWith": "Worf"
+      "matchedWith": "Worf",
+      "isAnimated": false
     },
     {
       "name": "Beverly Crusher",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F4d%2FBeverly_Crusher%252C_2402.png%2Frevision%2Flatest%3Fcb%3D20230423174207%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Beverly_Crusher",
       "performer": "Gates McFadden",
       "description": null,
-      "matchedWith": "Beverly Crusher"
+      "matchedWith": "Beverly Crusher",
+      "isAnimated": false
     },
     {
       "name": "Geordi La Forge",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F4e%2FGeordi_La_Forge%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20230323105617%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Geordi_La_Forge",
       "performer": "LeVar Burton",
       "description": null,
-      "matchedWith": "Geordi La Forge"
+      "matchedWith": "Geordi La Forge",
+      "isAnimated": false
     },
     {
       "name": "Wesley Crusher",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fc%2Fce%2FWesley_Crusher%252C_2024.png%2Frevision%2Flatest%3Fcb%3D20220505135249%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Wesley_Crusher",
       "performer": "Wil Wheaton",
       "description": null,
-      "matchedWith": "Wesley Crusher"
+      "matchedWith": "Wesley Crusher",
+      "isAnimated": false
     },
     {
       "name": "Tasha Yar",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F0%2F09%2FTasha_dead.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20120728223346%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Natasha_Yar",
       "performer": "Denise Crosby",
       "description": null,
-      "matchedWith": "Natasha Yar"
+      "matchedWith": "Natasha Yar",
+      "isAnimated": false
     },
     {
       "name": "Guinan",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F8%2F85%2FGuinan%252C_2401.jpg%2Frevision%2Flatest%3Fcb%3D20220304073244%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Guinan",
       "performer": "Whoopi Goldberg",
       "description": null,
-      "matchedWith": "Guinan"
+      "matchedWith": "Guinan",
+      "isAnimated": false
     },
     {
       "name": "Q",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Ff%2Ff4%2FQ%252C_2402.jpg%2Frevision%2Flatest%3Fcb%3D20230421020701%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Q",
       "performer": "John de Lancie",
       "description": null,
-      "matchedWith": "Q"
+      "matchedWith": "Q",
+      "isAnimated": false
     },
     {
       "name": "Lwaxana Troi",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F55%2FLwaxana_Troi%252C_2371.jpg%2Frevision%2Flatest%3Fcb%3D20061125094740%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Lwaxana_Troi",
       "performer": "Majel Barrett",
       "description": null,
-      "matchedWith": "Lwaxana Troi"
+      "matchedWith": "Lwaxana Troi",
+      "isAnimated": false
     }
   ],
   "star-trek-the-original-series": [
     {
       "name": "James T. Kirk",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F98%2FJames_Kirk%252C_2371.jpg%2Frevision%2Flatest%3Fcb%3D20210519003111%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/James_T._Kirk",
       "performer": "William Shatner",
       "description": null,
-      "matchedWith": "James T. Kirk"
+      "matchedWith": "James T. Kirk",
+      "isAnimated": false
     },
     {
       "name": "Spock",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fb%2Fb1%2FSpock%252C_2387.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20211211154448%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Spock",
       "performer": "Leonard Nimoy",
       "description": null,
-      "matchedWith": "Spock"
+      "matchedWith": "Spock",
+      "isAnimated": false
     },
     {
       "name": "Leonard McCoy",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fd%2Fda%2FLeonard_McCoy%252C_2364.jpg%2Frevision%2Flatest%3Fcb%3D20161120231114%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Leonard_McCoy",
       "performer": "DeForest Kelley",
       "description": null,
-      "matchedWith": "Leonard McCoy"
+      "matchedWith": "Leonard McCoy",
+      "isAnimated": false
     },
     {
       "name": "Montgomery Scott",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe2%2FMontgomery_Scott%252C_2369.jpg%2Frevision%2Flatest%3Fcb%3D20141125013310%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Montgomery_Scott",
       "performer": "James Doohan",
       "description": null,
-      "matchedWith": "Montgomery Scott"
+      "matchedWith": "Montgomery Scott",
+      "isAnimated": false
     },
     {
       "name": "Nyota Uhura",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fe1%2FNyota_Uhura%252C_2293.jpg%2Frevision%2Flatest%3Fcb%3D20120316182015%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Nyota_Uhura",
       "performer": "Nichelle Nichols",
       "description": null,
-      "matchedWith": "Nyota Uhura"
+      "matchedWith": "Nyota Uhura",
+      "isAnimated": false
     },
     {
       "name": "Hikaru Sulu",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fec%2FHikaru_Sulu%252C_2293.jpg%2Frevision%2Flatest%3Fcb%3D20120316190450%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Hikaru_Sulu",
       "performer": "George Takei",
       "description": null,
-      "matchedWith": "Hikaru Sulu"
+      "matchedWith": "Hikaru Sulu",
+      "isAnimated": false
     },
     {
       "name": "Pavel Chekov",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F5%2F56%2FPavel_Chekov%252C_2293-B.jpg%2Frevision%2Flatest%3Fcb%3D20120121073525%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Pavel_Chekov",
       "performer": "Walter Koenig",
       "description": null,
-      "matchedWith": "Pavel Chekov"
+      "matchedWith": "Pavel Chekov",
+      "isAnimated": false
     },
     {
       "name": "Christine Chapel",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F66%2FChristine_Chapel%252C_2286.jpg%2Frevision%2Flatest%2Fscale-to-width-down%2F1200%3Fcb%3D20220530210439%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Christine_Chapel",
       "performer": "Majel Barrett",
       "description": null,
-      "matchedWith": "Christine Chapel"
+      "matchedWith": "Christine Chapel",
+      "isAnimated": false
     }
   ],
   "star-trek-voyager": [
     {
       "name": "Kathryn Janeway",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Henry_Janeway",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F36%2FKathryn_Janeway%252C_2385.png%2Frevision%2Flatest%3Fcb%3D20240707152020%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Kathryn_Janeway",
       "performer": "Kate Mulgrew",
       "description": null,
-      "matchedWith": "Henry Janeway"
+      "matchedWith": "Kathryn Janeway",
+      "isAnimated": false
     },
     {
       "name": "Chakotay",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fe%2Fee%2FChakotay%252C_2385.png%2Frevision%2Flatest%3Fcb%3D20240705172510%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Chakotay",
       "performer": "Robert Beltran",
       "description": null,
-      "matchedWith": "Chakotay"
+      "matchedWith": "Chakotay",
+      "isAnimated": false
     },
     {
       "name": "Tuvok",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F41%2FTuvok%252C_2401.png%2Frevision%2Flatest%3Fcb%3D20230420233048%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Tuvok",
       "performer": "Tim Russ",
       "description": null,
-      "matchedWith": "Tuvok"
+      "matchedWith": "Tuvok",
+      "isAnimated": false
     },
     {
       "name": "B'Elanna Torres",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F6%2F60%2FB%2527Elanna_Torres%252C_2378.jpg%2Frevision%2Flatest%3Fcb%3D20140405044713%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/B'Elanna_Torres",
       "performer": "Roxann Dawson",
       "description": null,
-      "matchedWith": "B'Elanna Torres"
+      "matchedWith": "B'Elanna Torres",
+      "isAnimated": false
     },
     {
       "name": "Tom Paris",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Automated_Commander_122",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F9%2F9c%2FTom_Paris%252C_2381.png%2Frevision%2Flatest%3Fcb%3D20210826231850%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Tom_Paris",
       "performer": "Robert Duncan McNeill",
       "description": null,
-      "matchedWith": "Automated Commander 122"
+      "matchedWith": "Tom Paris",
+      "isAnimated": false
     },
     {
       "name": "Harry Kim",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Albert_Kim",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F1%2F19%2FHarry_Kim%252C_2378.jpg%2Frevision%2Flatest%3Fcb%3D20091230063651%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Harry_Kim",
       "performer": "Garrett Wang",
       "description": null,
-      "matchedWith": "Albert Kim"
+      "matchedWith": "Harry Kim",
+      "isAnimated": false
     },
     {
       "name": "The Doctor",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Chaotica",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2Fa%2Fa9%2FThe_Doctor%252C_2385.jpg%2Frevision%2Flatest%3Fcb%3D20240704231509%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/The_Doctor",
       "performer": "Robert Picardo",
       "description": null,
-      "matchedWith": "Doctor Chaotica"
+      "matchedWith": "The Doctor",
+      "isAnimated": false
     },
     {
       "name": "Seven of Nine",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/Claudia_Hansen",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F3%2F34%2FSeven_of_Nine%252C_2402.jpg%2Frevision%2Flatest%3Fcb%3D20230421002227%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Seven_of_Nine",
       "performer": "Jeri Ryan",
       "description": null,
-      "matchedWith": "Claudia Hansen"
+      "matchedWith": "Seven of Nine",
+      "isAnimated": false
     },
     {
       "name": "Neelix",
-      "image": null,
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F4%2F44%2FNeelix%252C_2378.jpg%2Frevision%2Flatest%3Fcb%3D20070518052022%26path-prefix%3Den",
       "url": "https://memory-alpha.fandom.com/wiki/Neelix",
       "performer": "Ethan Phillips",
       "description": null,
-      "matchedWith": "Neelix"
+      "matchedWith": "Neelix",
+      "isAnimated": false
     },
     {
       "name": "Kes",
-      "image": null,
-      "url": "https://memory-alpha.fandom.com/wiki/J._Frakes",
+      "image": "/api/proxy-image?url=https%3A%2F%2Fstatic.wikia.nocookie.net%2Fmemoryalpha%2Fimages%2F7%2F73%2FKes2374.jpg%2Frevision%2Flatest%3Fcb%3D20120409001247%26path-prefix%3Den",
+      "url": "https://memory-alpha.fandom.com/wiki/Kes",
       "performer": "Jennifer Lien",
       "description": null,
-      "matchedWith": "J. Frakes"
+      "matchedWith": "Kes",
+      "isAnimated": false
     }
   ]
 }

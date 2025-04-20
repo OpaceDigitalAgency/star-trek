@@ -115,7 +115,11 @@ async function buildSeriesCharactersCache() {
         { name: 'Jean-Luc Picard', performer: 'Patrick Stewart', search: c => c.name === 'Jean-Luc Picard' },
         { name: 'William T. Riker', performer: 'Jonathan Frakes', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('william') && name.includes('riker') && !name.includes('thomas');
+          // More flexible search for Riker
+          return (name.includes('william') && name.includes('riker')) ||
+                 name === 'will riker' ||
+                 name === 'commander riker' ||
+                 (name.includes('riker') && !name.includes('thomas') && !name.includes('kyle'));
         }},
         { name: 'Data', performer: 'Brent Spiner', search: c => c.name === 'Data' },
         { name: 'Deanna Troi', performer: 'Marina Sirtis', search: c => c.name.toLowerCase().includes('troi') },
@@ -633,6 +637,49 @@ async function buildSeriesCharactersCache() {
           const name = c.name.toLowerCase();
           return name === 'arex' || name.includes('arex') || name.includes('lieutenant arex');
         }}
+      ],
+      'star-trek-starfleet-academy': [
+        { name: 'Cadet Tyson', performer: 'Tig Notaro', search: c => {
+          // Use a more specific search to avoid matching with unrelated characters
+          const name = c.name.toLowerCase();
+          // Prioritize exact matches for "Cadet Tyson" or similar
+          return name === 'cadet tyson' ||
+                 (name.includes('cadet') && name.includes('tyson')) ||
+                 (name.includes('starfleet') && name.includes('tyson'));
+        }},
+        { name: 'Cadet Lucia Nandy', performer: 'Kerrice Brooks', search: c => {
+          // Use a more specific search to avoid matching with unrelated characters
+          const name = c.name.toLowerCase();
+          // Prioritize exact matches for "Lucia Nandy" or similar
+          return name === 'lucia nandy' ||
+                 name === 'cadet lucia nandy' ||
+                 (name.includes('cadet') && name.includes('lucia')) ||
+                 (name.includes('cadet') && name.includes('nandy'));
+        }},
+        { name: 'Cadet Tilly', performer: 'Mary Wiseman', search: c => {
+          // Use a more specific search to avoid matching with unrelated characters
+          const name = c.name.toLowerCase();
+          // Prioritize exact matches for "Cadet Tilly" or similar
+          return name === 'cadet tilly' ||
+                 (name.includes('cadet') && name.includes('tilly')) ||
+                 (name.includes('cadet') && name.includes('sylvia') && name.includes('tilly'));
+        }},
+        { name: 'Admiral Janeway', performer: 'Kate Mulgrew', search: c => {
+          // Use a more specific search to avoid matching with unrelated characters
+          const name = c.name.toLowerCase();
+          // Prioritize exact matches for "Admiral Janeway" or similar
+          return name === 'admiral janeway' ||
+                 (name.includes('admiral') && name.includes('janeway')) ||
+                 (name.includes('admiral') && name.includes('kathryn'));
+        }},
+        { name: 'Commander Tricia Miller', performer: 'Hana Hatae', search: c => {
+          // Use a more specific search to avoid matching with unrelated characters
+          const name = c.name.toLowerCase();
+          // Prioritize exact matches for "Commander Tricia Miller" or similar
+          return name === 'commander tricia miller' ||
+                 (name.includes('commander') && name.includes('tricia')) ||
+                 (name.includes('commander') && name.includes('miller'));
+        }}
       ]
     };
     
@@ -689,6 +736,12 @@ async function buildSeriesCharactersCache() {
           const characterName = castMember.name.toLowerCase();
           const performerName = castMember.performer.toLowerCase();
           
+          // Check if this is an animated series
+          const isAnimatedSeries = seriesSlug.includes('animated') ||
+                                  seriesSlug.includes('tas') ||
+                                  seriesSlug.includes('lower-decks') ||
+                                  seriesSlug.includes('prodigy');
+          
           // Strategy 1: Exact filename match
           // Look for image files that exactly match the character name
           const nameWithoutApostrophes = characterName.replace(/'/g, '');
@@ -719,21 +772,37 @@ async function buildSeriesCharactersCache() {
           // Extract potential UIDs from matching filenames
           const potentialUIDs = [];
           
-          // Strategy 1: Use the original search function
+          // Strategy 1: Try exact name match (highest priority)
+          console.log(`  Trying exact name match for ${castMember.name}...`);
+          char = localCharactersData.find(c => c.name.toLowerCase() === characterName) ||
+                 charactersData.find(c => c.name.toLowerCase() === characterName);
+          
+          // Strategy 2: Use the original search function
           if (!char) {
+            console.log(`  Using search function for ${castMember.name}...`);
             const localChar = localCharactersData.find(castMember.search);
             const mainChar = charactersData.find(castMember.search);
             char = localChar || mainChar;
           }
           
-          // Strategy 3: Try exact name match
+          // Strategy 3: Try exact match with character name as a substring
           if (!char) {
-            console.log(`  Trying exact name match for ${castMember.name}...`);
-            char = localCharactersData.find(c => c.name.toLowerCase() === characterName) ||
-                   charactersData.find(c => c.name.toLowerCase() === characterName);
+            console.log(`  Trying exact substring match for ${castMember.name}...`);
+            char = localCharactersData.find(c => {
+                    const cName = c.name.toLowerCase();
+                    return cName === characterName ||
+                           cName.endsWith(` ${characterName}`) ||
+                           cName.startsWith(`${characterName} `);
+                  }) ||
+                  charactersData.find(c => {
+                    const cName = c.name.toLowerCase();
+                    return cName === characterName ||
+                           cName.endsWith(` ${characterName}`) ||
+                           cName.startsWith(`${characterName} `);
+                  });
           }
           
-          // Strategy 4: Try combined first/last name match
+          // Strategy 4: Try combined first/last name match (more strict)
           if (!char) {
             console.log(`  Trying combined name match for ${castMember.name}...`);
             const nameParts = characterName.split(/\s+/);
@@ -741,27 +810,83 @@ async function buildSeriesCharactersCache() {
               const firstName = nameParts[0];
               const lastName = nameParts[nameParts.length - 1];
               
+              // More strict matching - must be exact match for first and last name
+              // or the character name must be a substring of the database entry
               char = localCharactersData.find(c => {
                       const cName = c.name.toLowerCase();
-                      return cName.includes(firstName) && cName.includes(lastName);
+                      const cNameParts = cName.split(/\s+/);
+                      return (cNameParts.length > 1 &&
+                              cNameParts[0] === firstName &&
+                              cNameParts[cNameParts.length - 1] === lastName) ||
+                             (cName.includes(firstName) &&
+                              cName.includes(lastName) &&
+                              cName.includes(`${firstName} ${lastName}`));
                     }) ||
-                     charactersData.find(c => {
+                    charactersData.find(c => {
                       const cName = c.name.toLowerCase();
-                      return cName.includes(firstName) && cName.includes(lastName);
+                      const cNameParts = cName.split(/\s+/);
+                      return (cNameParts.length > 1 &&
+                              cNameParts[0] === firstName &&
+                              cNameParts[cNameParts.length - 1] === lastName) ||
+                             (cName.includes(firstName) &&
+                              cName.includes(lastName) &&
+                              cName.includes(`${firstName} ${lastName}`));
                     });
             }
           }
           
-          // Strategy 5: Try performer name match
+          // Strategy 5: Try performer name match (more accurate)
           if (!char) {
             console.log(`  Trying performer match for ${castMember.performer}...`);
-            // Look for any character performed by this actor
-            const performerRegex = new RegExp(castMember.performer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-            char = localCharactersData.find(c => c.performer && performerRegex.test(c.performer)) ||
-                   charactersData.find(c => c.performer && performerRegex.test(c.performer));
+            // First try exact performer match
+            const performerName = castMember.performer.toLowerCase();
+            
+            // Try exact performer match first
+            char = localCharactersData.find(c => c.performer && c.performer.toLowerCase() === performerName) ||
+                   charactersData.find(c => c.performer && c.performer.toLowerCase() === performerName);
+            
+            // If no exact match, try partial match but with character name validation
+            if (!char) {
+              const performerRegex = new RegExp(castMember.performer.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+              
+              // Get all potential matches
+              const potentialMatches = localCharactersData.filter(c => c.performer && performerRegex.test(c.performer)) ||
+                                      charactersData.filter(c => c.performer && performerRegex.test(c.performer));
+              
+              // Sort by similarity to character name
+              if (potentialMatches.length > 0) {
+                potentialMatches.sort((a, b) => {
+                  const aNameSimilarity = calculateNameSimilarity(a.name.toLowerCase(), characterName);
+                  const bNameSimilarity = calculateNameSimilarity(b.name.toLowerCase(), characterName);
+                  return bNameSimilarity - aNameSimilarity;
+                });
+                
+                // Use the best match
+                char = potentialMatches[0];
+              }
+            }
           }
           
-          // Strategy 6: Try fuzzy name matching (more permissive)
+          // Helper function to calculate name similarity
+          function calculateNameSimilarity(name1, name2) {
+            // Simple similarity score based on common words
+            const words1 = name1.split(/\s+/);
+            const words2 = name2.split(/\s+/);
+            
+            let commonWords = 0;
+            for (const word1 of words1) {
+              if (words2.includes(word1)) {
+                commonWords++;
+              }
+            }
+            
+            // Also check if one name is a substring of the other
+            const isSubstring = name1.includes(name2) || name2.includes(name1);
+            
+            return commonWords + (isSubstring ? 2 : 0);
+          }
+          
+          // Strategy 6: Try fuzzy name matching (improved)
           if (!char) {
             console.log(`  Trying fuzzy name match for ${castMember.name}...`);
             // Split the name into parts and look for matches on any part
@@ -769,32 +894,71 @@ async function buildSeriesCharactersCache() {
             
             // First try to match all significant parts (length > 2)
             const significantParts = nameParts.filter(part => part.length > 2);
-            char = localCharactersData.find(c => {
-                     const cName = c.name.toLowerCase();
-                     return significantParts.every(part => cName.includes(part));
-                   }) ||
-                   charactersData.find(c => {
-                     const cName = c.name.toLowerCase();
-                     return significantParts.every(part => cName.includes(part));
-                   });
-                   
-            // If still not found, try matching any significant part
-            if (!char) {
-              char = localCharactersData.find(c => {
-                       const cName = c.name.toLowerCase();
-                       return significantParts.some(part => cName.includes(part));
-                     }) ||
-                     charactersData.find(c => {
-                       const cName = c.name.toLowerCase();
-                       return significantParts.some(part => cName.includes(part));
-                     });
+            
+            // Get all potential matches that contain all significant parts
+            let potentialMatches = [];
+            
+            // Try local characters data first
+            const localMatches = localCharactersData.filter(c => {
+              const cName = c.name.toLowerCase();
+              return significantParts.every(part => cName.includes(part));
+            });
+            
+            if (localMatches.length > 0) {
+              potentialMatches = localMatches;
+            } else {
+              // Try main characters data
+              const mainMatches = charactersData.filter(c => {
+                const cName = c.name.toLowerCase();
+                return significantParts.every(part => cName.includes(part));
+              });
+              
+              if (mainMatches.length > 0) {
+                potentialMatches = mainMatches;
+              }
+            }
+            
+            // If no matches found, try matching any significant part
+            if (potentialMatches.length === 0) {
+              // Try local characters data first
+              const localMatches = localCharactersData.filter(c => {
+                const cName = c.name.toLowerCase();
+                return significantParts.some(part => cName.includes(part));
+              });
+              
+              if (localMatches.length > 0) {
+                potentialMatches = localMatches;
+              } else {
+                // Try main characters data
+                const mainMatches = charactersData.filter(c => {
+                  const cName = c.name.toLowerCase();
+                  return significantParts.some(part => cName.includes(part));
+                });
+                
+                if (mainMatches.length > 0) {
+                  potentialMatches = mainMatches;
+                }
+              }
+            }
+            
+            // Sort potential matches by similarity score
+            if (potentialMatches.length > 0) {
+              potentialMatches.sort((a, b) => {
+                const aNameSimilarity = calculateNameSimilarity(a.name.toLowerCase(), characterName);
+                const bNameSimilarity = calculateNameSimilarity(b.name.toLowerCase(), characterName);
+                return bNameSimilarity - aNameSimilarity;
+              });
+              
+              // Use the best match
+              char = potentialMatches[0];
+              console.log(`  Found fuzzy match: ${char.name} (similarity: ${calculateNameSimilarity(char.name.toLowerCase(), characterName)})`);
             }
           }
           
-          // Strategy 7: Try matching by role/title
+          // Strategy 7: Try matching by role/title (improved)
           if (!char) {
             console.log(`  Trying role/title match for ${castMember.name}...`);
-            const commonTitles = ['captain', 'commander', 'lieutenant', 'ensign', 'doctor', 'dr'];
+            const commonTitles = ['captain', 'commander', 'lieutenant', 'ensign', 'doctor', 'dr', 'admiral', 'chief', 'major'];
             const hasTitle = commonTitles.some(title => characterName.includes(title));
             
             if (hasTitle) {
@@ -804,34 +968,187 @@ async function buildSeriesCharactersCache() {
                 nameWithoutTitle = nameWithoutTitle.replace(title, '').trim();
               }
               
-              // Try to find a character with this name
-              char = localCharactersData.find(c => c.name.toLowerCase().includes(nameWithoutTitle)) ||
-                     charactersData.find(c => c.name.toLowerCase().includes(nameWithoutTitle));
+              // Get all potential matches
+              let potentialMatches = [];
+              
+              // Try local characters data first
+              const localMatches = localCharactersData.filter(c => {
+                const cName = c.name.toLowerCase();
+                return cName.includes(nameWithoutTitle);
+              });
+              
+              if (localMatches.length > 0) {
+                potentialMatches = localMatches;
+              } else {
+                // Try main characters data
+                const mainMatches = charactersData.filter(c => {
+                  const cName = c.name.toLowerCase();
+                  return cName.includes(nameWithoutTitle);
+                });
+                
+                if (mainMatches.length > 0) {
+                  potentialMatches = mainMatches;
+                }
+              }
+              
+              // Sort potential matches by similarity score
+              if (potentialMatches.length > 0) {
+                potentialMatches.sort((a, b) => {
+                  const aNameSimilarity = calculateNameSimilarity(a.name.toLowerCase(), nameWithoutTitle);
+                  const bNameSimilarity = calculateNameSimilarity(b.name.toLowerCase(), nameWithoutTitle);
+                  return bNameSimilarity - aNameSimilarity;
+                });
+                
+                // Use the best match
+                char = potentialMatches[0];
+                console.log(`  Found title match: ${char.name} (similarity: ${calculateNameSimilarity(char.name.toLowerCase(), nameWithoutTitle)})`);
+              }
+            }
+          }
+          
+          // Strategy 8: Try to find an image file directly in the character-cache directory
+          if (!char && imageFiles.length > 0) {
+            console.log(`  Trying direct image file match for ${castMember.name}...`);
+            
+            // Create simplified versions of the character name for matching
+            const simpleName = characterName.replace(/[^a-z0-9]/g, '');
+            const nameWords = characterName.split(/\s+/);
+            
+            // Look for image files that might match this character
+            const potentialMatches = [];
+            
+            for (const file of imageFiles) {
+              const lowerFile = file.toLowerCase();
+              
+              // Check if the file contains the character's name or parts of it
+              const containsName = lowerFile.includes(simpleName) ||
+                                  nameWords.some(word => word.length > 2 && lowerFile.includes(word));
+              
+              // Check if the file contains the performer's name
+              const containsPerformer = lowerFile.includes(castMember.performer.toLowerCase().replace(/\s+/g, ''));
+              
+              // If the file contains either the character's name or the performer's name, add it to potential matches
+              if (containsName || containsPerformer) {
+                // Extract the UID from the filename
+                const uidMatch = lowerFile.match(/chma\d+/);
+                if (uidMatch) {
+                  const uid = uidMatch[0].toUpperCase();
+                  
+                  // Look for a character with this UID
+                  const matchedChar = localCharactersData.find(c => c.uid && c.uid.includes(uid)) ||
+                                     charactersData.find(c => c.uid && c.uid.includes(uid));
+                  
+                  if (matchedChar) {
+                    potentialMatches.push({
+                      char: matchedChar,
+                      file: file,
+                      similarity: calculateNameSimilarity(matchedChar.name.toLowerCase(), characterName)
+                    });
+                  }
+                }
+              }
+            }
+            
+            // Sort potential matches by similarity score
+            if (potentialMatches.length > 0) {
+              potentialMatches.sort((a, b) => b.similarity - a.similarity);
+              
+              // Use the best match
+              char = potentialMatches[0].char;
+              console.log(`  Found image file match: ${char.name} (file: ${potentialMatches[0].file})`);
             }
           }
           
           if (char) {
+            // For animated series, use placeholder images instead of real actor images
+            let imageToUse = char.wikiImage;
+            
+            // For animated series, we want to use the actual character images if available
+            // Only use placeholders if no image is available
+            if (isAnimatedSeries && !imageToUse) {
+              console.log(`  No image found for animated character ${castMember.name}, using placeholder`);
+              // Use a series-specific placeholder for animated series
+              if (seriesSlug.includes('animated') || seriesSlug.includes('tas')) {
+                imageToUse = '/images/placeholder-tas.jpg';
+              } else if (seriesSlug.includes('lower-decks')) {
+                imageToUse = '/images/placeholder-disco.jpg'; // Using disco as placeholder for lower decks
+              } else if (seriesSlug.includes('prodigy')) {
+                imageToUse = '/images/placeholder-disco.jpg'; // Using disco as placeholder for prodigy
+              } else {
+                imageToUse = '/images/generic-character.jpg';
+              }
+            }
+            
             enhancedCharacters.push({
               name: castMember.name,
-              image: char.wikiImage,
+              image: imageToUse,
               url: char.wikiUrl,
               performer: castMember.performer,
               description: char.description || null,
-              matchedWith: char.name // Add this for debugging
+              matchedWith: char.name, // Add this for debugging
+              isAnimated: isAnimatedSeries // Add this to indicate if it's an animated series
             });
             console.log(`✅ Added ${castMember.name} to cast list for ${series.title} (matched with ${char.name})`);
           } else {
             console.log(`❌ Could not find match for ${castMember.name} (${castMember.performer}) in ${series.title}`);
             
-            // Add the character anyway, but without an image
+            // Add the character anyway, but with a character-specific or series-specific placeholder
+            let placeholderImage = null;
+            
+            // For animated series, ALWAYS use a placeholder image
+            if (isAnimatedSeries) {
+              // Use a series-specific placeholder for animated series
+              if (seriesSlug.includes('animated') || seriesSlug.includes('tas')) {
+                placeholderImage = '/images/placeholder-tas.jpg';
+              } else if (seriesSlug.includes('lower-decks')) {
+                placeholderImage = '/images/placeholder-disco.jpg'; // Using disco as placeholder for lower decks
+              } else if (seriesSlug.includes('prodigy')) {
+                placeholderImage = '/images/placeholder-disco.jpg'; // Using disco as placeholder for prodigy
+              } else {
+                placeholderImage = '/images/generic-character.jpg';
+              }
+            } else if (seriesSlug.includes('starfleet-academy')) {
+              // For Starfleet Academy, use disco placeholder
+              placeholderImage = '/images/placeholder-disco.jpg';
+            } else {
+              // For live-action series, try character-specific placeholders first
+              const name = castMember.name.toLowerCase();
+              if (name.includes('sisko')) {
+                placeholderImage = '/images/sisko-placeholder.jpg';
+              } else if (name.includes('picard')) {
+                placeholderImage = '/images/picard-placeholder.jpg';
+              } else if (name.includes('kirk')) {
+                placeholderImage = '/images/kirk-placeholder.jpg';
+              } else if (name.includes('janeway')) {
+                placeholderImage = '/images/janeway-placeholder.jpg';
+              }
+              // Then try series-specific placeholders
+              else if (seriesSlug.includes('deep-space-nine') || seriesSlug.includes('ds9')) {
+                placeholderImage = '/images/placeholder-ds9.jpg';
+              } else if (seriesSlug.includes('next-generation') || seriesSlug.includes('tng')) {
+                placeholderImage = '/images/placeholder-tng.jpg';
+              } else if (seriesSlug.includes('original') || seriesSlug.includes('tos')) {
+                placeholderImage = '/images/placeholder-tos.jpg';
+              } else if (seriesSlug.includes('voyager') || seriesSlug.includes('voy')) {
+                placeholderImage = '/images/placeholder-voy.jpg';
+              } else if (seriesSlug.includes('enterprise') || seriesSlug.includes('ent')) {
+                placeholderImage = '/images/placeholder-ent.jpg';
+              } else if (seriesSlug.includes('discovery') || seriesSlug.includes('disco')) {
+                placeholderImage = '/images/placeholder-disco.jpg';
+              } else if (seriesSlug.includes('picard')) {
+                placeholderImage = '/images/placeholder-picard.jpg';
+              }
+            }
+            
             enhancedCharacters.push({
               name: castMember.name,
-              image: null,
+              image: placeholderImage,
               url: null,
               performer: castMember.performer,
-              description: null
+              description: null,
+              isAnimated: isAnimatedSeries // Add this to indicate if it's an animated series
             });
-            console.log(`⚠️ Added ${castMember.name} to cast list for ${series.title} without image`);
+            console.log(`⚠️ Added ${castMember.name} to cast list for ${series.title} with placeholder image: ${placeholderImage || 'none'}`);
           }
         }
       }

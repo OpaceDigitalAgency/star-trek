@@ -64,6 +64,7 @@ These scripts ensure that the series detail pages have complete and accurate inf
 - Fallback data for newer series and seasons not yet in STAPI
 - Multi-strategy character matching for accurate character data
 - Consistent data output to both Netlify functions and frontend data files
+- Enhanced character image handling with character-specific and series-specific fallbacks
 
 ### Deployment Notes
 

@@ -433,3 +433,25 @@
       - Improved the layout and styling for better readability
  
  - **Outcome:** Series detail pages now provide a much better user experience with comprehensive information about each Star Trek series, properly organized and displayed in a visually appealing way.
+## 2025-04-20
+
+- **Fixed Character Images on Series Detail Pages**
+  - **Issue:** Character images on series detail pages were showing the generic fallback image instead of character-specific images.
+  - **Analysis:**
+    - The series-characters.json file had all characters with `"image": null`, causing the generic fallback image to be used.
+    - The build-series-characters.mjs script was matching characters with incorrect entries (e.g., "Benjamin Sisko" with "Benjamin A. Ziff").
+    - The image files referenced in the characters-local.json file didn't exist in the character-cache directory.
+  - **Solutions implemented:**
+    1. **Improved Character Matching Logic:**
+       - Reordered matching strategies to prioritize exact name matches
+       - Made combined first/last name matching more strict
+       - Added similarity scoring for better matching
+       - Added a new strategy to check for character UIDs in image filenames
+    2. **Enhanced Fallback Logic:**
+       - Updated the series detail page to use character-specific placeholders when available
+       - Added series-specific placeholders as a secondary fallback
+       - Improved error handling for image loading
+    3. **Updated Series Characters Cache:**
+       - Ran the update-all-series-data.mjs script to rebuild the series characters cache
+       - Verified that characters now have correct image paths in series-characters.json
+  - **Outcome:** Character images now display correctly on series detail pages, using appropriate character-specific or series-specific images instead of the generic fallback image.

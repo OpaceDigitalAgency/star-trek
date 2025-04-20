@@ -51,8 +51,58 @@ export async function getStaticPaths() {
       if (Array.isArray(seriesData.cast) && seriesData.cast.length > 0) {
         // Process cast data, ensuring correct image path generation
         castWithDetails = seriesData.cast.map(member => {
-          // Use existing image path if available, otherwise generate one
-          const imagePath = member.image || '/images/generic-character.jpg';
+          // Check if this is an animated series
+          const seriesSlug = slug.toLowerCase();
+          const isAnimatedSeries = seriesSlug.includes('animated') ||
+                                  seriesSlug.includes('tas') ||
+                                  seriesSlug.includes('lower-decks') ||
+                                  seriesSlug.includes('prodigy');
+          
+          // Use existing image path if available, otherwise try placeholders
+          let imagePath = member.image;
+          
+          // If still no image, try character-specific placeholder
+          if (!imagePath) {
+            const name = member.name.toLowerCase();
+            
+            // First try character-specific placeholders
+            if (name.includes('sisko')) {
+              imagePath = '/images/sisko-placeholder.jpg';
+            } else if (name.includes('picard')) {
+              imagePath = '/images/picard-placeholder.jpg';
+            } else if (name.includes('kirk')) {
+              imagePath = '/images/kirk-placeholder.jpg';
+            } else if (name.includes('janeway')) {
+              imagePath = '/images/janeway-placeholder.jpg';
+            }
+            // Then try series-specific placeholders
+            else if (seriesSlug.includes('deep-space-nine') || seriesSlug.includes('ds9')) {
+              imagePath = '/images/placeholder-ds9.jpg';
+            } else if (seriesSlug.includes('next-generation') || seriesSlug.includes('tng')) {
+              imagePath = '/images/placeholder-tng.jpg';
+            } else if (seriesSlug.includes('original') || seriesSlug.includes('tos')) {
+              imagePath = '/images/placeholder-tos.jpg';
+            } else if (seriesSlug.includes('voyager') || seriesSlug.includes('voy')) {
+              imagePath = '/images/placeholder-voy.jpg';
+            } else if (seriesSlug.includes('enterprise') || seriesSlug.includes('ent')) {
+              imagePath = '/images/placeholder-ent.jpg';
+            } else if (seriesSlug.includes('discovery') || seriesSlug.includes('disco')) {
+              imagePath = '/images/placeholder-disco.jpg';
+            } else if (seriesSlug.includes('picard')) {
+              imagePath = '/images/placeholder-picard.jpg';
+            } else if (seriesSlug.includes('animated') || seriesSlug.includes('tas')) {
+              imagePath = '/images/placeholder-tas.jpg';
+            } else if (seriesSlug.includes('lower-decks')) {
+              imagePath = '/images/placeholder-disco.jpg'; // Using disco as placeholder for lower decks
+            } else if (seriesSlug.includes('prodigy')) {
+              imagePath = '/images/placeholder-disco.jpg'; // Using disco as placeholder for prodigy
+            } else if (seriesSlug.includes('starfleet-academy')) {
+              imagePath = '/images/placeholder-disco.jpg'; // Using disco as placeholder for Starfleet Academy
+            } else {
+              // Default fallback
+              imagePath = '/images/generic-character.jpg';
+            }
+          }
           
           return {
             ...member,
@@ -280,7 +330,66 @@ const seriesSchema = !notFound && seriesData
                             alt={`Image of ${member.name}`}
                             class="w-full h-full object-cover"
                             loading="lazy"
-                            onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
+                            onerror="
+                              this.onerror=null;
+                              const name = this.alt.toLowerCase();
+                              const seriesSlug = window.location.pathname.split('/').pop().toLowerCase();
+                              
+                              // Check if this is an animated series
+                              const isAnimatedSeries = seriesSlug.includes('animated') ||
+                                                      seriesSlug.includes('tas') ||
+                                                      seriesSlug.includes('lower-decks') ||
+                                                      seriesSlug.includes('prodigy');
+                              
+                              // Set image based on series type
+                              // For animated series, use series-specific placeholders
+                              if (isAnimatedSeries) {
+                                if (seriesSlug.includes('animated') || seriesSlug.includes('tas')) {
+                                  this.src='/images/placeholder-tas.jpg';
+                                } else if (seriesSlug.includes('lower-decks')) {
+                                  this.src='/images/placeholder-disco.jpg'; // Using disco as placeholder for lower decks
+                                } else if (seriesSlug.includes('prodigy')) {
+                                  this.src='/images/placeholder-disco.jpg'; // Using disco as placeholder for prodigy
+                                } else {
+                                  this.src='/images/generic-character.jpg';
+                                }
+                              }
+                              // For Starfleet Academy, use placeholder
+                              else if (seriesSlug.includes('starfleet-academy')) {
+                                this.src='/images/placeholder-disco.jpg';
+                              }
+                              // For live-action series, try character-specific placeholders first
+                              else {
+                                // First try character-specific placeholders
+                                if (name.includes('sisko')) {
+                                  this.src='/images/sisko-placeholder.jpg';
+                                } else if (name.includes('picard')) {
+                                  this.src='/images/picard-placeholder.jpg';
+                                } else if (name.includes('kirk')) {
+                                  this.src='/images/kirk-placeholder.jpg';
+                                } else if (name.includes('janeway')) {
+                                  this.src='/images/janeway-placeholder.jpg';
+                                }
+                                // Then try series-specific placeholders
+                                else if (seriesSlug.includes('deep-space-nine') || seriesSlug.includes('ds9')) {
+                                  this.src='/images/placeholder-ds9.jpg';
+                                } else if (seriesSlug.includes('next-generation') || seriesSlug.includes('tng')) {
+                                  this.src='/images/placeholder-tng.jpg';
+                                } else if (seriesSlug.includes('original') || seriesSlug.includes('tos')) {
+                                  this.src='/images/placeholder-tos.jpg';
+                                } else if (seriesSlug.includes('voyager') || seriesSlug.includes('voy')) {
+                                  this.src='/images/placeholder-voy.jpg';
+                                } else if (seriesSlug.includes('enterprise') || seriesSlug.includes('ent')) {
+                                  this.src='/images/placeholder-ent.jpg';
+                                } else if (seriesSlug.includes('discovery') || seriesSlug.includes('disco')) {
+                                  this.src='/images/placeholder-disco.jpg';
+                                } else if (seriesSlug.includes('picard')) {
+                                  this.src='/images/placeholder-picard.jpg';
+                                } else {
+                                  this.src='/images/generic-character.jpg';
+                                }
+                              }
+                            "
                           />
                         </div>
                         <span class="text-starfleet-gold group-hover:underline text-sm block truncate">{member.name}</span>
