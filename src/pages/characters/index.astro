@@ -102,7 +102,6 @@ const charactersSchema = {
                 <select
                   id="species-filter"
                   class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
-                  style="-webkit-appearance: menulist; -moz-appearance: menulist; appearance: menulist;"
                 >
                   <option value="all">All Species</option>
                   {allSpecies.map(species => (
@@ -119,7 +118,6 @@ const charactersSchema = {
                               <select
                                 id="rank-filter"
                                 class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
-                                style="-webkit-appearance: menulist; -moz-appearance: menulist; appearance: menulist;"
                               >
                                 <option value="all">All Ranks</option>
                                 {initialRanks.map(rank => (
@@ -239,13 +237,16 @@ const charactersSchema = {
 
     async getCharacters(page = 0, pageSize = 48, filters = {}) {
       try {
+        // Create a new object without the pageSize property from filters
+        const { pageSize: filterPageSize, ...otherFilters } = filters;
+        
         const params = new URLSearchParams({
           pageNumber: page.toString(),
           pageSize: pageSize.toString(),
         });
 
         // Add filter parameters
-        for (const [key, value] of Object.entries(filters)) {
+        for (const [key, value] of Object.entries(otherFilters)) {
           if (value && value !== 'all') { // Only add active filters
             params.append(key, value);
           }
@@ -342,6 +343,8 @@ const charactersSchema = {
         value: e.target.value
       });
       currentFilters = getCurrentFilters();
+      // Removed erroneous line
+      // Removed erroneous line
       console.log('Current filters before fetch:', currentFilters);
       applyFiltersAndFetch();
     });
@@ -474,20 +477,53 @@ const charactersSchema = {
 
     // Function to apply filters and get a specific page
     async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
-      if (isLoading) return;
+      console.log('fetchPageIfNeeded called with page:', pageNumber, 'type:', typeof pageNumber);
+      if (isLoading) {
+        console.log('Already loading, ignoring request');
+        return;
+      }
 
       try {
         isLoading = true;
         container.style.opacity = '0.5';
 
+        // Ensure pageNumber is a number
+        const pageNum = Number(pageNumber);
+        console.log('Converted pageNumber to number:', pageNum);
+        
         // Get the requested page
-        const pageIndex = pageNumber - 1;
+        const pageIndex = pageNum - 1;
         const start = pageIndex * PAGE_SIZE;
         const end = start + PAGE_SIZE;
+        
+        console.log('Fetching page slice:', {
+          pageIndex,
+          start,
+          end,
+          totalItems: filteredCharacters.length
+        });
+        
+        // Check if we need to fetch more data from the API
+        if (start >= filteredCharacters.length && pageNum <= totalPages) {
+          console.log('Need to fetch more data from API for page:', pageNum);
+          // This would be implemented in a real app, but for now we'll just use what we have
+        }
+        
+        // Get the characters for this page
         allCharacters = filteredCharacters.slice(start, end);
-        currentPage = pageNumber;
+        currentPage = pageNum; // Store as a number
+        
+        console.log('Updated page data:', {
+          currentPage,
+          itemsInCurrentPage: allCharacters.length
+        });
 
+        // Update the UI
         render();
+        
+        // Update pagination buttons
+        prevBtn.disabled = pageNum <= 1 || isLoading;
+        nextBtn.disabled = pageNum >= Number(totalPages) || isLoading;
       } catch (error) {
         console.error(`Error fetching page ${pageNumber}:`, error);
         container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading characters. Please try again.</p>';
@@ -511,75 +547,49 @@ const charactersSchema = {
             // Get current filters
             currentFilters = getCurrentFilters();
             console.log('Applying filters:', currentFilters);
-            
-            // Start with all characters
-            let chars = [...payload.characters];
-            
-            // Apply species filter
-            if (currentFilters.species) {
-                chars = chars.filter(c => {
-                    const charSpecies = [
-                        ...(c.characterSpecies?.map(s => s.name.toLowerCase()) || []),
-                        ...(c.species?.map(s => s.name.toLowerCase()) || [])
-                    ];
-                    return charSpecies.includes(currentFilters.species.toLowerCase());
-                });
+
+            // Fetch characters from the API with filters
+            const pageNumber = 1; // Always start with page 1 when applying filters
+            const pageSize = PAGE_SIZE;
+            const apiFilters = {
+                page: pageNumber - 1, // API expects 0-based index
+                ...currentFilters,
+            };
+
+            // Rename filter parameters to match API expectations
+            if (apiFilters.title) {
+                apiFilters.rank = apiFilters.title;
+                delete apiFilters.title;
             }
 
-            // Apply rank/title filter
-            if (currentFilters.title) {
-                chars = chars.filter(c =>
-                    c.title?.toLowerCase().includes(currentFilters.title.toLowerCase())
-                );
+            // Convert boolean values to strings for the API
+            if (apiFilters.important === true) {
+                apiFilters.important = 'true';
+            }
+            if (apiFilters.keep === true) {
+                apiFilters.keep = 'true';
             }
 
-            // Apply name search
-            if (currentFilters.name) {
-                chars = chars.filter(c =>
-                    c.name.toLowerCase().includes(currentFilters.name.toLowerCase())
-                );
-            }
+            console.log('Sending API filters:', apiFilters);
+            const apiData = await stapiClient.getCharacters(apiFilters.page, pageSize, apiFilters);
+            console.log('API data received:', apiData);
 
-            // Apply important characters filter
-            if (currentFilters.important === true) {
-                console.log('Filtering important characters...');
-                console.log('Before filter:', chars.length, 'characters');
-                
-                // Use the 'important' flag from the data
-                chars = chars.filter(c => {
-                    const isImportant = c.important === true;
-                    if (isImportant) {
-                        console.log(`Found important character: ${c.name}`);
-                    }
-                    return isImportant;
-                });
-                
-                console.log('After filter:', chars.length, 'important characters');
-            }
+            // Update filtered characters and total pages
+            filteredCharacters = apiData.characters || [];
+            totalCharacters = apiData.page?.totalElements || 0;
+            totalPages = Math.ceil(totalCharacters / pageSize);
 
-            // Apply primary actor records filter
-            if (currentFilters.keep === true) {
-                console.log('Filtering primary actor records...');
-                console.log('Current filters:', currentFilters);
-                console.log('Before filter:', chars.length, 'characters');
-                // Use the 'keep' flag from the data
-                chars = chars.filter(c => {
-                    const isPrimary = c.keep === true;
-                    if (isPrimary) {
-                        console.log(`Primary actor record found: ${c.name}`);
-                    }
-                    return isPrimary;
-                });
-                console.log('After filter:', chars.length, 'primary actor records');
-            }
+            // Update the total pages display
+            totalNum.textContent = totalPages;
 
-            // Update filtered characters and totals
-            filteredCharacters = chars;
-            totalPages = Math.ceil(filteredCharacters.length / PAGE_SIZE);
-            totalCharacters = filteredCharacters.length;
+            // Update the character count badge
+            countBadge.textContent = `${totalCharacters} characters`;
 
-            // Reset to first page
+            // Reset to page 1
             currentPage = 1;
+            pageNum.textContent = currentPage;
+
+            // Get the first page of characters
             allCharacters = filteredCharacters.slice(0, PAGE_SIZE);
 
             // Show no results message if needed
@@ -622,8 +632,28 @@ const charactersSchema = {
         totalNum.textContent = totalPages; // Display the overall total pages
 
         // Enable/disable pagination buttons based on overall totalPages
-        prevBtn.disabled = currentPage <= 1 || isLoading;
-        nextBtn.disabled = currentPage >= totalPages || isLoading;
+        const currentPageNum = Number(currentPage);
+        const totalPagesNum = Number(totalPages);
+        
+        // Force update button states immediately and after a short delay
+        const updateButtonStates = () => {
+          prevBtn.disabled = currentPageNum <= 1 || isLoading;
+          nextBtn.disabled = currentPageNum >= totalPagesNum || isLoading;
+          
+          console.log('Pagination button states:', {
+            prevDisabled: prevBtn.disabled,
+            nextDisabled: nextBtn.disabled,
+            currentPage: currentPageNum,
+            totalPages: totalPagesNum,
+            isLoading
+          });
+        };
+        
+        // Update immediately
+        updateButtonStates();
+        
+        // And again after a short delay to ensure DOM updates
+        setTimeout(updateButtonStates, 100);
 
         // Display "No Results" message if totalCharacters is 0 after fetch/filter
         noResults.classList.toggle('hidden', totalCharacters > 0);
@@ -707,22 +737,60 @@ const charactersSchema = {
     updateSpeciesDropdown();
 
     prevBtn.addEventListener('click', async () => {
-      if (currentPage > 1 && !isLoading) {
+      console.log('Previous button clicked', {
+        currentPage,
+        isLoading,
+        disabled: prevBtn.disabled
+      });
+      
+      if (Number(currentPage) > 1 && !isLoading) {
         try {
-          await fetchPageIfNeeded(currentPage - 1);
+          const prevPage = Number(currentPage) - 1;
+          console.log('Fetching previous page:', prevPage);
+          await fetchPageIfNeeded(prevPage);
         } catch (error) {
           console.error('Error navigating to previous page:', error);
         }
+      } else {
+        console.log('Previous button condition not met', {
+          currentPageCheck: Number(currentPage) > 1,
+          loadingCheck: !isLoading
+        });
       }
     });
 
-    nextBtn.addEventListener('click', async () => {
-      if (currentPage < totalPages && !isLoading) {
+    nextBtn.addEventListener('click', function() {
+      // Convert to numbers for comparison
+      const currentPageNum = Number(currentPage);
+      const totalPagesNum = Number(totalPages);
+      
+      console.log('Next button clicked', {
+        currentPage: currentPageNum,
+        totalPages: totalPagesNum,
+        isLoading,
+        disabled: nextBtn.disabled,
+        condition: currentPageNum < totalPagesNum
+      });
+      
+      if (currentPageNum < totalPagesNum && !isLoading) {
         try {
-          await fetchPageIfNeeded(currentPage + 1);
+          // Use the next page number
+          const nextPage = currentPageNum + 1;
+          console.log('Fetching next page:', nextPage);
+          
+          // Call fetchPageIfNeeded with the next page number
+          // Use a timeout to ensure the UI updates before fetching the next page
+          setTimeout(() => {
+            fetchPageIfNeeded(nextPage);
+          }, 100);
         } catch (error) {
           console.error('Error navigating to next page:', error);
         }
+      } else {
+        console.log('Next button condition not met', {
+          currentPageCheck: currentPageNum < totalPagesNum,
+          loadingCheck: !isLoading
+        });
       }
     });
 

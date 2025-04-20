@@ -71,11 +71,20 @@ exports.handler = async (event) => {
             filtered = filtered.filter(c => c.title && c.title.toLowerCase().includes(titleLower));
         }
         if (filters.isImportant === 'true' || filters.important === 'true') {
-            filtered = filtered.filter(c => c.important === true || c.isImportant === true);
+            console.log('Filtering for important characters');
+            filtered = filtered.filter(c => {
+                const isImportant = c.important === true || c.isImportant === true;
+                return isImportant;
+            });
+            console.log(`Found ${filtered.length} important characters`);
         }
         if (filters.keep === 'true') {
             // Ensure we only show primary actor records
-            filtered = filtered.filter(c => c.keep === true);
+            console.log('Filtering for primary actor records (keep=true)');
+            filtered = filtered.filter(c => {
+                const isPrimary = c.keep === true;
+                return isPrimary;
+            });
             
             // Log how many records have keep=true for debugging
             console.log(`Found ${filtered.length} characters with keep=true`);
