@@ -605,6 +605,8 @@ const charactersSchema = {
             console.log('API data received:', apiData);
 
             // Update filtered characters and total pages
+            // We only get the first page of filtered characters here
+            // The rest will be fetched as needed by fetchPageIfNeeded
             filteredCharacters = apiData.characters || [];
             totalCharacters = apiData.page?.totalElements || 0;
             totalPages = Math.ceil(totalCharacters / pageSize);
@@ -619,8 +621,8 @@ const charactersSchema = {
             currentPage = 1;
             pageNum.textContent = currentPage;
 
-            // Get the first page of characters
-            allCharacters = filteredCharacters.slice(0, PAGE_SIZE);
+            // Set the current page of characters
+            allCharacters = filteredCharacters;
 
             // Show no results message if needed
             if (totalCharacters === 0) {
@@ -637,6 +639,10 @@ const charactersSchema = {
             if (!currentFilters.species) {
                 updateSpeciesDropdown();
             }
+
+            // Update pagination buttons
+            prevBtn.disabled = currentPage <= 1 || isLoading;
+            nextBtn.disabled = currentPage >= totalPages || isLoading;
 
             render();
         } catch (error) {
