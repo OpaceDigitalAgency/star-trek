@@ -340,7 +340,11 @@ Memory Alpha wiki provides images and additional information. The application in
 
 > ⚠️ **Development Challenge:** We had to be careful not to overload Memory Alpha with too many requests, implementing rate limiting, retries, and queueing.
 
-### 5. Series Data Sources
+### 5. Series Data Processing Pipeline
+
+The application uses a comprehensive data processing pipeline to ensure all series, seasons, episodes, and characters are properly fetched, processed, and displayed. This pipeline consists of several scripts that work together to create a complete dataset.
+
+#### 5.1 Data Sources
 
 The application uses multiple sources for series data to ensure comprehensive and accurate information:
 
@@ -361,23 +365,78 @@ The application uses multiple sources for series data to ensure comprehensive an
    - Each entry includes character name, performer name, and search function for matching with STAPI data
    > ✅ **Solution:** This hybrid approach ensures complete and accurate cast information for all series, even when STAPI data is incomplete.
 
-4. **Series Data Processing Pipeline**:
-   ```mermaid
-   graph TD
-       STAPI[STAPI API] --> SeriesCache[build-series-cache.mjs]
-       MemoryAlpha[Memory Alpha Wiki] --> SeriesCache
-       SeriesCache --> SeriesJSON[src/data/series.json]
-       
-       STAPI --> EpisodesScript[build-series-episodes.mjs]
-       EpisodesScript --> SeriesJSON
-       
-       STAPI --> CharactersScript[build-series-characters.mjs]
-       ManualLists[Manually Curated Lists] --> CharactersScript
-       CharactersScript --> CharactersJSON[series-characters.json]
-       
-       SeriesJSON --> SeriesPage[Series Detail Page]
-       CharactersJSON --> SeriesPage
-   ```
+4. **Fallback Data**: Provides complete series, season, and episode data when STAPI is incomplete
+   - The scripts contain fallback data for all major Star Trek series
+   - This ensures that even if STAPI is missing data for newer series or seasons, the application still displays complete information
+   - Fallback data includes series metadata, season information, and episode details
+   > ✅ **Solution:** This approach ensures that the application always has complete data, even when external APIs are incomplete or unavailable.
+
+#### 5.2 Series Data Processing Scripts
+
+The series data processing pipeline consists of several scripts that work together to create a complete dataset:
+
+1. **build-series-cache.mjs**: Fetches and processes basic series data
+   - Fetches series data from STAPI API
+   - Filters to include only Star Trek series (excluding movies, etc.)
+   - Normalizes series titles (e.g., "Star Trek" → "Star Trek: The Original Series")
+   - Checks for missing series and adds them from fallback data
+   - Enhances series data with Memory Alpha content (descriptions, images)
+   - Outputs to `src/data/series.json`
+   > ✅ **Solution:** The script now uses a more robust filtering approach that ensures all Star Trek series are included, even if they have different naming conventions in STAPI.
+
+2. **build-series-episodes.mjs**: Enhances series data with episode information
+   - Fetches season data for each series from STAPI
+   - Fetches episode data for each season
+   - Organizes episodes by season
+   - Adds fallback episode data for newer seasons that might not be in STAPI yet
+   - Updates the series data in `src/data/series.json`
+   > ✅ **Solution:** The script now includes a more robust season matching algorithm and fallback episode data for newer seasons, ensuring complete episode information for all series.
+
+3. **build-series-characters.mjs**: Builds character data for each series
+   - Uses manually curated lists of main cast members for each series
+   - Matches characters with STAPI data using UIDs or name matching
+   - Enhances character data with images from the character cache
+   - Outputs to both `netlify/functions/series-characters.json` and `src/data/series-characters.json`
+   > ✅ **Solution:** The script now uses a multi-strategy approach to match characters, ensuring accurate character data for all series.
+
+4. **update-all-series-data.mjs**: Orchestrates the entire series data processing pipeline
+   - Runs all three scripts in sequence
+   - Ensures that all data is consistent and up-to-date
+   - Provides a single command to update all series data
+   - Handles errors and ensures all scripts complete successfully
+   > ✅ **Solution:** This new script simplifies the process of updating all series data, making it easier to maintain and update the application.
+
+#### 5.3 Series Data Processing Flow
+
+The series data processing pipeline follows this flow:
+
+```mermaid
+graph TD
+    STAPI[STAPI API] --> SeriesCache[build-series-cache.mjs]
+    MemoryAlpha[Memory Alpha Wiki] --> SeriesCache
+    FallbackSeriesData[Fallback Series Data] --> SeriesCache
+    SeriesCache --> SeriesJSON[src/data/series.json]
+    
+    STAPI --> EpisodesScript[build-series-episodes.mjs]
+    FallbackEpisodeData[Fallback Episode Data] --> EpisodesScript
+    EpisodesScript --> SeriesJSON
+    
+    STAPI --> CharactersScript[build-series-characters.mjs]
+    ManualLists[Manually Curated Lists] --> CharactersScript
+    CharacterCache[Character Image Cache] --> CharactersScript
+    CharactersScript --> CharactersJSON1[netlify/functions/series-characters.json]
+    CharactersScript --> CharactersJSON2[src/data/series-characters.json]
+    
+    UpdateAll[update-all-series-data.mjs] --> SeriesCache
+    UpdateAll --> EpisodesScript
+    UpdateAll --> CharactersScript
+    
+    SeriesJSON --> SeriesPage[Series Detail Page]
+    CharactersJSON1 --> SeriesPage
+    CharactersJSON2 --> SeriesPage
+```
+
+This pipeline ensures that all series data is complete, accurate, and up-to-date, even when external APIs are incomplete or unavailable.
 
 ### 6. ProgressiveImage Component
 

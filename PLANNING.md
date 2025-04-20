@@ -135,3 +135,58 @@ The HTML template is embedded directly in the function code and populated with c
   - Clear visual indication of missing data
 
 This architecture ensures robust handling of series data while maintaining a smooth user experience, even when dealing with incomplete or malformed data from the API.
+
+---
+
+## Series Data Processing Pipeline
+
+### Rationale
+- The STAPI API provides comprehensive Star Trek data, but has some limitations:
+  - Missing or incomplete data for newer series and seasons
+  - Inconsistent naming conventions for series (e.g., "Star Trek" vs "Star Trek: The Original Series")
+  - Incomplete character data for series
+- Memory Alpha wiki provides additional information, but requires careful handling to avoid overloading with requests
+- We need a reliable process to fetch, process, and display all series data, even when external APIs are incomplete
+
+### Solution: Comprehensive Data Processing Pipeline
+- **Multi-Source Approach:** Combine data from STAPI, Memory Alpha, and fallback data
+- **Robust Filtering:** Ensure all Star Trek series are included, regardless of naming conventions
+- **Fallback System:** Provide complete data for newer series and seasons not yet in STAPI
+- **Unified Command:** Single script to update all series data
+
+### Implementation: Key Scripts
+
+1. **build-series-cache.mjs**
+   - Fetches series data from STAPI API
+   - Filters to include only Star Trek series
+   - Normalizes series titles
+   - Checks for missing series and adds them from fallback data
+   - Enhances series data with Memory Alpha content
+   - Outputs to `src/data/series.json`
+
+2. **build-series-episodes.mjs**
+   - Fetches season data for each series
+   - Fetches episode data for each season
+   - Organizes episodes by season
+   - Adds fallback episode data for newer seasons
+   - Updates the series data in `src/data/series.json`
+
+3. **build-series-characters.mjs**
+   - Uses manually curated lists of main cast members
+   - Matches characters with STAPI data
+   - Enhances character data with images
+   - Outputs to both `netlify/functions/series-characters.json` and `src/data/series-characters.json`
+
+4. **update-all-series-data.mjs**
+   - Orchestrates the entire series data processing pipeline
+   - Runs all three scripts in sequence
+   - Ensures data consistency and completeness
+   - Handles errors and ensures successful completion
+
+### Benefits
+- **Complete Data:** All series, seasons, and episodes are properly represented
+- **Resilience:** System works even when external APIs are incomplete or unavailable
+- **Maintainability:** Single command to update all data
+- **Performance:** Efficient processing that balances completeness with build time constraints
+
+This pipeline ensures that the application always has complete and accurate series data, providing users with a comprehensive view of the Star Trek universe.

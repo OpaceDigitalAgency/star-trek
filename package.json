@@ -12,6 +12,7 @@
     "cache-images": "node scripts/cache-character-images.mjs",
     "update-json": "node scripts/update-characters-json.mjs",
     "prepare-images": "npm run cache-images && npm run update-json",
+    "update-series-data": "node scripts/update-all-series-data.mjs",
     "prepare-deploy": "node scripts/prepare-deployment.mjs",
     "deploy": "npm run prepare-deploy && netlify deploy"
   },

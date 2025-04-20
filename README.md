@@ -35,16 +35,35 @@ Run these scripts after adding new characters or when images aren't displaying c
 The following scripts are available for managing series data:
 
 - `scripts/build-series-cache.mjs` - Builds a local cache of Star Trek series data from STAPI and enhances it with Memory Alpha content
-- `scripts/build-series-characters.mjs` - Builds a cache of character data for each Star Trek series, using a combination of STAPI API data and manually curated lists
 - `scripts/build-series-episodes.mjs` - Enhances the series data with episode information from STAPI, organized by season
+- `scripts/build-series-characters.mjs` - Builds a cache of character data for each Star Trek series, using a combination of STAPI API data and manually curated lists
+- `scripts/update-all-series-data.mjs` - Runs all three scripts in sequence to update all series data
 
 To update the series data:
 
+**Option 1: Update all series data at once (recommended)**
+```bash
+npm run update-series-data
+```
+or
+```bash
+node scripts/update-all-series-data.mjs
+```
+
+This script will run all three scripts in sequence, ensuring that all series data is consistent and up-to-date. It handles errors and ensures all scripts complete successfully.
+
+**Option 2: Update individual components**
 1. Run `node scripts/build-series-cache.mjs` to update the basic series information
 2. Run `node scripts/build-series-episodes.mjs` to add episode data to the series
 3. Run `node scripts/build-series-characters.mjs` to update the character data for each series
 
-These scripts ensure that the series detail pages have complete and accurate information about each Star Trek series, including cast and episodes.
+These scripts ensure that the series detail pages have complete and accurate information about each Star Trek series, including cast and episodes. The scripts include robust error handling and fallback data to ensure that all series are properly represented, even when external APIs are incomplete or unavailable.
+
+**Key Improvements in Series Data Processing:**
+- Robust filtering to ensure all Star Trek series are included, regardless of naming conventions
+- Fallback data for newer series and seasons not yet in STAPI
+- Multi-strategy character matching for accurate character data
+- Consistent data output to both Netlify functions and frontend data files
 
 ### Deployment Notes
 
