@@ -45,7 +45,16 @@ async function updateAllSeriesData() {
     process.exit(1);
   }
   
-  // Step 2: Build the series episodes cache
+  // Step 2: Cache the series images
+  const seriesImagesScript = path.join(__dirname, 'cache-series-images.mjs');
+  const seriesImagesSuccess = await runScript(seriesImagesScript);
+  
+  if (!seriesImagesSuccess) {
+    console.error('Failed to cache series images.');
+    process.exit(1);
+  }
+  
+  // Step 3: Build the series episodes cache
   const seriesEpisodesScript = path.join(__dirname, 'build-series-episodes.mjs');
   const seriesEpisodesSuccess = await runScript(seriesEpisodesScript);
   
@@ -54,7 +63,7 @@ async function updateAllSeriesData() {
     process.exit(1);
   }
   
-  // Step 3: Build the series characters cache
+  // Step 4: Build the series characters cache
   const seriesCharactersScript = path.join(__dirname, 'build-series-characters.mjs');
   const seriesCharactersSuccess = await runScript(seriesCharactersScript);
   

@@ -524,23 +524,31 @@ async function buildSeriesCharactersCache() {
       'star-trek-the-original-series': [
         { name: 'James T. Kirk', performer: 'William Shatner', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('kirk') || name.includes('james t') ||
-                 name === 'captain kirk' || name === 'admiral kirk';
+          // More specific search to avoid matching with wrong characters
+          return (name === 'james t. kirk' || name === 'james kirk' ||
+                 name === 'captain kirk' || name === 'admiral kirk' ||
+                 (name.includes('kirk') && name.includes('james')));
         }},
         { name: 'Spock', performer: 'Leonard Nimoy', search: c => {
           const name = c.name.toLowerCase();
-          return name === 'spock' || name.includes('spock') ||
-                 name === 'mr. spock' || name.includes('s\'chn t\'gai spock');
+          // More specific search to avoid matching with wrong characters
+          return (name === 'spock' ||
+                 (name.includes('spock') && !name.includes('benjamin')));
         }},
         { name: 'Leonard McCoy', performer: 'DeForest Kelley', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('mccoy') || name.includes('leonard') ||
-                 name === 'dr. mccoy' || name === 'doctor mccoy' || name.includes('bones');
+          // More specific search to avoid matching with wrong characters
+          return (name === 'leonard mccoy' || name === 'leonard h. mccoy' ||
+                 name === 'dr. mccoy' || name === 'doctor mccoy' ||
+                 (name === 'mccoy') || name.includes('bones') ||
+                 (name.includes('leonard') && name.includes('mccoy')));
         }},
         { name: 'Montgomery Scott', performer: 'James Doohan', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('scott') || name.includes('montgomery') ||
-                 name === 'lt. commander scott' || name.includes('scotty');
+          // More specific search to avoid matching with wrong characters
+          return (name === 'montgomery scott' || name === 'lt. commander scott' ||
+                 name.includes('scotty') ||
+                 (name.includes('scott') && name.includes('montgomery') && !name.includes('a. montgomery')));
         }},
         { name: 'Nyota Uhura', performer: 'Nichelle Nichols', search: c => {
           const name = c.name.toLowerCase();
@@ -549,13 +557,15 @@ async function buildSeriesCharactersCache() {
         }},
         { name: 'Hikaru Sulu', performer: 'George Takei', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('sulu') || name.includes('hikaru') ||
-                 name === 'lieutenant sulu' || name === 'lt. sulu';
+          // More specific search to avoid matching with wrong characters
+          return (name === 'hikaru sulu' || name === 'lieutenant sulu' || name === 'lt. sulu' ||
+                 (name.includes('sulu') && !name.includes('demora')));
         }},
         { name: 'Pavel Chekov', performer: 'Walter Koenig', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('chekov') || name.includes('pavel') ||
-                 name === 'ensign chekov' || name === 'lieutenant chekov';
+          // More specific search to avoid matching with wrong characters
+          return (name === 'pavel chekov' || name === 'ensign chekov' || name === 'lieutenant chekov' ||
+                 (name.includes('chekov') && !name.includes('andrei') && !name.includes('anton')));
         }},
         { name: 'Christine Chapel', performer: 'Majel Barrett', search: c => {
           const name = c.name.toLowerCase();
@@ -566,23 +576,32 @@ async function buildSeriesCharactersCache() {
       'star-trek-the-animated-series': [
         { name: 'James T. Kirk', performer: 'William Shatner', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('kirk') || name.includes('james t') ||
-                 name === 'captain kirk' || name === 'admiral kirk';
+          // More specific search to avoid matching with wrong characters
+          return (name === 'james t. kirk' || name === 'james kirk' ||
+                 name === 'captain kirk' || name === 'admiral kirk' ||
+                 (name.includes('kirk') && name.includes('james')));
         }},
         { name: 'Spock', performer: 'Leonard Nimoy', search: c => {
           const name = c.name.toLowerCase();
-          return name === 'spock' || name.includes('spock') ||
-                 name === 'mr. spock' || name.includes('s\'chn t\'gai spock');
+          // More specific search to avoid matching with wrong characters
+          return (name === 'spock' ||
+                 (name.includes('spock') && !name.includes('benjamin')));
         }},
         { name: 'Leonard McCoy', performer: 'DeForest Kelley', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('mccoy') || name.includes('leonard') ||
-                 name === 'dr. mccoy' || name === 'doctor mccoy' || name.includes('bones');
+          // More specific search to avoid matching with wrong characters
+          return (name === 'leonard mccoy' || name === 'leonard h. mccoy' ||
+                 name === 'dr. mccoy' || name === 'doctor mccoy' ||
+                 (name === 'mccoy') || name.includes('bones') ||
+                 (name.includes('leonard') && name.includes('mccoy')) ||
+                 (name.includes('mccoy') && !name.includes('daniel') && !name.includes('david') && !name.includes('joanna')));
         }},
         { name: 'Montgomery Scott', performer: 'James Doohan', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('scott') || name.includes('montgomery') ||
-                 name === 'lt. commander scott' || name.includes('scotty');
+          // More specific search to avoid matching with wrong characters
+          return (name === 'montgomery scott' || name === 'lt. commander scott' ||
+                 name.includes('scotty') ||
+                 (name.includes('scott') && name.includes('montgomery') && !name.includes('a. montgomery')));
         }},
         { name: 'Nyota Uhura', performer: 'Nichelle Nichols', search: c => {
           const name = c.name.toLowerCase();
@@ -591,13 +610,15 @@ async function buildSeriesCharactersCache() {
         }},
         { name: 'Hikaru Sulu', performer: 'George Takei', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('sulu') || name.includes('hikaru') ||
-                 name === 'lieutenant sulu' || name === 'lt. sulu';
+          // More specific search to avoid matching with wrong characters
+          return (name === 'hikaru sulu' || name === 'lieutenant sulu' || name === 'lt. sulu' ||
+                 (name.includes('sulu') && !name.includes('demora')));
         }},
         { name: 'Pavel Chekov', performer: 'Walter Koenig', search: c => {
           const name = c.name.toLowerCase();
-          return name.includes('chekov') || name.includes('pavel') ||
-                 name === 'ensign chekov' || name === 'lieutenant chekov';
+          // More specific search to avoid matching with wrong characters
+          return (name === 'pavel chekov' || name === 'ensign chekov' || name === 'lieutenant chekov' ||
+                 (name.includes('chekov') && !name.includes('andrei') && !name.includes('anton')));
         }},
         { name: 'Christine Chapel', performer: 'Majel Barrett', search: c => {
           const name = c.name.toLowerCase();
@@ -698,28 +719,7 @@ async function buildSeriesCharactersCache() {
           // Extract potential UIDs from matching filenames
           const potentialUIDs = [];
           
-          // Extract UIDs from matching filenames
-          matchingFiles.forEach(file => {
-            const uidMatch = file.match(/CHMA\d+/);
-            if (uidMatch) {
-              potentialUIDs.push(uidMatch[0]);
-            }
-          });
-          
-          // Try to find characters with these UIDs
-          if (potentialUIDs.length > 0) {
-            for (const uid of potentialUIDs) {
-              const uidChar = localCharactersData.find(c => c.uid === uid) ||
-                             charactersData.find(c => c.uid === uid);
-              if (uidChar) {
-                char = uidChar;
-                console.log(`  Found character by UID ${uid} from filename pattern`);
-                break;
-              }
-            }
-          }
-          
-          // Strategy 2: Use the original search function
+          // Strategy 1: Use the original search function
           if (!char) {
             const localChar = localCharactersData.find(castMember.search);
             const mainChar = charactersData.find(castMember.search);
