@@ -491,27 +491,57 @@ const charactersSchema = {
         const pageNum = Number(pageNumber);
         console.log('Converted pageNumber to number:', pageNum);
         
-        // Get the requested page
-        const pageIndex = pageNum - 1;
-        const start = pageIndex * PAGE_SIZE;
-        const end = start + PAGE_SIZE;
+        // Check if we have filters applied
+        const hasFilters = Object.keys(currentFilters).length > 0;
         
-        console.log('Fetching page slice:', {
-          pageIndex,
-          start,
-          end,
-          totalItems: filteredCharacters.length
-        });
-        
-        // Check if we need to fetch more data from the API
-        if (start >= filteredCharacters.length && pageNum <= totalPages) {
-          console.log('Need to fetch more data from API for page:', pageNum);
-          // This would be implemented in a real app, but for now we'll just use what we have
+        if (hasFilters) {
+          // If filters are applied, we need to fetch the specific page from the API
+          console.log('Filters applied, fetching page from API:', pageNum);
+          
+          // Prepare API filters
+          const apiFilters = {
+            page: pageNum - 1, // API expects 0-based index
+            ...currentFilters,
+          };
+          
+          // Rename filter parameters to match API expectations
+          if (apiFilters.title) {
+            apiFilters.rank = apiFilters.title;
+            delete apiFilters.title;
+          }
+          
+          // Convert boolean values to strings for the API
+          if (apiFilters.important === true) {
+            apiFilters.important = 'true';
+          }
+          if (apiFilters.keep === true) {
+            apiFilters.keep = 'true';
+          }
+          
+          console.log('Sending API filters for page:', apiFilters);
+          const apiData = await stapiClient.getCharacters(apiFilters.page, PAGE_SIZE, apiFilters);
+          
+          // Update the characters for this page
+          allCharacters = apiData.characters || [];
+          currentPage = pageNum;
+        } else {
+          // No filters, use local data
+          // Get the requested page
+          const pageIndex = pageNum - 1;
+          const start = pageIndex * PAGE_SIZE;
+          const end = start + PAGE_SIZE;
+          
+          console.log('Fetching page slice from local data:', {
+            pageIndex,
+            start,
+            end,
+            totalItems: filteredCharacters.length
+          });
+          
+          // Get the characters for this page
+          allCharacters = filteredCharacters.slice(start, end);
+          currentPage = pageNum; // Store as a number
         }
-        
-        // Get the characters for this page
-        allCharacters = filteredCharacters.slice(start, end);
-        currentPage = pageNum; // Store as a number
         
         console.log('Updated page data:', {
           currentPage,
