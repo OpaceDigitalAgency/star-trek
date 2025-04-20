@@ -36,55 +36,65 @@ async function downloadImage(url, dest) {
   }
 }
 
+async function processCharacter(char) {
+  const ext = '.jpg';
+  const filename = `${slugify(char.name || char.uid)}-${char.uid}${ext}`;
+  const localPath = `/images/character-cache/${filename}`;
+  const dest = path.join(IMAGES_DIR, filename);
+
+  // Check if the cached image exists
+  let alreadyExists = false;
+  try {
+    await fs.access(dest);
+    alreadyExists = true;
+  } catch {}
+
+  if (alreadyExists) {
+    // If we have a cached image, use it
+    return { ...char, wikiImage: localPath };
+  }
+
+  // Get image URL from either wikiImage or imageUrl
+  let imageUrl = char.wikiImage || char.imageUrl;
+
+  // Extract the actual URL from the proxy URL
+  if (imageUrl && imageUrl.includes('proxy-image?url=')) {
+    const urlParam = new URLSearchParams(imageUrl.split('?')[1]).get('url');
+    if (urlParam) {
+      imageUrl = decodeURIComponent(urlParam);
+    }
+  }
+
+  // If no valid image URL, return character with null wikiImage
+  if (!imageUrl || (!imageUrl.startsWith('http') && !imageUrl.startsWith('/.'))) {
+    return { ...char, wikiImage: null };
+  }
+
+  // Try to download the image
+  const ok = await downloadImage(imageUrl, dest);
+  if (!ok) {
+    return { ...char, wikiImage: null };
+  }
+
+  // Return character with local image path
+  return { ...char, wikiImage: localPath };
+}
+
 async function main() {
   await ensureDir(IMAGES_DIR);
   const raw = await fs.readFile(CHARACTERS_JSON, 'utf8');
   const characters = JSON.parse(raw);
-  let updated = [];
   let count = 0;
 
+  const updated = [];
   for (const char of characters) {
-    let imageUrl = char.wikiImage;
-    // Extract the actual URL from the proxy URL
-    if (imageUrl && imageUrl.includes('proxy-image?url=')) {
-      const urlParam = new URLSearchParams(imageUrl.split('?')[1]).get('url');
-      if (urlParam) {
-        imageUrl = decodeURIComponent(urlParam);
-      }
-    }
-    
-    if (!imageUrl || (!imageUrl.startsWith('http') && !imageUrl.startsWith('/.'))) {
-      updated.push({ ...char, wikiImage: null });
-      continue;
-    }
-    const ext = path.extname(imageUrl.split('?')[0]) || '.jpg';
-    const filename = `${slugify(char.name || char.uid)}-${char.uid}${ext}`;
-    const localPath = `/images/character-cache/${filename}`;
-    const dest = path.join(IMAGES_DIR, filename);
-
-    // Only download if not already present
-    let alreadyExists = false;
-    try {
-      await fs.access(dest);
-      alreadyExists = true;
-    } catch {}
-
-    if (!alreadyExists) {
-      const ok = await downloadImage(imageUrl, dest);
-      if (!ok) {
-        updated.push({ ...char, wikiImage: null });
-        continue;
-      }
-      count++;
-    }
-    updated.push({ ...char, wikiImage: localPath });
+    const processedChar = await processCharacter(char);
+    if (processedChar.wikiImage) count++;
+    updated.push(processedChar);
   }
 
   await fs.writeFile(OUTPUT_JSON, JSON.stringify(updated, null, 2));
-  console.log(`Downloaded ${count} new images. Updated data written to ${OUTPUT_JSON}`);
+  console.log(`Updated ${count} characters with image paths. Data written to ${OUTPUT_JSON}`);
 }
 
-main().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+main().catch(console.error);

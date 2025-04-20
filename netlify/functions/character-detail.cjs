@@ -73,8 +73,12 @@ exports.handler = async function(event, context) {
   }
 
   // Ensure wikiImage is present if available (no-op if already present)
-  if (!char.wikiImage && char.wikiImageUrl) {
-    char.wikiImage = char.wikiImageUrl;
+  if (!char.wikiImage) {
+    if (char.wikiImageUrl) {
+      char.wikiImage = char.wikiImageUrl;
+    } else if (char.imageUrl) {
+      char.wikiImage = char.imageUrl;
+    }
   }
 
   // Create a full HTML template that matches the site's layout and styling
@@ -96,14 +100,14 @@ exports.handler = async function(event, context) {
   <meta property="og:url" content="https://star-trek-timelines.netlify.app/characters/${slugify(char.name)}-${char.uid}/">
   <meta property="og:title" content="${char.name} | Star Trek Character Profile">
   <meta property="og:description" content="Learn about ${char.name}, a character from Star Trek.">
-  <meta property="og:image" content="${char.wikiImage || char.image || "/images/generic-character.jpg"}">
+  <meta property="og:image" content="${char.wikiImage || char.imageUrl || char.image || "/images/generic-character.jpg"}">
   
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
   <meta property="twitter:url" content="https://star-trek-timelines.netlify.app/characters/${slugify(char.name)}-${char.uid}/">
   <meta property="twitter:title" content="${char.name} | Star Trek Character Profile">
   <meta property="twitter:description" content="Learn about ${char.name}, a character from Star Trek.">
-  <meta property="twitter:image" content="${char.wikiImage || char.image || "/images/generic-character.jpg"}">
+  <meta property="twitter:image" content="${char.wikiImage || char.imageUrl || char.image || "/images/generic-character.jpg"}">
   
   <!-- Schema.org / JSON-LD -->
   <script type="application/ld+json">
@@ -387,7 +391,7 @@ exports.handler = async function(event, context) {
           <div class="lcars-panel p-6">
             <div class="character-image">
               <img
-                src="${char.wikiImage || char.image || "/images/generic-character.jpg"}"
+                src="${char.wikiImage || char.imageUrl || char.image || "/images/generic-character.jpg"}"
                 alt="${char.name}"
                 onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
               />

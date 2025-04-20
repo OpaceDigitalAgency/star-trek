@@ -1,54 +1,31 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
-/* removed: import { slugify } from '../../utils/slugify.js'; */
 
-// SEO metadata for pagination
-const currentPage = 1; // Initial page is always 1 for SSR
-const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
-
-// Pagination settings
-const PAGE_SIZE = 48; // Number of characters to display per page
-let initialCharacters = [];
-let totalPages = 1;
-let totalCharacters = 0;
-let allSpecies = []; // For filter dropdown
-
-// Import the local characters data at the top level
+// Import the local characters data
 import charactersLocalJson from '../../data/characters-local.json';
 
-// Fetch only the first page of characters for the initial build
-try {
-  // Use local characters data directly for the initial build
-  import.meta.env.SSR && console.log('Using local characters data for initial build');
-  
-  // Get the first page of characters
-  const charactersData = charactersLocalJson;
-  initialCharacters = charactersData.slice(0, PAGE_SIZE);
-  totalPages = Math.ceil(charactersData.length / PAGE_SIZE);
-  totalCharacters = charactersData.length;
+// Pagination settings
+const PAGE_SIZE = 48;
+const initialCharacters = charactersLocalJson.slice(0, PAGE_SIZE);
+const totalPages = Math.ceil(charactersLocalJson.length / PAGE_SIZE);
+const totalCharacters = charactersLocalJson.length;
 
-  // Fetch all species for the filter dropdown (consider caching this later)
-  // This might still be slow if there are thousands of species
-  const speciesData = await stapiService.searchSpecies({ pageSize: 2000 }); // Adjust pageSize as needed
-  allSpecies = speciesData.map(s => s.name).sort((a, b) => {
-    if (a === 'Human') return -1;
-    if (b === 'Human') return 1;
-    if (a === 'Unknown') return -1; // Assuming 'Unknown' might exist
-    if (b === 'Unknown') return 1;
-    return a.localeCompare(b);
-  });
+// Get all unique species for the filter dropdown
+const allSpecies = Array.from(new Set(
+  charactersLocalJson.flatMap(c => [
+    ...(c.characterSpecies?.map(s => s.name) || []),
+    ...(c.species?.map(s => s.name) || [])
+  ])
+)).sort((a, b) => {
+  if (a === 'Human') return -1;
+  if (b === 'Human') return 1;
+  if (a === 'Unknown') return -1;
+  if (b === 'Unknown') return 1;
+  return a.localeCompare(b);
+});
 
-  console.log(`Initial build: Fetched ${initialCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
-
-} catch (error) {
-  console.error('Error fetching initial character/species data:', error);
-  // Add fallback data if needed
-  initialCharacters = [ /* Add fallback character objects here if API fails */ ];
-  allSpecies = ['Human', 'Vulcan', 'Klingon']; // Basic fallback species
-  totalCharacters = initialCharacters.length;
-  totalPages = 1;
-}
+console.log(`Initial build: Fetched ${initialCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
 
 // Extract ranks *only* from the initial page for the build
 let initialRanks = [...new Set(initialCharacters
@@ -119,38 +96,37 @@ const charactersSchema = {
         
         <div class="filters mb-8">
           <div class="flex flex-wrap gap-4">
-            <div class="filter-group">
+            <div class="filter-group relative">
               <h3 class="text-white text-lg mb-2">Filter by Species</h3>
-              <select
-                id="species-filter"
-                class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
-              >
-                <option value="all">All Species</option>
-                {allSpecies.map(species => (
-                                  <option value={species}>{species}</option>
-                                ))}
-              </select>
-              <!-- chevron -->
-              <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
-                   viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
+              <div class="relative">
+                <select
+                  id="species-filter"
+                  class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
+                  style="-webkit-appearance: menulist; -moz-appearance: menulist; appearance: menulist;"
+                >
+                  <option value="all">All Species</option>
+                  {allSpecies.map(species => (
+                    <option value={species}>{species}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             
             {initialRanks.length > 0 && (
-                          <div class="filter-group">
+                          <div class="filter-group relative">
                             <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
-                            <select
-                              id="rank-filter"
-                              class="appearance-none bg-space-black text-white p-2 pr-8 border border-starfleet-blue rounded relative"
-                            >
-                              <option value="all">All Ranks</option>
-                              {/* Populate ranks dynamically client-side later */}
-                              {initialRanks.map(rank => (
-                                <option value={rank}>{rank}</option>
-                              ))}
-                            </select>
-                            <!-- chevron -->
-                            <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 fill-starfleet-gold"
-                                 viewBox="0 0 20 20"><path d="M5 7l5 5 5-5H5z"/></svg>
+                            <div class="relative">
+                              <select
+                                id="rank-filter"
+                                class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
+                                style="-webkit-appearance: menulist; -moz-appearance: menulist; appearance: menulist;"
+                              >
+                                <option value="all">All Ranks</option>
+                                {initialRanks.map(rank => (
+                                  <option value={rank}>{rank}</option>
+                                ))}
+                              </select>
+                            </div>
                           </div>
                         )}
             
@@ -161,17 +137,19 @@ const charactersSchema = {
                   <input
                     type="checkbox"
                     id="important-filter"
-                    class="mr-2"
+                    class="mr-2 w-4 h-4 accent-starfleet-gold cursor-pointer"
+                    onclick="this.blur()"
                   >
-                  <label for="important-filter" class="text-white">Important Characters</label>
+                  <label for="important-filter" class="text-white cursor-pointer select-none hover:text-starfleet-gold">Important Characters</label>
                 </div>
                 <div class="flex items-center">
                   <input
                     type="checkbox"
                     id="keep-filter"
-                    class="mr-2"
+                    class="mr-2 w-4 h-4 accent-starfleet-gold cursor-pointer"
+                    onclick="this.blur()"
                   >
-                  <label for="keep-filter" class="text-white">Primary Actor Records</label>
+                  <label for="keep-filter" class="text-white cursor-pointer select-none hover:text-starfleet-gold">Primary Actor Records</label>
                 </div>
               </div>
             </div>
@@ -231,7 +209,7 @@ const charactersSchema = {
   id="initial-payload"
   type="application/json"
   set:html={JSON.stringify({
-    characters: initialCharacters,
+    characters: charactersLocalJson,
     totalPages: totalPages,
     totalCharacters: totalCharacters,
     pageSize: PAGE_SIZE,
@@ -298,14 +276,28 @@ const charactersSchema = {
 
 
   document.addEventListener('DOMContentLoaded', () => {
+      // Get initial data from payload
       const payload = JSON.parse(document.getElementById('initial-payload').textContent);
       const PAGE_SIZE = payload.pageSize;
       let currentPage = 1;
-      let totalPages = payload.totalPages;
-      let totalCharacters = payload.totalCharacters;
-      let allCharacters = [...payload.characters]; // Always holds only the current page's characters
+      let allCharacters = []; // Current page's characters
+      let filteredCharacters = [...payload.characters]; // All filtered characters
+      let totalPages = Math.ceil(filteredCharacters.length / PAGE_SIZE);
+      let totalCharacters = filteredCharacters.length;
       let isLoading = false; // Prevent multiple simultaneous fetches
       let currentFilters = {}; // Initialize current filters
+
+      // Initialize with first page
+      allCharacters = filteredCharacters.slice(0, PAGE_SIZE);
+
+      // Style fixes for dropdowns
+      const dropdowns = document.querySelectorAll('select');
+      dropdowns.forEach(dropdown => {
+        const wrapper = dropdown.closest('.relative');
+        if (wrapper) {
+          wrapper.style.zIndex = '20';
+        }
+      });
 
     // DOM Elements
     const speciesFilter = document.getElementById('species-filter');
@@ -329,22 +321,70 @@ const charactersSchema = {
       };
     };
 
+    // Add event listeners for filters
+    speciesFilter.addEventListener('change', () => {
+      applyFiltersAndFetch();
+    });
+
+    if (rankFilter) {
+      rankFilter.addEventListener('change', () => {
+        applyFiltersAndFetch();
+      });
+    }
+
+    importantBox.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      console.log('Important characters checkbox changed:', isChecked);
+      console.log('Checkbox element:', e.target);
+      console.log('Checkbox properties:', {
+        id: e.target.id,
+        checked: e.target.checked,
+        value: e.target.value
+      });
+      currentFilters = getCurrentFilters();
+      console.log('Current filters before fetch:', currentFilters);
+      applyFiltersAndFetch();
+    });
+
+    keepBox.addEventListener('change', (e) => {
+      const isChecked = e.target.checked;
+      console.log('Primary actor records checkbox changed:', isChecked);
+      currentFilters = getCurrentFilters();
+      console.log('Current filters:', currentFilters);
+      applyFiltersAndFetch();
+    });
+
+    // Debounced search input handler
+    searchInput.addEventListener('input', debounce(() => {
+      applyFiltersAndFetch();
+    }, 300));
+
     // --- Species Dropdown Dynamic Update ---
     // Fetch all matching characters (with current filters except species) and update the species dropdown
-    async function updateSpeciesDropdown() {
-      // Build filters excluding species
+    function updateSpeciesDropdown() {
+      // Get current filters except species
       const filters = getCurrentFilters();
-      delete filters.species; // Remove species filter to get all possible species for current search/rank/important
+      delete filters.species;
 
-      // Fetch all matching characters (up to 2000)
-      let data;
-      try {
-        data = await stapiClient.getCharacters(0, 2000, filters);
-      } catch (e) {
-        console.error("Failed to fetch all characters for species dropdown:", e);
-        return;
+      // Start with all characters
+      let chars = [...payload.characters];
+      
+      // Apply current filters except species
+      if (filters.title) {
+        chars = chars.filter(c => c.title?.toLowerCase().includes(filters.title.toLowerCase()));
       }
-      const chars = data.characters || [];
+      if (filters.name) {
+        chars = chars.filter(c => c.name.toLowerCase().includes(filters.name.toLowerCase()));
+      }
+      if (filters.important) {
+        chars = chars.filter(c => c.isImportant);
+      }
+      if (filters.keep) {
+        chars = chars.filter(c => c.keep);
+      }
+
+      console.log(`Found ${chars.length} characters matching current filters (excluding species)`);
+
       // Build a set of species with at least one matching character
       const speciesSet = new Set();
       for (const c of chars) {
@@ -391,107 +431,185 @@ const charactersSchema = {
     // Function to get current filter values from UI elements
     function getCurrentFilters() {
         const filters = {};
+        
+        // Species filter
         const speciesVal = speciesFilter.value;
-        const rankVal = rankFilter ? rankFilter.value : 'all';
-        const importantOnly = importantBox.checked;
-        const keepOnly = keepBox.checked;
+        if (speciesVal && speciesVal !== 'all') {
+            filters.species = speciesVal;
+        }
+        
+        // Rank filter
+        if (rankFilter) {
+            const rankVal = rankFilter.value;
+            if (rankVal && rankVal !== 'all') {
+                filters.title = rankVal;
+            }
+        }
+        
+        // Important characters filter
+        console.log('Important checkbox state:', {
+            element: importantBox,
+            checked: importantBox.checked,
+            value: importantBox.value
+        });
+        filters.important = importantBox.checked;
+        
+        // Primary actor records filter
+        console.log('Keep checkbox state:', {
+            element: keepBox,
+            checked: keepBox.checked,
+            value: keepBox.value
+        });
+        filters.keep = keepBox.checked;
+        
+        // Search filter
         const searchTerm = searchInput.value.trim();
+        if (searchTerm) {
+            filters.name = searchTerm;
+        }
 
-        if (speciesVal !== 'all') filters.species = speciesVal; // Assuming API filter key is 'species'
-        if (rankVal !== 'all') filters.title = rankVal; // Assuming API filter key is 'title' for rank
-        if (importantOnly) filters.important = 'true'; // Using the correct property name from the JSON file
-        if (keepOnly) filters.keep = 'true'; // Filter by the "keep" flag for primary actor records
-        if (searchTerm) filters.name = searchTerm; // Assuming API filter key is 'name'
-
+        console.log('Computed filters:', filters);
         return filters;
     }
 
-    // Function to fetch a specific page *for the current filters* if not already loaded
+    // Function to apply filters and get a specific page
     async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
-      if (isLoading) {
-        return; // Prevent multiple simultaneous fetches
-      }
-      const pageIndex = pageNumber - 1; // API is 0-based
-
-      isLoading = true;
-      container.style.opacity = '0.5'; // Indicate loading
-      
-      // Show loading message
-      container.innerHTML = '<p class="text-center text-white col-span-full">Loading page ' + pageNumber + '...</p>';
-      
-      // Disable pagination buttons during loading
-      prevBtn.disabled = true;
-      nextBtn.disabled = true;
+      if (isLoading) return;
 
       try {
-        console.log(`Fetching page ${pageNumber} (index ${pageIndex}) with filters:`, currentFilters);
-        
-        // Fetch using current filters
-        const data = await stapiClient.getCharacters(pageIndex, PAGE_SIZE, currentFilters);
-        
-        if (!data || !Array.isArray(data.characters)) {
-          console.error(`Invalid data returned for page ${pageNumber}:`, data);
-          throw new Error('Invalid data returned from API');
-        }
-        
-        allCharacters = data.characters || [];
-        console.log(`Received ${allCharacters.length} characters for page ${pageNumber}`);
-        
-        // Update totals if provided
-        if (data.page?.totalPages && data.page.totalPages !== totalPages) {
-          totalPages = data.page.totalPages;
-        }
-        if (data.page?.totalElements && data.page.totalElements !== totalCharacters) {
-          totalCharacters = data.page.totalElements;
-        }
-        
-        return data; // Return the data for the caller to use
+        isLoading = true;
+        container.style.opacity = '0.5';
+
+        // Get the requested page
+        const pageIndex = pageNumber - 1;
+        const start = pageIndex * PAGE_SIZE;
+        const end = start + PAGE_SIZE;
+        allCharacters = filteredCharacters.slice(start, end);
+
+        render();
       } catch (error) {
-        console.error(`Failed to fetch page ${pageIndex} with filters:`, error);
+        console.error(`Error fetching page ${pageNumber}:`, error);
         container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading characters. Please try again.</p>';
-        throw error; // Re-throw to let the caller handle it
       } finally {
         isLoading = false;
         container.style.opacity = '1';
-        // Don't call render() here - let the caller decide when to render
       }
     }
 
-    // Function to apply filters, fetch the first page, and update state
+    // Function to apply filters and update state using local data
     async function applyFiltersAndFetch() {
-        if (isLoading) return; // Don't apply if already loading
-
-        currentPage = 1; // Reset to first page
-        currentFilters = getCurrentFilters(); // Get latest filters from UI
-        allCharacters = []; // Clear existing characters
-        isLoading = true; // Set loading flag
-        container.innerHTML = '<p class="text-center text-white col-span-full">Loading...</p>'; // Show loading message
-        noResults.classList.add('hidden'); // Hide no results message
-        countBadge.textContent = `Loading...`;
-        pageNum.textContent = '1';
-        totalNum.textContent = '?'; // Indicate total pages unknown
-        prevBtn.disabled = true;
-        nextBtn.disabled = true;
-
-        // Update species dropdown before fetching page (so user sees correct options)
-        await updateSpeciesDropdown();
+        if (isLoading) return;
 
         try {
-            const data = await stapiClient.getCharacters(0, PAGE_SIZE, currentFilters); // Fetch page 0 (first page)
-            allCharacters = data.characters || [];
-            totalPages = data.page?.totalPages || 1;
-            totalCharacters = data.page?.totalElements || allCharacters.length;
-            // loadedPages.add(0); // Removed: no longer used in new pagination/filter logic
+            isLoading = true;
+            container.style.opacity = '0.5';
+            container.innerHTML = '<p class="text-center text-white col-span-full">Loading...</p>';
+            noResults.classList.add('hidden');
+            countBadge.textContent = 'Loading...';
+
+            // Get current filters
+            currentFilters = getCurrentFilters();
+            console.log('Applying filters:', currentFilters);
+            
+            // Start with all characters
+            let chars = [...payload.characters];
+            
+            // Apply species filter
+            if (currentFilters.species) {
+                chars = chars.filter(c => {
+                    const charSpecies = [
+                        ...(c.characterSpecies?.map(s => s.name.toLowerCase()) || []),
+                        ...(c.species?.map(s => s.name.toLowerCase()) || [])
+                    ];
+                    return charSpecies.includes(currentFilters.species.toLowerCase());
+                });
+            }
+
+            // Apply rank/title filter
+            if (currentFilters.title) {
+                chars = chars.filter(c =>
+                    c.title?.toLowerCase().includes(currentFilters.title.toLowerCase())
+                );
+            }
+
+            // Apply name search
+            if (currentFilters.name) {
+                chars = chars.filter(c =>
+                    c.name.toLowerCase().includes(currentFilters.name.toLowerCase())
+                );
+            }
+
+            // Apply important characters filter
+            if (currentFilters.important === true) {
+                console.log('Filtering important characters...');
+                console.log('Before filter:', chars.length, 'characters');
+                
+                // Use the 'important' flag from the data
+                chars = chars.filter(c => {
+                    const isImportant = c.important === true;
+                    if (isImportant) {
+                        console.log(`Found important character: ${c.name}`);
+                    }
+                    return isImportant;
+                });
+                
+                console.log('After filter:', chars.length, 'important characters');
+            }
+
+            // Apply primary actor records filter
+            if (currentFilters.keep === true) {
+                console.log('Filtering primary actor records...');
+                console.log('Current filters:', currentFilters);
+                console.log('Before filter:', chars.length, 'characters');
+                // Use the 'keep' flag from the data
+                chars = chars.filter(c => {
+                    const isPrimary = c.keep === true;
+                    if (isPrimary) {
+                        console.log(`Primary actor record found: ${c.name}`);
+                    }
+                    return isPrimary;
+                });
+                console.log('After filter:', chars.length, 'primary actor records');
+            }
+
+            // Update filtered characters and totals
+            filteredCharacters = chars;
+            totalPages = Math.ceil(filteredCharacters.length / PAGE_SIZE);
+            totalCharacters = filteredCharacters.length;
+
+            // Reset to first page
+            currentPage = 1;
+            allCharacters = filteredCharacters.slice(0, PAGE_SIZE);
+
+            // Show no results message if needed
+            if (totalCharacters === 0) {
+                noResults.classList.remove('hidden');
+                container.classList.add('hidden');
+                countBadge.textContent = 'No characters found';
+            } else {
+                noResults.classList.add('hidden');
+                container.classList.remove('hidden');
+                countBadge.textContent = `${totalCharacters} characters found`;
+            }
+
+            // Update pagination display
+            pageNum.textContent = currentPage;
+            totalNum.textContent = totalPages;
+            prevBtn.disabled = currentPage <= 1;
+            nextBtn.disabled = currentPage >= totalPages;
+
+            // Update species dropdown if needed
+            if (!currentFilters.species) {
+                updateSpeciesDropdown();
+            }
+
+            render();
         } catch (error) {
-            console.error("Error applying filters and fetching initial data:", error);
-            allCharacters = [];
-            totalPages = 1;
-            totalCharacters = 0;
-            // Optionally display an error message in the container
-            container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading characters. Please try again.</p>';
+            console.error('Error applying filters:', error);
+            container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error filtering characters. Please try again.</p>';
         } finally {
             isLoading = false;
-            render(); // Render the newly fetched data (or empty state/error)
+            container.style.opacity = '1';
         }
     }
 
@@ -527,15 +645,8 @@ const charactersSchema = {
                       return ''; // Skip invalid characters
                   }
                   
-                  // Try to use local cached image first, then wikiImage, then fallback to generic
-                  // Make sure to handle both relative and absolute URLs
-                  let imageUrl = c.wikiImage || '/images/generic-character.jpg';
-                  
-                  // If the image URL is a relative path starting with /images/character-cache/,
-                  // it's a cached image, so use it directly
-                  if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('data:')) {
-                    // The URL is already correct, no need to modify it
-                  }
+                  // Try to use local cached image first, then wikiImage, then imageUrl, then fallback to generic
+                  const imageUrl = c.wikiImage || c.imageUrl || '/images/generic-character.jpg';
                   
                   // Create a slug that includes both the character name and UID
                   // Debug logging for slugify and character fields
@@ -603,21 +714,12 @@ const charactersSchema = {
     prevBtn.addEventListener('click', async () => {
       if (currentPage > 1 && !isLoading) {
         try {
-          isLoading = true;
-          prevBtn.disabled = true;
-          nextBtn.disabled = true;
-          
           const prevPageNum = currentPage - 1;
-          // Fetch the previous page data before decrementing currentPage
           await fetchPageIfNeeded(prevPageNum);
-          // Only decrement if fetch didn't fail
           currentPage = prevPageNum;
           render();
         } catch (error) {
-          console.error("Error navigating to previous page:", error);
-        } finally {
-          isLoading = false;
-          // render() will update button states
+          console.error('Error navigating to previous page:', error);
         }
       }
     });
@@ -625,23 +727,12 @@ const charactersSchema = {
     nextBtn.addEventListener('click', async () => {
       if (currentPage < totalPages && !isLoading) {
         try {
-          isLoading = true;
-          prevBtn.disabled = true;
-          nextBtn.disabled = true;
-          
           const nextPageNum = currentPage + 1;
-          // Fetch if needed *before* incrementing currentPage visually
           await fetchPageIfNeeded(nextPageNum);
-          // Only increment if fetch didn't fail catastrophically and page exists
-          if (currentPage < totalPages) { // Check totalPages again in case fetch failed
-            currentPage = nextPageNum;
-            render(); // Render the new page slice
-          }
+          currentPage = nextPageNum;
+          render();
         } catch (error) {
-          console.error("Error navigating to next page:", error);
-        } finally {
-          isLoading = false;
-          // render() will update button states
+          console.error('Error navigating to next page:', error);
         }
       }
     });
