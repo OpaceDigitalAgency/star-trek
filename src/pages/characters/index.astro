@@ -335,24 +335,31 @@ const charactersSchema = {
       });
     }
 
-    // Direct click handler for checkboxes
-    importantBox.addEventListener('click', (e) => {
+    // Multiple event handlers for checkboxes to ensure they trigger
+    const handleImportantChange = (e) => {
       const isChecked = e.target.checked;
-      console.log('Important characters checkbox clicked:', isChecked);
+      console.log('Important characters checkbox changed:', isChecked);
       // Force update the currentFilters
       currentFilters.important = isChecked;
       console.log('Current filters after important update:', currentFilters);
       applyFiltersAndFetch();
-    });
+    };
 
-    keepBox.addEventListener('click', (e) => {
+    const handleKeepChange = (e) => {
       const isChecked = e.target.checked;
-      console.log('Primary actor records checkbox clicked:', isChecked);
+      console.log('Primary actor records checkbox changed:', isChecked);
       // Force update the currentFilters
       currentFilters.keep = isChecked;
       console.log('Current filters after keep update:', currentFilters);
       applyFiltersAndFetch();
-    });
+    };
+
+    // Add both click and change event listeners to ensure they trigger
+    importantBox.addEventListener('click', handleImportantChange);
+    importantBox.addEventListener('change', handleImportantChange);
+    
+    keepBox.addEventListener('click', handleKeepChange);
+    keepBox.addEventListener('change', handleKeepChange);
 
     // Debounced search input handler
     searchInput.addEventListener('input', debounce(() => {
