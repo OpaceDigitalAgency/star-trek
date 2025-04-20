@@ -324,41 +324,39 @@ const charactersSchema = {
 
     // Add event listeners for filters
     speciesFilter.addEventListener('change', () => {
+      console.log('Species filter changed');
       applyFiltersAndFetch();
     });
 
     if (rankFilter) {
       rankFilter.addEventListener('change', () => {
+        console.log('Rank filter changed');
         applyFiltersAndFetch();
       });
     }
 
-    importantBox.addEventListener('change', (e) => {
+    // Direct click handler for checkboxes
+    importantBox.addEventListener('click', (e) => {
       const isChecked = e.target.checked;
-      console.log('Important characters checkbox changed:', isChecked);
-      console.log('Checkbox element:', e.target);
-      console.log('Checkbox properties:', {
-        id: e.target.id,
-        checked: e.target.checked,
-        value: e.target.value
-      });
-      currentFilters = getCurrentFilters();
-      // Removed erroneous line
-      // Removed erroneous line
-      console.log('Current filters before fetch:', currentFilters);
+      console.log('Important characters checkbox clicked:', isChecked);
+      // Force update the currentFilters
+      currentFilters.important = isChecked;
+      console.log('Current filters after important update:', currentFilters);
       applyFiltersAndFetch();
     });
 
-    keepBox.addEventListener('change', (e) => {
+    keepBox.addEventListener('click', (e) => {
       const isChecked = e.target.checked;
-      console.log('Primary actor records checkbox changed:', isChecked);
-      currentFilters = getCurrentFilters();
-      console.log('Current filters:', currentFilters);
+      console.log('Primary actor records checkbox clicked:', isChecked);
+      // Force update the currentFilters
+      currentFilters.keep = isChecked;
+      console.log('Current filters after keep update:', currentFilters);
       applyFiltersAndFetch();
     });
 
     // Debounced search input handler
     searchInput.addEventListener('input', debounce(() => {
+      console.log('Search input changed');
       applyFiltersAndFetch();
     }, 300));
 
@@ -491,57 +489,35 @@ const charactersSchema = {
         const pageNum = Number(pageNumber);
         console.log('Converted pageNumber to number:', pageNum);
         
-        // Check if we have filters applied
-        const hasFilters = Object.keys(currentFilters).length > 0;
+        // Always fetch from API to ensure consistent behavior
+        console.log('Current filters for page fetch:', currentFilters);
         
-        if (hasFilters) {
-          // If filters are applied, we need to fetch the specific page from the API
-          console.log('Filters applied, fetching page from API:', pageNum);
-          
-          // Prepare API filters
-          const apiFilters = {
-            page: pageNum - 1, // API expects 0-based index
-            ...currentFilters,
-          };
-          
-          // Rename filter parameters to match API expectations
-          if (apiFilters.title) {
-            apiFilters.rank = apiFilters.title;
-            delete apiFilters.title;
-          }
-          
-          // Convert boolean values to strings for the API
-          if (apiFilters.important === true) {
-            apiFilters.important = 'true';
-          }
-          if (apiFilters.keep === true) {
-            apiFilters.keep = 'true';
-          }
-          
-          console.log('Sending API filters for page:', apiFilters);
-          const apiData = await stapiClient.getCharacters(apiFilters.page, PAGE_SIZE, apiFilters);
-          
-          // Update the characters for this page
-          allCharacters = apiData.characters || [];
-          currentPage = pageNum;
-        } else {
-          // No filters, use local data
-          // Get the requested page
-          const pageIndex = pageNum - 1;
-          const start = pageIndex * PAGE_SIZE;
-          const end = start + PAGE_SIZE;
-          
-          console.log('Fetching page slice from local data:', {
-            pageIndex,
-            start,
-            end,
-            totalItems: filteredCharacters.length
-          });
-          
-          // Get the characters for this page
-          allCharacters = filteredCharacters.slice(start, end);
-          currentPage = pageNum; // Store as a number
+        // Prepare API filters
+        const apiFilters = {
+          page: pageNum - 1, // API expects 0-based index
+          ...currentFilters,
+        };
+        
+        // Rename filter parameters to match API expectations
+        if (apiFilters.title) {
+          apiFilters.rank = apiFilters.title;
+          delete apiFilters.title;
         }
+        
+        // Convert boolean values to strings for the API
+        if (apiFilters.important === true) {
+          apiFilters.important = 'true';
+        }
+        if (apiFilters.keep === true) {
+          apiFilters.keep = 'true';
+        }
+        
+        console.log('Sending API filters for page:', apiFilters);
+        const apiData = await stapiClient.getCharacters(apiFilters.page, PAGE_SIZE, apiFilters);
+        
+        // Update the characters for this page
+        allCharacters = apiData.characters || [];
+        currentPage = pageNum;
         
         console.log('Updated page data:', {
           currentPage,
@@ -574,9 +550,27 @@ const charactersSchema = {
             noResults.classList.add('hidden');
             countBadge.textContent = 'Loading...';
 
-            // Get current filters
-            currentFilters = getCurrentFilters();
-            console.log('Applying filters:', currentFilters);
+            // Get current filters from UI elements directly
+            const filters = {
+                species: speciesFilter.value !== 'all' ? speciesFilter.value : undefined,
+                important: importantBox.checked,
+                keep: keepBox.checked
+            };
+            
+            // Add rank filter if available
+            if (rankFilter && rankFilter.value !== 'all') {
+                filters.title = rankFilter.value;
+            }
+            
+            // Add search term if available
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm) {
+                filters.name = searchTerm;
+            }
+            
+            // Update current filters
+            currentFilters = filters;
+            console.log('Applying filters (direct from UI):', currentFilters);
 
             // Fetch characters from the API with filters
             const pageNumber = 1; // Always start with page 1 when applying filters
