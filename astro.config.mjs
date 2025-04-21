@@ -17,7 +17,8 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        'astro/runtime/server': 'astro/dist/runtime/server/index.js'
+        'astro/runtime/server': 'astro/dist/runtime/server/index.js',
+        '@data': '/src/data'
       }
     },
     build: {
