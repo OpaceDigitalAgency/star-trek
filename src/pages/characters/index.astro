@@ -8,6 +8,8 @@ import initialCharactersJson from '../../data/initial-characters.json';
 // Pagination settings
 const PAGE_SIZE = 48;
 const initialCharacters = initialCharactersJson;
+const totalCharacters = 7571; // Total characters in the database
+const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
 
 // Get unique species from initial characters
 const allSpecies = [
@@ -35,6 +37,15 @@ const allSpecies = [
 });
 
 console.log(`Initial build: Fetched ${initialCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
+
+// Ensure these values are available during SSR
+export const prerender = true;
+export const initialState = {
+  characters: initialCharacters,
+  totalCharacters,
+  totalPages,
+  pageSize: PAGE_SIZE
+};
 
 // Extract ranks *only* from the initial page for the build
 let initialRanks = [...new Set(initialCharacters

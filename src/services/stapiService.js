@@ -488,6 +488,11 @@ export const stapiService = {
       return '/images/generic-character.jpg';
     }
   },
+
+  // Proxy function for backward compatibility
+  proxyImageUrl(url) {
+    return '/images/generic-character.jpg';
+  },
   
   // Combined method to get Memory Alpha content with proper image URL
   async getMemoryAlphaContent(title) {
