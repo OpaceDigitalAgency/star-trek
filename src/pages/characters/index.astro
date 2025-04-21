@@ -30,10 +30,7 @@ const allSpecies = [
 
 console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
 
-// Ensure these values are available during SSR and prerendering
-export const prerender = true;
-
-// Export initial state with static data
+// Export initial state with static data for server-side rendering
 export const initialState = {
   characters: staticCharacters,
   totalCharacters,
