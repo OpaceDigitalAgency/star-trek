@@ -26,23 +26,14 @@ exports.handler = async (event) => {
     // Always use local JSON for filtering to support all filter types
     // This ensures species and isImportant filters work just like name search
     {
-        // Use local JSON for global search/filter
-        const fs = require('fs');
-        const path = require('path');
-        // Try to load characters-local.json first (which has cached image paths)
-        // Fall back to characters.json if characters-local.json is not available
-        let allChars = [];
-        try {
-            // Load from netlify/functions/characters.json
-            const filePath = path.join(__dirname, 'characters.json');
-            console.log('Loading characters from characters.json');
-            allChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-        } catch (err) {
-            console.error('Failed to load local characters.json:', err);
+        // Import the characters data directly
+        const allChars = require('./characters.json');
+        if (!allChars || !Array.isArray(allChars)) {
+            console.error('Invalid or missing characters data');
             return {
                 statusCode: 500,
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ error: 'Failed to load local character data' }),
+                body: JSON.stringify({ error: 'Failed to load character data' }),
             };
         }
     
