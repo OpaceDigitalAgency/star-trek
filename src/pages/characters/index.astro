@@ -2,28 +2,34 @@
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
 
-// Pagination settings
+// Static data for initial render
 const PAGE_SIZE = 48;
-const totalCharacters = 7571; // Total characters in the database
+const totalCharacters = 7571;
 const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
 
-// Initial characters for first page
-const initialCharacters = [
-  {
-    "uid": "CHMA0000215045",
-    "name": "James T. Kirk",
-    "keep": true,
-    "important": true,
-    "wikiImage": "/images/kirk-placeholder.jpg"
-  },
-  {
-    "uid": "CHMA0000174718",
-    "name": "Spock",
-    "keep": true,
-    "important": true,
-    "wikiImage": "/images/generic-character.jpg"
-  }
-];
+// Initial data for client-side hydration
+const initialData = {
+  characters: [
+    {
+      uid: "CHMA0000215045",
+      name: "James T. Kirk",
+      keep: true,
+      important: true,
+      wikiImage: "/images/kirk-placeholder.jpg"
+    },
+    {
+      uid: "CHMA0000174718",
+      name: "Spock",
+      keep: true,
+      important: true,
+      wikiImage: "/images/generic-character.jpg"
+    }
+  ],
+  totalPages,
+  totalCharacters,
+  pageSize: PAGE_SIZE,
+  initialRanks: []
+};
 
 // Get unique species from initial characters
 const allSpecies = [
@@ -50,7 +56,7 @@ const allSpecies = [
   return a.localeCompare(b);
 });
 
-console.log(`Initial build: Fetched ${initialCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
+console.log(`Initial build: Fetched ${initialData.characters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
 
 // Ensure these values are available during SSR
 export const prerender = true;
@@ -62,7 +68,7 @@ export const initialState = {
 };
 
 // Extract ranks *only* from the initial page for the build
-let initialRanks = [...new Set(initialCharacters
+let initialRanks = [...new Set(initialData.characters
   .map(c => c.title?.trim())
   .filter(Boolean) // Remove empty/null titles
 )].sort();
@@ -88,8 +94,8 @@ const charactersSchema = {
     "name": "Star Trek",
     "description": "Science fiction media franchise created by Gene Roddenberry"
   },
-  // Update hasPart to use initialCharacters
-  "hasPart": initialCharacters.slice(0, 10).map(char => ({ // Limit to first 10 for schema
+  // Update hasPart to use initial characters
+  "hasPart": initialData.characters.slice(0, 10).map(char => ({ // Limit to first 10 for schema
       "@type": "Person",
       "name": char.name,
       // Ensure slug/uid exists for URL generation
@@ -240,14 +246,7 @@ const charactersSchema = {
 <script
   id="initial-payload"
   type="application/json"
-  set:html={JSON.stringify({
-    characters: initialCharacters,
-    totalPages: totalPages,
-    totalCharacters: totalCharacters,
-    pageSize: PAGE_SIZE,
-    // Pass initial ranks too, species are already in the dropdown
-    initialRanks: initialRanks
-  })}
+  set:html={JSON.stringify(initialData)}
 />
 
 <script>
