@@ -282,9 +282,9 @@ const charactersSchema = {
       const PAGE_SIZE = payload.pageSize;
       let currentPage = 1;
       let allCharacters = []; // Current page's characters
-      let filteredCharacters = [...payload.characters]; // All filtered characters
-      let totalPages = Math.ceil(filteredCharacters.length / PAGE_SIZE);
-      let totalCharacters = filteredCharacters.length;
+      let filteredCharacters = [...payload.characters]; // Current page's characters
+      let totalPages = payload.totalPages; // Use server-provided total pages
+      let totalCharacters = payload.totalCharacters; // Use server-provided total
       let isLoading = false; // Prevent multiple simultaneous fetches
       let currentFilters = {}; // Initialize current filters
 
@@ -521,13 +521,17 @@ const charactersSchema = {
         console.log('Sending API filters for page:', apiFilters);
         const apiData = await stapiClient.getCharacters(apiFilters.page, PAGE_SIZE, apiFilters);
         
-        // Update the characters for this page
+        // Update the characters and pagination data
         allCharacters = apiData.characters || [];
         currentPage = pageNum;
+        totalPages = apiData.page?.totalPages || totalPages;
+        totalCharacters = apiData.page?.totalElements || totalCharacters;
         
         console.log('Updated page data:', {
           currentPage,
-          itemsInCurrentPage: allCharacters.length
+          itemsInCurrentPage: allCharacters.length,
+          totalPages,
+          totalCharacters
         });
 
         // Update the UI
@@ -609,7 +613,7 @@ const charactersSchema = {
             // The rest will be fetched as needed by fetchPageIfNeeded
             filteredCharacters = apiData.characters || [];
             totalCharacters = apiData.page?.totalElements || 0;
-            totalPages = Math.ceil(totalCharacters / pageSize);
+            totalPages = apiData.page?.totalPages || Math.ceil(totalCharacters / pageSize);
 
             // Update the total pages display
             totalNum.textContent = totalPages;
