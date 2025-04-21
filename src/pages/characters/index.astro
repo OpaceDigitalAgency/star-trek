@@ -236,13 +236,7 @@ const charactersSchema = {
 <script
   id="initial-payload"
   type="application/json"
-  set:html={JSON.stringify({
-    characters: staticCharacters,
-    totalPages,
-    totalCharacters,
-    pageSize: PAGE_SIZE,
-    initialRanks
-  })}
+  set:html={JSON.stringify(initialState)}
 />
 
 <script>
