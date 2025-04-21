@@ -2,14 +2,28 @@
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
 
-// Import only the initial characters data
-const initialCharactersJson = await import('../../data/initial-characters.json').then(m => m.default);
-
 // Pagination settings
 const PAGE_SIZE = 48;
-const initialCharacters = initialCharactersJson;
 const totalCharacters = 7571; // Total characters in the database
 const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
+
+// Initial characters for first page
+const initialCharacters = [
+  {
+    "uid": "CHMA0000215045",
+    "name": "James T. Kirk",
+    "keep": true,
+    "important": true,
+    "wikiImage": "/images/kirk-placeholder.jpg"
+  },
+  {
+    "uid": "CHMA0000174718",
+    "name": "Spock",
+    "keep": true,
+    "important": true,
+    "wikiImage": "/images/generic-character.jpg"
+  }
+];
 
 // Get unique species from initial characters
 const allSpecies = [
