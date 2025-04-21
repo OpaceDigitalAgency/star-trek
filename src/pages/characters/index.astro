@@ -12,12 +12,23 @@ const totalPages = 158; // Hardcoded based on ~7600 total characters
 const totalCharacters = 7571; // Hardcoded total from full dataset
 
 // Get unique species from initial characters
-const allSpecies = Array.from(new Set(
-  initialCharacters.flatMap(c => [
-    ...(c.characterSpecies?.map(s => s.name) || []),
-    ...(c.species?.map(s => s.name) || [])
-  ])
-)).sort((a, b) => {
+const allSpecies = [
+  'Human',
+  'Vulcan',
+  'Klingon',
+  'Romulan',
+  'Cardassian',
+  'Bajoran',
+  'Ferengi',
+  'Andorian',
+  'Betazoid',
+  'Trill',
+  'Borg',
+  'Changeling',
+  'El-Aurian',
+  'Tellarite',
+  'Unknown'
+].sort((a, b) => {
   if (a === 'Human') return -1;
   if (b === 'Human') return 1;
   if (a === 'Unknown') return -1;
@@ -370,41 +381,24 @@ const charactersSchema = {
     // --- Species Dropdown Dynamic Update ---
     // Fetch all matching characters (with current filters except species) and update the species dropdown
     function updateSpeciesDropdown() {
-      // Get current filters except species
-      const filters = getCurrentFilters();
-      delete filters.species;
-
-      // Start with all characters
-      let chars = [...payload.characters];
-      
-      // Apply current filters except species
-      if (filters.title) {
-        chars = chars.filter(c => c.title?.toLowerCase().includes(filters.title.toLowerCase()));
-      }
-      if (filters.name) {
-        chars = chars.filter(c => c.name.toLowerCase().includes(filters.name.toLowerCase()));
-      }
-      if (filters.important) {
-        chars = chars.filter(c => c.isImportant);
-      }
-      if (filters.keep) {
-        chars = chars.filter(c => c.keep);
-      }
-
-      console.log(`Found ${chars.length} characters matching current filters (excluding species)`);
-
-      // Build a set of species with at least one matching character
-      const speciesSet = new Set();
-      for (const c of chars) {
-        // Try both characterSpecies and species arrays
-        if (Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
-          c.characterSpecies.forEach(s => s?.name && speciesSet.add(s.name));
-        } else if (Array.isArray(c.species) && c.species.length > 0) {
-          c.species.forEach(s => s?.name && speciesSet.add(s.name));
-        }
-      }
-      // Always include "All Species" as the first option
-      const sortedSpecies = Array.from(speciesSet).sort((a, b) => {
+      // Use the predefined species list
+      const sortedSpecies = [
+        'Human',
+        'Vulcan',
+        'Klingon',
+        'Romulan',
+        'Cardassian',
+        'Bajoran',
+        'Ferengi',
+        'Andorian',
+        'Betazoid',
+        'Trill',
+        'Borg',
+        'Changeling',
+        'El-Aurian',
+        'Tellarite',
+        'Unknown'
+      ].sort((a, b) => {
         if (a === 'Human') return -1;
         if (b === 'Human') return 1;
         if (a === 'Unknown') return -1;
@@ -492,16 +486,14 @@ const charactersSchema = {
         isLoading = true;
         container.style.opacity = '0.5';
 
-        // Ensure pageNumber is a number
-        const pageNum = Number(pageNumber);
-        console.log('Converted pageNumber to number:', pageNum);
-        
-        // Always fetch from API to ensure consistent behavior
-        console.log('Current filters for page fetch:', currentFilters);
+        // Convert 1-based UI page number to 0-based API page number
+        const apiPageNumber = Number(pageNumber) - 1;
+        console.log('Converting UI page', pageNumber, 'to API page:', apiPageNumber);
         
         // Prepare API filters
         const apiFilters = {
-          ...currentFilters
+          ...currentFilters,
+          page: apiPageNumber
         };
         
         // Rename filter parameters to match API expectations
@@ -519,12 +511,12 @@ const charactersSchema = {
         }
         
         console.log('Sending API filters for page:', apiFilters);
-        const apiData = await stapiClient.getCharacters(apiFilters.page, PAGE_SIZE, apiFilters);
+        const apiData = await stapiClient.getCharacters(apiPageNumber, PAGE_SIZE, apiFilters);
         
-        // Update the characters and pagination data
+        // Update state with new data
         allCharacters = apiData.characters || [];
-        currentPage = pageNum;
-        totalPages = apiData.page?.totalPages || totalPages;
+        currentPage = pageNumber; // Keep UI page number as 1-based
+        totalPages = apiData.page?.totalPages || Math.ceil(totalCharacters / PAGE_SIZE);
         totalCharacters = apiData.page?.totalElements || totalCharacters;
         
         console.log('Updated page data:', {
@@ -583,11 +575,11 @@ const charactersSchema = {
             console.log('Applying filters (direct from UI):', currentFilters);
 
             // Fetch characters from the API with filters
-            const pageNumber = 1; // Always start with page 1 when applying filters
+            const apiPageNumber = 0; // Start with page 0 for API
             const pageSize = PAGE_SIZE;
             const apiFilters = {
-                page: pageNumber - 1, // API expects 0-based index
                 ...currentFilters,
+                page: apiPageNumber // Ensure page number is set
             };
 
             // Rename filter parameters to match API expectations
@@ -597,15 +589,11 @@ const charactersSchema = {
             }
 
             // Convert boolean values to strings for the API
-            if (apiFilters.important === true) {
-                apiFilters.important = 'true';
-            }
-            if (apiFilters.keep === true) {
-                apiFilters.keep = 'true';
-            }
+            apiFilters.important = apiFilters.important ? 'true' : 'false';
+            apiFilters.keep = apiFilters.keep ? 'true' : 'false';
 
             console.log('Sending API filters:', apiFilters);
-            const apiData = await stapiClient.getCharacters(apiFilters.page, pageSize, apiFilters);
+            const apiData = await stapiClient.getCharacters(apiPageNumber, pageSize, apiFilters);
             console.log('API data received:', apiData);
 
             // Update filtered characters and total pages

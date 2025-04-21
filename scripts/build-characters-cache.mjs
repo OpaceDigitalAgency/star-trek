@@ -12,8 +12,25 @@ process.env.SKIP_CHAR_CACHE = 'true';
 const characters = await stapiService.getAllCharacters();
 console.log(`Fetched ${characters.length} characters from STAPI`);
 
-// Enrich with Memory Alpha data for important characters
-console.log('Enriching important characters with Memory Alpha data...');
+// Define a list of primary actors (keep=true) and important characters
+const primaryActors = [
+  "James T. Kirk",
+  "Spock",
+  "Leonard McCoy",
+  "Jean-Luc Picard",
+  "William Riker",
+  "Data",
+  "Benjamin Sisko",
+  "Kira Nerys",
+  "Kathryn Janeway",
+  "Chakotay",
+  "Seven of Nine",
+  "The Doctor",
+  "Jonathan Archer",
+  "T'Pol",
+  "Michael Burnham",
+  "Christopher Pike"
+];
 
 // Define a list of important characters to prioritize
 const importantCharacters = [
@@ -108,103 +125,22 @@ const BATCH_SIZE = 100;  // Process in batches
 const DELAY_BETWEEN_REQUESTS = 100;  // ms between requests
 const MAX_CHARACTERS = 7571;  // Safety limit
 
-// Process important characters first
-for (const char of importantChars) {
-  if (downloaded >= MAX_CHARACTERS) break;
-
-  // Skip if already has wikiImage or wikiUrl
-  if (char.wikiImage || char.wikiUrl) {
-    downloaded++;
-    continue;
+// Mark important characters and primary actors
+for (const char of characters) {
+  // Mark important characters
+  if (importantCharacters.includes(char.name)) {
+    char.important = true;
   }
-
-  console.log(`Processing important character: ${char.name}`);
-  
-  // Process character name for Memory Alpha lookup
-  // 1. Expand abbreviated names (e.g. "J. Kirk" → "James T. Kirk")
-  // 2. Remove titles (e.g. "Gul Dukat" → "Dukat", "Admiral Janeway" → "Janeway")
-  let queryName = char.name.match(/^[A-Z]\./) ? char.fullName ?? char.name : char.name;
-  
-  // Remove common titles
-  const titles = ["Admiral", "Captain", "Commander", "Lieutenant", "Ensign", "Doctor", "Dr.", "Gul", "Legate", "Kai"];
-  for (const title of titles) {
-    if (queryName.startsWith(title + " ")) {
-      queryName = queryName.substring(title.length + 1);
-      console.log(`Removed title from ${char.name} → ${queryName}`);
-      break;
-    }
-  }
-  
-  try {
-    const wiki = await stapiService.getMemoryAlphaContent(queryName);
-    if (wiki?.image?.includes('placeholder') || wiki?.image?.endsWith('.svg')) {
-      // keep searching, don't count towards budget
-      console.log(`Skipping placeholder/SVG image for ${char.name}`);
-    } else if (wiki?.image) {
-      char.wikiImage = wiki.image;
-      downloaded++;
-      console.log(`Added image for ${char.name}: ${wiki.image}`);
-    }
-    
-    if (wiki?.wikiUrl) {
-      char.wikiUrl = wiki.wikiUrl;
-      console.log(`Added wiki URL for ${char.name}: ${wiki.wikiUrl}`);
-    }
-  } catch (error) {
-    console.error(`Error fetching wiki content for ${char.name}:`, error);
+  // Mark primary actors
+  if (primaryActors.includes(char.name)) {
+    char.keep = true;
   }
 }
 
-// Process remaining characters
-const remainingChars = characters.filter(char =>
-  !importantChars.includes(char) && !char.wikiImage
-);
-
-// Shuffle the array to get a random selection
-const shuffled = [...remainingChars].sort(() => 0.5 - Math.random());
-
-// Process random selection of remaining characters
-for (const char of shuffled) {
-  if (downloaded >= MAX_CHARACTERS) break;
-
-  // Process character name for Memory Alpha lookup
-  // 1. Expand abbreviated names (e.g. "J. Kirk" → "James T. Kirk")
-  // 2. Remove titles (e.g. "Gul Dukat" → "Dukat", "Admiral Janeway" → "Janeway")
-  let queryName = char.name.match(/^[A-Z]\./) ? char.fullName ?? char.name : char.name;
-  
-  // Remove common titles
-  const titles = ["Admiral", "Captain", "Commander", "Lieutenant", "Ensign", "Doctor", "Dr.", "Gul", "Legate", "Kai"];
-  for (const title of titles) {
-    if (queryName.startsWith(title + " ")) {
-      queryName = queryName.substring(title.length + 1);
-      console.log(`Removed title from ${char.name} → ${queryName}`);
-      break;
-    }
-  }
-
-  try {
-    const wiki = await stapiService.getMemoryAlphaContent(queryName);
-    if (wiki?.image?.includes('placeholder') || wiki?.image?.endsWith('.svg')) {
-      // keep searching, don't count towards budget
-    } else if (wiki?.image) {
-      char.wikiImage = wiki.image;
-      downloaded++;
-    }
-    
-    if (wiki?.wikiUrl) {
-      char.wikiUrl = wiki.wikiUrl;
-    }
-  } catch (error) {
-    console.error(`Error fetching wiki content for ${queryName}:`, error);
-  }
-  
-  // Log progress every 50 characters
-  if (downloaded % 50 === 0 && downloaded > 0) {
-    console.log(`Processed ${downloaded} characters with Memory Alpha data`);
-  }
-}
-
-console.log(`Enriched ${downloaded} characters with Memory Alpha data`);
+const withKeep = characters.filter(char => char.keep === true);
+const withImportant = characters.filter(char => char.important === true);
+console.log(`Marked ${withKeep.length} characters as primary actors (keep=true)`);
+console.log(`Marked ${withImportant.length} characters as important`);
 
 // Save to file
 fs.mkdirSync(path.dirname(output), { recursive: true });

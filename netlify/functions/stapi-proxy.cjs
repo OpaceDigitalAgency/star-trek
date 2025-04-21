@@ -57,43 +57,72 @@ exports.handler = async (event) => {
         }
         if (filters.species) {
             const speciesLower = filters.species.toLowerCase();
-            filtered = filtered.filter(c =>
-                (Array.isArray(c.characterSpecies) && c.characterSpecies.some(s => s.name && s.name.toLowerCase().includes(speciesLower))) ||
-                (Array.isArray(c.species) && c.species.some(s => s.name && s.name.toLowerCase().includes(speciesLower)))
-            );
+            filtered = filtered.filter(c => {
+                // Check characterSpecies array first
+                if (Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
+                    return c.characterSpecies.some(s => s.name && s.name.toLowerCase() === speciesLower);
+                }
+                // Fall back to species array
+                if (Array.isArray(c.species) && c.species.length > 0) {
+                    return c.species.some(s => s.name && s.name.toLowerCase() === speciesLower);
+                }
+                // If no species info, mark as Unknown
+                return speciesLower === 'unknown';
+            });
+            console.log(`Found ${filtered.length} characters of species: ${filters.species}`);
         }
         if (filters.title) {
             const titleLower = filters.title.toLowerCase();
             filtered = filtered.filter(c => c.title && c.title.toLowerCase().includes(titleLower));
         }
-        if (filters.isImportant === 'true' || filters.important === 'true') {
+        // Handle important filter (both true and false values)
+        if (filters.isImportant === 'true' || filters.isImportant === true ||
+            filters.important === 'true' || filters.important === true) {
             console.log('Filtering for important characters');
             filtered = filtered.filter(c => {
-                // Convert both string 'true' and boolean true
                 const isImportant = c.important === true || c.important === 'true' ||
                                   c.isImportant === true || c.isImportant === 'true';
                 return isImportant;
             });
             console.log(`Found ${filtered.length} important characters`);
+        } else if (filters.isImportant === 'false' || filters.isImportant === false ||
+                   filters.important === 'false' || filters.important === false) {
+            console.log('Filtering for non-important characters');
+            filtered = filtered.filter(c => {
+                const isImportant = c.important === true || c.important === 'true' ||
+                                  c.isImportant === true || c.isImportant === 'true';
+                return !isImportant;
+            });
+            console.log(`Found ${filtered.length} non-important characters`);
         }
-        if (filters.keep === 'true') {
-            // Ensure we only show primary actor records
+        // Handle keep filter (both true and false values)
+        if (filters.keep === 'true' || filters.keep === true) {
             console.log('Filtering for primary actor records (keep=true)');
             filtered = filtered.filter(c => {
-                const isPrimary = c.keep === true;
+                const isPrimary = c.keep === true || c.keep === 'true';
                 return isPrimary;
             });
-            
-            // Log how many records have keep=true for debugging
             console.log(`Found ${filtered.length} characters with keep=true`);
+        } else if (filters.keep === 'false' || filters.keep === false) {
+            console.log('Filtering for non-primary actor records (keep=false)');
+            filtered = filtered.filter(c => {
+                const isPrimary = c.keep === true || c.keep === 'true';
+                return !isPrimary;
+            });
+            console.log(`Found ${filtered.length} characters with keep=false`);
         }
     
+        // Sort filtered array alphabetically by name
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+
         // Paginate
         const pageNum = parseInt(pageNumber, 10) || 0;
         const pageSz = parseInt(pageSize, 10) || 48;
         const start = pageNum * pageSz;
         const end = start + pageSz;
         const pageChars = filtered.slice(start, end);
+
+        console.log(`Paginating: page ${pageNum}, size ${pageSz}, showing ${start}-${end} of ${filtered.length} characters`);
     
         // Format response to match STAPI API
         const data = {

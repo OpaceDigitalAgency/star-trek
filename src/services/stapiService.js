@@ -749,15 +749,14 @@ export const stapiService = {
           pageNumber += 1;
           
           // Check if we've reached the last page according to API pagination
-          // But ensure we fetch at least minPagesToFetch pages to get a good sample
-          if (data.page && pageNumber >= data.page.totalPages && pageNumber >= minPagesToFetch) {
+          if (data.page && pageNumber >= data.page.totalPages) {
             console.log(`Reached last page (${pageNumber-1} of ${data.page.totalPages}), stopping`);
             break;
           }
           
-          // Safety check to prevent infinite loops
-          if (pageNumber > 100) {
-            console.log(`Reached safety limit of 100 pages, stopping`);
+          // Safety check to prevent infinite loops - increased to handle full dataset
+          if (pageNumber > 500) {
+            console.log(`Reached safety limit of 500 pages, stopping`);
             break;
           }
         }
