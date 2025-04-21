@@ -10,13 +10,11 @@ export default defineConfig({
     tailwind(),
     react(),
     netlify({
-      excludedPath: ['/api/*'],
-      dist: {
-        assets: ['src/data']
-      }
+      excludedPath: ['/api/*']
     })
   ],
   site: 'https://star-trek-timelines.netlify.app',
+  srcDir: './src',
   vite: {
     resolve: {
       alias: {

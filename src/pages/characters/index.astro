@@ -3,7 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
 
 // Import only the initial characters data
-import initialCharactersJson from '../../data/initial-characters.json';
+const initialCharactersJson = await import('../../data/initial-characters.json').then(m => m.default);
 
 // Pagination settings
 const PAGE_SIZE = 48;
