@@ -471,3 +471,4 @@ This ensures we have static content for the first page while maintaining dynamic
 1. Adjusted page numbering to be 1-based for UI but 0-based for API calls
 2. Updated params construction to use correct page numbers
 3. Ensured smooth transition from static first page (48 characters) to dynamic loading of remaining characters
+[2025-04-21 10:56] Fixed prerendering error by properly exporting the staticCharacters variable in characters/index.astro. This ensures the variable is available during the static build phase when Astro is prerendering routes.
