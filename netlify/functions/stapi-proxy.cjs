@@ -21,7 +21,7 @@ exports.handler = async (event) => {
         };
     }
 
-    const { pageNumber = 0, pageSize = 20, ...filters } = event.queryStringParameters || {};
+    const { pageNumber = 0, pageSize = 48, page, ...filters } = event.queryStringParameters || {};
     
     // Always use local JSON for filtering to support all filter types
     // This ensures species and isImportant filters work just like name search
@@ -90,7 +90,7 @@ exports.handler = async (event) => {
     
         // Paginate
         const pageNum = parseInt(pageNumber, 10) || 0;
-        const pageSz = parseInt(pageSize, 10) || 20;
+        const pageSz = parseInt(pageSize, 10) || 48;
         const start = pageNum * pageSz;
         const end = start + pageSz;
         const pageChars = filtered.slice(start, end);

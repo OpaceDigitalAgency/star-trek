@@ -501,8 +501,7 @@ const charactersSchema = {
         
         // Prepare API filters
         const apiFilters = {
-          page: pageNum - 1, // API expects 0-based index
-          ...currentFilters,
+          ...currentFilters
         };
         
         // Rename filter parameters to match API expectations
