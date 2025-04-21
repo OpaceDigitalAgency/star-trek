@@ -462,3 +462,8 @@
 [2025-04-21 10:41] Fixed Netlify build error by removing duplicate staticCharacters declaration and updating rank filter references to use initialRanks directly instead of initialData.initialRanks in src/pages/characters/index.astro.
 [2025-04-21 10:44] Attempting new approach to fix Netlify build error by moving all static data (staticCharacters, PAGE_SIZE, totalCharacters, totalPages) to a separate file src/data/staticCharacters.js and importing it in the Astro component. This change aims to resolve the prerendering issue by ensuring the data is properly available during the build process.
 [2025-04-21 10:47] Changed rendering strategy by switching from hybrid to server-side rendering in astro.config.mjs and removing the prerender flag from characters/index.astro. This change aims to resolve the build issues by ensuring all data is handled server-side rather than during the static build phase.
+[2025-04-21 10:50] Implemented proper hybrid rendering approach by:
+1. Loading first 48 characters from initial-characters.json at build time
+2. Setting up prerendering with hybrid output mode
+3. Configuring dynamic loading for remaining characters through pagination
+This ensures we have static content for the first page while maintaining dynamic loading for the remaining 7500+ characters.

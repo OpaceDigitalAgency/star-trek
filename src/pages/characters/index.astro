@@ -256,13 +256,15 @@ const charactersSchema = {
   const stapiClient = {
     PROXY_URL: '/api/characters', // Use the proxy endpoint
 
-    async getCharacters(page = 0, pageSize = 48, filters = {}) {
+    async getCharacters(page = 1, pageSize = 48, filters = {}) {
+      // Adjust page number for API (0-based)
+      const apiPage = page - 1;
       try {
         // Create a new object without the pageSize property from filters
         const { pageSize: filterPageSize, ...otherFilters } = filters;
         
         const params = new URLSearchParams({
-          pageNumber: page.toString(),
+          pageNumber: apiPage.toString(),
           pageSize: pageSize.toString(),
         });
 
