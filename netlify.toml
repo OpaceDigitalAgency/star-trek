@@ -24,7 +24,7 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = ["netlify/functions/characters.json", "src/data/series.json", "src/data/characters.json", "src/data/characters-local.json"]
+  included_files = ["netlify/functions/characters.json"]
 
 # API and function redirects
 [[redirects]]

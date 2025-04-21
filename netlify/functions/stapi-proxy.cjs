@@ -33,17 +33,10 @@ exports.handler = async (event) => {
         // Fall back to characters.json if characters-local.json is not available
         let allChars = [];
         try {
-            // First try to load from src/data/characters-local.json
-            const localFilePath = path.join(process.cwd(), 'src', 'data', 'characters-local.json');
-            if (fs.existsSync(localFilePath)) {
-                console.log('Loading characters from characters-local.json');
-                allChars = JSON.parse(fs.readFileSync(localFilePath, 'utf-8'));
-            } else {
-                // Fall back to netlify/functions/characters.json
-                const filePath = path.join(__dirname, 'characters.json');
-                console.log('Loading characters from characters.json');
-                allChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-            }
+            // Load from netlify/functions/characters.json
+            const filePath = path.join(__dirname, 'characters.json');
+            console.log('Loading characters from characters.json');
+            allChars = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
         } catch (err) {
             console.error('Failed to load local characters.json:', err);
             return {
