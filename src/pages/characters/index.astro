@@ -1,29 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
-
-// Static data for initial render
-const PAGE_SIZE = 48;
-const totalCharacters = 7571;
-const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
-
-// Define static characters first
-const staticCharacters = [
-  {
-    uid: "CHMA0000215045",
-    name: "James T. Kirk",
-    keep: true,
-    important: true,
-    wikiImage: "/images/kirk-placeholder.jpg"
-  },
-  {
-    uid: "CHMA0000174718",
-    name: "Spock",
-    keep: true,
-    important: true,
-    wikiImage: "/images/generic-character.jpg"
-  }
-];
+import { staticCharacters, PAGE_SIZE, totalCharacters, totalPages } from '../../data/staticCharacters.js';
 
 // Get unique species from initial characters
 const allSpecies = [
