@@ -61,7 +61,7 @@ console.log(`Initial build: Fetched ${initialData.characters.length} characters.
 // Ensure these values are available during SSR
 export const prerender = true;
 export const initialState = {
-  characters: initialCharacters,
+  characters: initialData.characters,
   totalCharacters,
   totalPages,
   pageSize: PAGE_SIZE
