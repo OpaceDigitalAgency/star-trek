@@ -151,22 +151,22 @@ const charactersSchema = {
               </div>
             </div>
             
-            {initialRanks.length > 0 && (
-                          <div class="filter-group relative">
-                            <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
-                            <div class="relative">
-                              <select
-                                id="rank-filter"
-                                class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
-                              >
-                                <option value="all">All Ranks</option>
-                                {initialRanks.map(rank => (
-                                  <option value={rank}>{rank}</option>
-                                ))}
-                              </select>
-                            </div>
-                          </div>
-                        )}
+            {initialData.initialRanks?.length > 0 && (
+              <div class="filter-group relative">
+                <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
+                <div class="relative">
+                  <select
+                    id="rank-filter"
+                    class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
+                  >
+                    <option value="all">All Ranks</option>
+                    {initialData.initialRanks.map(rank => (
+                      <option value={rank}>{rank}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
             
             <div class="filter-group ml-4">
               <h3 class="text-white text-lg mb-2">Show Only</h3>
