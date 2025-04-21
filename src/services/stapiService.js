@@ -37,7 +37,7 @@ export const stapiService = {
   },
   
   // Fetch characters with pagination
-  async getCharacters(page = 0, pageSize = 20) {
+  async getCharacters(page = 0, pageSize = 48) {
     try {
       const response = await axios.get(`${BASE_URL}/character/search`, {
         params: {

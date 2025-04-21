@@ -116,8 +116,8 @@ exports.handler = async (event) => {
         filtered.sort((a, b) => a.name.localeCompare(b.name));
 
         // Paginate
-        const pageNum = parseInt(pageNumber, 10) || 0;
-        const pageSz = parseInt(pageSize, 10) || 48;
+        const pageNum = parseInt(pageNumber, 10);
+        const pageSz = parseInt(pageSize, 10);
         const start = pageNum * pageSz;
         const end = start + pageSz;
         const pageChars = filtered.slice(start, end);
