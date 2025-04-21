@@ -1,5 +1,20 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import initialSeries from '../../data/series.json';
+
+const PAGE_SIZE = 12;  // Number of series to display per page
+const totalPages = Math.ceil(initialSeries.length / PAGE_SIZE);
+
+export const prerender = true;
+export const staticSeries = initialSeries.slice(0, PAGE_SIZE);
+
+export const initialState = {
+  series: staticSeries,
+  totalSeries: initialSeries.length,
+  totalPages,
+  pageSize: PAGE_SIZE
+};
+
 import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
 import ProgressiveImage from '../../components/ProgressiveImage.js';
 import { slugify } from '../../utils/slugify.js';
@@ -96,11 +111,7 @@ const progressiveImageScript = `
 const currentPage = 1; // Initial page is always 1 for SSR
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
 
-// Pagination settings
-const PAGE_SIZE = 12; // Number of series to display per page
-let initialSeries = [];
-let totalPages = 1;
-let totalSeries = 0;
+// Make sure the ProgressiveImage component is available in the client
 
 // Import the local series data at the top level
 let seriesLocalJson = [];
