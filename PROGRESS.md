@@ -455,3 +455,4 @@
        - Ran the update-all-series-data.mjs script to rebuild the series characters cache
        - Verified that characters now have correct image paths in series-characters.json
   - **Outcome:** Character images now display correctly on series detail pages, using appropriate character-specific or series-specific images instead of the generic fallback image.
+[2025-04-21 10:26] Fixed Netlify build error by removing src/pages/characters/index.astro.bak file that was causing Astro to fail during build with "Invalid file extension for Pages: .bak" error.
