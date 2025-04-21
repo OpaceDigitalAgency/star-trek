@@ -49,14 +49,6 @@ export const initialState = {
   pageSize: PAGE_SIZE
 };
 
-// Export initial state with static data
-export const initialState = {
-  characters: staticCharacters,
-  totalCharacters,
-  totalPages,
-  pageSize: PAGE_SIZE
-};
-
 // Extract ranks *only* from the initial page for the build
 let initialRanks = [...new Set(staticCharacters
   .map(c => c.title?.trim())

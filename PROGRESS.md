@@ -473,3 +473,4 @@ This ensures we have static content for the first page while maintaining dynamic
 3. Ensured smooth transition from static first page (48 characters) to dynamic loading of remaining characters
 [2025-04-21 10:56] Fixed prerendering error by properly exporting the staticCharacters variable in characters/index.astro. This ensures the variable is available during the static build phase when Astro is prerendering routes.
 [2025-04-21 10:57] Fixed state management by properly exporting initialState with staticCharacters and ensuring all necessary data (characters, totalCharacters, totalPages, pageSize) is available during prerendering.
+[2025-04-21 11:00] Simplified initial payload handling by using the initialState object directly in the client-side script tag, ensuring consistent data structure between server and client.
