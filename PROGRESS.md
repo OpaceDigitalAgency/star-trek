@@ -458,3 +458,4 @@
 [2025-04-21 10:26] Fixed Netlify build error by removing src/pages/characters/index.astro.bak file that was causing Astro to fail during build with "Invalid file extension for Pages: .bak" error.
 [2025-04-21 10:29] Fixed Netlify build error by correcting the reference from 'initialCharacters' to 'initialData.characters' in src/pages/characters/index.astro. This was causing a ReferenceError during the build process.
 [2025-04-21 10:33] Fixed Netlify build error by replacing all references to initialData with staticCharacters in src/pages/characters/index.astro. This ensures the data is properly available during the prerendering phase, preventing the "initialData is not defined" error.
+[2025-04-21 10:35] Fixed Netlify build error by moving the staticCharacters definition to the top of src/pages/characters/index.astro, ensuring it's defined before being used in the prerendering phase.

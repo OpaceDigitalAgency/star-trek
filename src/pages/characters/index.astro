@@ -55,24 +55,7 @@ console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total
 // Ensure these values are available during SSR and prerendering
 export const prerender = true;
 
-// Define initial state with static data to ensure it's available during prerendering
-const staticCharacters = [
-  {
-    uid: "CHMA0000215045",
-    name: "James T. Kirk",
-    keep: true,
-    important: true,
-    wikiImage: "/images/kirk-placeholder.jpg"
-  },
-  {
-    uid: "CHMA0000174718",
-    name: "Spock",
-    keep: true,
-    important: true,
-    wikiImage: "/images/generic-character.jpg"
-  }
-];
-
+// Export initial state with static data
 export const initialState = {
   characters: staticCharacters,
   totalCharacters,
@@ -164,7 +147,7 @@ const charactersSchema = {
               </div>
             </div>
             
-            {initialData.initialRanks?.length > 0 && (
+            {initialRanks?.length > 0 && (
               <div class="filter-group relative">
                 <h3 class="text-white text-lg mb-2">Filter by Rank</h3>
                 <div class="relative">
@@ -173,7 +156,7 @@ const charactersSchema = {
                     class="w-48 bg-space-black text-white p-2 border border-starfleet-blue rounded cursor-pointer hover:border-starfleet-gold focus:border-starfleet-gold focus:outline-none"
                   >
                     <option value="all">All Ranks</option>
-                    {initialData.initialRanks.map(rank => (
+                    {initialRanks.map(rank => (
                       <option value={rank}>{rank}</option>
                     ))}
                   </select>
