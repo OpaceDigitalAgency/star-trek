@@ -467,3 +467,7 @@
 2. Setting up prerendering with hybrid output mode
 3. Configuring dynamic loading for remaining characters through pagination
 This ensures we have static content for the first page while maintaining dynamic loading for the remaining 7500+ characters.
+[2025-04-21 10:51] Fixed pagination logic to properly handle the transition between static and dynamic data:
+1. Adjusted page numbering to be 1-based for UI but 0-based for API calls
+2. Updated params construction to use correct page numbers
+3. Ensured smooth transition from static first page (48 characters) to dynamic loading of remaining characters

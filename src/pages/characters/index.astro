@@ -8,8 +8,8 @@ const PAGE_SIZE = 48;
 const totalCharacters = 7571;
 const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
 
-// Get first page of characters from initial data
-const staticCharacters = initialCharacters.slice(0, PAGE_SIZE);
+// Get first page of characters from initial data and export for prerendering
+export const staticCharacters = initialCharacters.slice(0, PAGE_SIZE);
 
 // Get unique species from initial characters
 const allSpecies = [
