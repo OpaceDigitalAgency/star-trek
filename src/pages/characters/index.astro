@@ -299,8 +299,11 @@ const charactersSchema = {
       let isLoading = false; // Prevent multiple simultaneous fetches
       let currentFilters = {}; // Initialize current filters
 
-      // Initialize with first page
-      allCharacters = filteredCharacters.slice(0, PAGE_SIZE);
+      // Initialize state
+      let allCharacters = [];
+      let currentPage = 1;
+      let totalPages = 1;
+      let totalCharacters = 0;
 
       // Style fixes for dropdowns
       const dropdowns = document.querySelectorAll('select');
@@ -375,8 +378,18 @@ const charactersSchema = {
     // Debounced search input handler
     searchInput.addEventListener('input', debounce(() => {
       console.log('Search input changed');
+      currentPage = 1; // Reset to first page on search
       applyFiltersAndFetch();
     }, 300));
+
+    // Update UI elements with pagination state
+    function updatePaginationUI() {
+      pageNum.textContent = currentPage;
+      totalNum.textContent = totalPages;
+      prevBtn.disabled = currentPage <= 1 || isLoading;
+      nextBtn.disabled = currentPage >= totalPages || isLoading;
+      countBadge.textContent = `${totalCharacters} characters`;
+    }
 
     // --- Species Dropdown Dynamic Update ---
     // Fetch all matching characters (with current filters except species) and update the species dropdown
@@ -529,9 +542,13 @@ const charactersSchema = {
         // Update the UI
         render();
         
-        // Update pagination buttons
-        prevBtn.disabled = pageNum <= 1 || isLoading;
-        nextBtn.disabled = pageNum >= Number(totalPages) || isLoading;
+        // Update pagination buttons (adjust for 1-based UI pagination)
+        prevBtn.disabled = currentPage <= 1 || isLoading;
+        nextBtn.disabled = currentPage >= totalPages || isLoading;
+
+        // Update page number display
+        pageNum.textContent = currentPage;
+        totalNum.textContent = totalPages;
       } catch (error) {
         console.error(`Error fetching page ${pageNumber}:`, error);
         container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading characters. Please try again.</p>';
@@ -575,12 +592,16 @@ const charactersSchema = {
             console.log('Applying filters (direct from UI):', currentFilters);
 
             // Fetch characters from the API with filters
-            const apiPageNumber = 0; // Start with page 0 for API
+            // Convert UI page number (1-based) to API page number (0-based)
+            const apiPageNumber = 0; // Always start at first page when applying filters
             const pageSize = PAGE_SIZE;
             const apiFilters = {
                 ...currentFilters,
-                page: apiPageNumber // Ensure page number is set
+                page: apiPageNumber
             };
+            
+            // Reset pagination state
+            currentPage = 1;
 
             // Rename filter parameters to match API expectations
             if (apiFilters.title) {

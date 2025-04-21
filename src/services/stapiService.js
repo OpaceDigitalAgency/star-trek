@@ -37,48 +37,62 @@ export const stapiService = {
   },
   
   // Fetch characters with pagination
-  async getCharacters(page = 0, pageSize = 48) {
+  async getCharacters(page = 0, pageSize = 48, filters = {}) {
     try {
-      const response = await axios.get(`${BASE_URL}/character/search`, {
-        params: {
-          pageNumber: page,
-          pageSize: pageSize
-        }
-      });
+      // Load characters from local cache
+      const localCharsPath = charactersLocalJsonPath;
+      const localChars = JSON.parse(fs.readFileSync(localCharsPath, 'utf8'));
       
-      // Enrich character data with wikiImage property
-      const data = response.data;
+      // Apply filters
+      let filtered = localChars;
       
-      if (data.characters && Array.isArray(data.characters)) {
-        try {
-          // Try to load local characters data for wikiImage enrichment
-          const localCharsPath = charactersLocalJsonPath;
-          if (fs.existsSync(localCharsPath)) {
-            const localChars = JSON.parse(fs.readFileSync(localCharsPath, 'utf8'));
-            
-            // Create a map of uid to wikiImage for faster lookup
-            const wikiImageMap = {};
-            localChars.forEach(c => {
-              if (c.uid && c.wikiImage) {
-                wikiImageMap[c.uid] = c.wikiImage;
-              }
-            });
-            
-            // Add wikiImage to each character
-            data.characters = data.characters.map(char => {
-              if (char.uid && wikiImageMap[char.uid]) {
-                return { ...char, wikiImage: wikiImageMap[char.uid] };
-              }
-              return char;
-            });
-          }
-        } catch (err) {
-          console.error('Failed to enrich characters with wikiImage:', err);
-          // Continue without enrichment if there's an error
-        }
+      if (filters.name) {
+        const nameLower = filters.name.toLowerCase();
+        filtered = filtered.filter(c => c.name && c.name.toLowerCase().includes(nameLower));
       }
       
-      return data;
+      if (filters.species) {
+        const speciesLower = filters.species.toLowerCase();
+        filtered = filtered.filter(c => {
+          if (Array.isArray(c.characterSpecies) && c.characterSpecies.length > 0) {
+            return c.characterSpecies.some(s => s.name && s.name.toLowerCase() === speciesLower);
+          }
+          if (Array.isArray(c.species) && c.species.length > 0) {
+            return c.species.some(s => s.name && s.name.toLowerCase() === speciesLower);
+          }
+          return speciesLower === 'unknown';
+        });
+      }
+      
+      if (filters.important === 'true' || filters.important === true) {
+        filtered = filtered.filter(c => c.important === true || c.important === 'true');
+      }
+      
+      if (filters.keep === 'true' || filters.keep === true) {
+        filtered = filtered.filter(c => c.keep === true || c.keep === 'true');
+      }
+      
+      // Sort alphabetically
+      filtered.sort((a, b) => a.name.localeCompare(b.name));
+      
+      // Paginate
+      const start = page * pageSize;
+      const end = start + pageSize;
+      const pageChars = filtered.slice(start, end);
+      
+      return {
+        page: {
+          pageNumber: page,
+          pageSize: pageSize,
+          numberOfElements: pageChars.length,
+          totalElements: filtered.length,
+          totalPages: Math.ceil(filtered.length / pageSize),
+          firstPage: page === 0,
+          lastPage: end >= filtered.length
+        },
+        sort: { clauses: [] },
+        characters: pageChars
+      };
     } catch (error) {
       console.error('Error fetching characters:', error);
       return { characters: [], page: { totalPages: 1 } };

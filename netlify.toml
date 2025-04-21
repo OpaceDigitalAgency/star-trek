@@ -44,11 +44,6 @@
   status = 200
 
 [[redirects]]
-  from = "/api/characters"
-  to = "/.netlify/functions/stapi-proxy"
-  status = 200
-
-[[redirects]]
   from = "/api/series"
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
