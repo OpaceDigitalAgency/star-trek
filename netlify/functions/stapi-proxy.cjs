@@ -26,10 +26,22 @@ exports.handler = async (event) => {
     // Always use local JSON for filtering to support all filter types
     // This ensures species and isImportant filters work just like name search
     {
-        // Import the characters data directly
-        const allChars = require('./characters.json');
-        if (!allChars || !Array.isArray(allChars)) {
-            console.error('Invalid or missing characters data');
+        // Load and parse the JSON file fresh each time to avoid module caching
+        const fs = require('fs');
+        const path = require('path');
+        let allChars;
+        try {
+            const filePath = path.join(__dirname, 'characters.json');
+            const fileContent = fs.readFileSync(filePath, 'utf-8');
+            allChars = JSON.parse(fileContent);
+            
+            if (!Array.isArray(allChars)) {
+                throw new Error('Invalid data format');
+            }
+            
+            console.log(`Loaded ${allChars.length} characters from file`);
+        } catch (err) {
+            console.error('Failed to load characters.json:', err);
             return {
                 statusCode: 500,
                 headers: { 'Content-Type': 'application/json' },
@@ -57,7 +69,9 @@ exports.handler = async (event) => {
         if (filters.isImportant === 'true' || filters.important === 'true') {
             console.log('Filtering for important characters');
             filtered = filtered.filter(c => {
-                const isImportant = c.important === true || c.isImportant === true;
+                // Convert both string 'true' and boolean true
+                const isImportant = c.important === true || c.important === 'true' ||
+                                  c.isImportant === true || c.isImportant === 'true';
                 return isImportant;
             });
             console.log(`Found ${filtered.length} important characters`);
