@@ -2,18 +2,18 @@
 import Layout from '../../layouts/Layout.astro';
 import { stapiService } from '../../services/stapiService';
 
-// Import the local characters data
-import charactersLocalJson from '../../data/characters-local.json';
+// Import only the initial characters data
+import initialCharactersJson from '../../data/initial-characters.json';
 
 // Pagination settings
 const PAGE_SIZE = 48;
-const initialCharacters = charactersLocalJson.slice(0, PAGE_SIZE);
-const totalPages = Math.ceil(charactersLocalJson.length / PAGE_SIZE);
-const totalCharacters = charactersLocalJson.length;
+const initialCharacters = initialCharactersJson;
+const totalPages = 158; // Hardcoded based on ~7600 total characters
+const totalCharacters = 7571; // Hardcoded total from full dataset
 
-// Get all unique species for the filter dropdown
+// Get unique species from initial characters
 const allSpecies = Array.from(new Set(
-  charactersLocalJson.flatMap(c => [
+  initialCharacters.flatMap(c => [
     ...(c.characterSpecies?.map(s => s.name) || []),
     ...(c.species?.map(s => s.name) || [])
   ])

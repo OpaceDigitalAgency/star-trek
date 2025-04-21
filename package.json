@@ -12,9 +12,10 @@
     "cache-images": "node scripts/cache-character-images.mjs",
     "update-json": "node scripts/update-characters-json.mjs",
     "prepare-images": "npm run cache-images && npm run update-json",
+    "prepare-initial": "node scripts/prepare-initial-characters.mjs",
     "update-series-data": "node scripts/update-all-series-data.mjs",
     "update-netlify-characters": "node scripts/update-netlify-characters.mjs",
-    "prepare-deploy": "node scripts/prepare-deployment.mjs && npm run update-netlify-characters",
+    "prepare-deploy": "npm run prepare-images && npm run prepare-initial && node scripts/prepare-deployment.mjs && npm run update-netlify-characters",
     "deploy": "npm run prepare-deploy && netlify deploy"
   },
   "dependencies": {
