@@ -11,29 +11,10 @@ try {
     // Also fetch Memory Alpha data for Kirk
     const kirkData = await stapiService.getMemoryAlphaContent("James T. Kirk");
     
-    // Debug: Log the image URL
-    console.log("Kirk image URL:", kirkData.image);
-    
-    // Try to get the raw image URL from Memory Alpha
-    let rawImageUrl = null;
-    try {
-      const html = await stapiService.getMemoryAlphaPageHTML("James_T._Kirk");
-      const $ = await import('cheerio').then(module => module.load(html));
-      const rawUrl = $('meta[property="og:image"]').attr('content');
-      if (rawUrl) {
-        // Use the proxy for the raw image URL
-        rawImageUrl = stapiService.proxyImageUrl(stapiService.cleanWikiaImageUrl(rawUrl));
-      }
-      console.log("Raw Kirk image URL:", rawImageUrl);
-    } catch (error) {
-      console.error("Error getting raw image URL:", error);
-    }
-    
     featuredCharacters.push({
       name: response[0].name,
       series: "The Original Series",
-      // Try the raw image URL first, then the proxy, then the fallback
-      image: rawImageUrl || kirkData.image || `/images/kirk-placeholder.jpg`,
+      image: `/images/kirk-placeholder.jpg`,
       slug: response[0].uid,
       wikiUrl: kirkData.wikiUrl
     });
@@ -130,12 +111,8 @@ if (featuredCharacters.length === 0) {
             alt={character.name}
             class="w-full h-full object-cover"
             loading="lazy"
-            onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg'; console.error('Image failed to load:', this.src);"
+            onerror="this.onerror=null; this.src='/images/stars-placeholder.jpg';"
           />
-          <!-- Debug: Show the image URL -->
-          <div class="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-1 overflow-hidden">
-            {character.image ? character.image.substring(0, 30) + '...' : 'No image URL'}
-          </div>
           <div class="scanner-line absolute inset-x-0 h-[2px] bg-starfleet-blue opacity-60 top-0"></div>
           <div class="targeting-reticle absolute inset-0 opacity-0 transition-opacity duration-300"></div>
         </div>
