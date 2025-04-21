@@ -8,8 +8,6 @@ import initialCharactersJson from '../../data/initial-characters.json';
 // Pagination settings
 const PAGE_SIZE = 48;
 const initialCharacters = initialCharactersJson;
-const totalPages = 158; // Hardcoded based on ~7600 total characters
-const totalCharacters = 7571; // Hardcoded total from full dataset
 
 // Get unique species from initial characters
 const allSpecies = [
@@ -291,19 +289,14 @@ const charactersSchema = {
       // Get initial data from payload
       const payload = JSON.parse(document.getElementById('initial-payload').textContent);
       const PAGE_SIZE = payload.pageSize;
-      let currentPage = 1;
-      let allCharacters = []; // Current page's characters
-      let filteredCharacters = [...payload.characters]; // Current page's characters
-      let totalPages = payload.totalPages; // Use server-provided total pages
-      let totalCharacters = payload.totalCharacters; // Use server-provided total
       let isLoading = false; // Prevent multiple simultaneous fetches
       let currentFilters = {}; // Initialize current filters
-
+      
       // Initialize state
-      let allCharacters = [];
+      let allCharacters = [...payload.characters]; // Current page's characters
       let currentPage = 1;
-      let totalPages = 1;
-      let totalCharacters = 0;
+      let totalPages = payload.totalPages;
+      let totalCharacters = payload.totalCharacters;
 
       // Style fixes for dropdowns
       const dropdowns = document.querySelectorAll('select');
@@ -348,6 +341,7 @@ const charactersSchema = {
         applyFiltersAndFetch();
       });
     }
+
 
     // Multiple event handlers for checkboxes to ensure they trigger
     const handleImportantChange = (e) => {
