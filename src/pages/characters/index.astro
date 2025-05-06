@@ -1,20 +1,12 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import initialCharacters from '../../data/initial-characters.json';
-import { PAGE_SIZE, totalCharacters, totalPages } from '../../data/staticCharacters.js';
-
-// ---- constants -----------------------------------------------------------
+import { initialState, totalPages, staticCharacters, totalCharacters } from '../../data/staticData.js';
 
 // ---- prerender exports ---------------------------------------------------
 export const prerender = true;
-export const staticCharacters = initialCharacters.slice(0, PAGE_SIZE);
 
-export const initialState = {
-  characters: staticCharacters,
-  totalCharacters,
-  totalPages,
-  pageSize: PAGE_SIZE
-};
+// Log build info
+console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}`);
 // Get unique species from initial characters
 const allSpecies = [
   'Human',
