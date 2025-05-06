@@ -1,4 +1,4 @@
 This file was created to trigger a new Netlify build.
-Timestamp: 2025-04-21 16:30:00
+Timestamp: 2025-05-06 16:06:00
 Branch: fix/netlify-deployment
-Configuration: Minimal (public folder only)
+Configuration: Full build (dist folder)
