@@ -1,10 +1,9 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import initialCharacters from '../../data/initial-characters.json';
-import { PAGE_SIZE, totalCharacters } from '../../data/staticCharacters.js';
+import { PAGE_SIZE, totalCharacters, totalPages } from '../../data/staticCharacters.js';
 
 // ---- constants -----------------------------------------------------------
-const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
 
 // ---- prerender exports ---------------------------------------------------
 export const prerender = true;
