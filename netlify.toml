@@ -18,3 +18,8 @@
   from = "/characters/*"
   to = "/characters/[slug]"
   status = 200
+
+[[redirects]]
+  from = "/scripts/*"
+  to = "/scripts/:splat"
+  status = 200
