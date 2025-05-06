@@ -3,12 +3,12 @@ import Layout from '../../layouts/Layout.astro';
 import seriesData from '../../data/series.json';
 
 import { SERIES_PAGE_SIZE } from '../../data/constants.js';
-export const totalPages = Math.ceil(seriesData.length / SERIES_PAGE_SIZE);
-export const totalSeries = seriesData.length;
+let totalPages = Math.ceil(seriesData.length / SERIES_PAGE_SIZE);
+let totalSeries = seriesData.length;
 
 export const prerender = true;
 export const staticSeries = seriesData.slice(0, SERIES_PAGE_SIZE);
-export const initialSeries = staticSeries;
+let initialSeries = staticSeries;
 
 export const initialState = {
   series: staticSeries,
@@ -117,6 +117,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
 
 // Import the local series data at the top level
 let seriesLocalJson = [];
+let computedTotalPages = 0;
+let computedTotalSeries = 0;
 try {
   // Try to import the local series data
   seriesLocalJson = await import('../../data/series.json').then(m => m.default);
