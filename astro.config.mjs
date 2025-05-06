@@ -9,23 +9,16 @@ export default defineConfig({
   integrations: [
     tailwind(),
     react(),
-    netlify({
-      excludedPath: ['/api/*']
-    })
+    netlify()  // Removed excludedPath which might be causing issues
   ],
   site: 'https://star-trek-timelines.netlify.app',
   srcDir: './src',
   vite: {
     resolve: {
       alias: {
-        'astro/runtime/server': 'astro/dist/runtime/server/index.js',
         '@data': '/src/data'
       }
     },
-    build: {
-      rollupOptions: {
-        external: ['astro/runtime/server']
-      }
-    }
+    // Removed potentially problematic build options
   },
 });

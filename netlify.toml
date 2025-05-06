@@ -29,13 +29,12 @@
     "src/data/initial-characters.json"
   ]
 
-# API and function redirects
+# API and function redirects - these need to be before the catch-all redirects
 [[redirects]]
   from = "/api/series"
   to = "/.netlify/functions/stapi-series-proxy"
   status = 200
 
-# API and function redirects - these need to be before the catch-all redirects
 [[redirects]]
   from = "/api/memory-alpha/*"
   to = "/.netlify/functions/memory-alpha-search"
@@ -46,11 +45,6 @@
   to = "/.netlify/functions/character-detail"
   status = 200
 
-[[redirects]]
-  from = "/api/series"
-  to = "/.netlify/functions/stapi-series-proxy"
-  status = 200
-
 # API endpoint for series detail data - using Netlify function as fallback
 [[redirects]]
   from = "/api/series/:slug"
@@ -58,17 +52,7 @@
   status = 200
 
 # Series detail pages should be handled by the Astro SSR page, not directly by the function
-[[redirects]]
-  from = "/series/:slug"
-  to = "/series/:slug"
-  status = 200
-  force = true
-
-[[redirects]]
-  from = "/series/:slug/"
-  to = "/series/:slug"
-  status = 200
-  force = true
+# Removed circular redirects that might be causing issues
 
 # This is a more general redirect and should come after the specific ones
 [[redirects]]
