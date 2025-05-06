@@ -1,9 +1,13 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import { PAGE_SIZE } from '../../data/staticCharacters.js';
 import { initialState, totalPages, staticCharacters, totalCharacters } from '../../data/staticData.js';
 
 // ---- prerender exports ---------------------------------------------------
 export const prerender = true;
+
+// Make PAGE_SIZE available during build
+export { PAGE_SIZE };
 
 // Log build info
 console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}`);
