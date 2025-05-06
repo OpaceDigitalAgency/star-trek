@@ -42,7 +42,7 @@ const allSpecies = [
   return a.localeCompare(b);
 });
 
-console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
+console.log(`Initial build: Fetched ${initialCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
 
 // Initialize ranks - will be populated dynamically
 let initialRanks = [];
@@ -102,8 +102,8 @@ const charactersSchema = {
     "name": "Star Trek",
     "description": "Science fiction media franchise created by Gene Roddenberry"
   },
-  // Update hasPart to use static characters
-  "hasPart": staticCharacters.slice(0, 10).map(char => ({ // Limit to first 10 for schema
+  // Use initial characters for schema
+  "hasPart": initialCharacters.slice(0, 10).map(char => ({ // Limit to first 10 for schema
       "@type": "Person",
       "name": char.name,
       // Ensure slug/uid exists for URL generation
@@ -351,14 +351,12 @@ const charactersSchema = {
       // Get initial data from payload
       const payload = JSON.parse(document.getElementById('initial-payload').textContent);
       const PAGE_SIZE = payload.pageSize;
-      let isLoading = false; // Prevent multiple simultaneous fetches
-      let currentFilters = {}; // Initialize current filters
-      
       // Initialize state
+      let isLoading = false; // Prevent multiple simultaneous fetches
       let currentPage = 1;
       let totalPages = initialState.totalPages;
       let totalCharacters = initialState.totalCharacters;
-      let currentFilters = {};
+      let currentFilters = {}; // Initialize current filters
 
       // Function to render character cards
       function renderCharacters(characters) {
