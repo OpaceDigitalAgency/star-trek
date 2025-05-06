@@ -4,12 +4,14 @@ import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
-  output: 'static',
+  output: 'hybrid',
   integrations: [
     tailwind(),
     react()
   ],
   site: 'https://star-trek-timelines.netlify.app',
+  // Prerender first 48 character pages, rest handled at runtime
+  prefetch: true,
   srcDir: './src',
   vite: {
     resolve: {
