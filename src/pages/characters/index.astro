@@ -564,6 +564,10 @@ const charactersSchema = {
     // Initial load
     async function initialize() {
       try {
+        // Show loading state
+        isLoading = true;
+        container.style.opacity = '0.5';
+
         // Update dropdowns first
         await Promise.all([
           updateSpeciesDropdown(),
@@ -572,8 +576,15 @@ const charactersSchema = {
         
         // Then fetch first page of characters
         await fetchPageIfNeeded(1);
+
+        // Update UI
+        updatePaginationUI();
       } catch (error) {
         console.error('Error during initialization:', error);
+        container.innerHTML = '<p class="text-center text-red-500 col-span-full">Error loading characters. Please try again.</p>';
+      } finally {
+        isLoading = false;
+        container.style.opacity = '1';
       }
     }
 
