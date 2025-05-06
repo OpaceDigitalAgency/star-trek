@@ -1,4 +1,4 @@
 This file was created to trigger a new Netlify build.
-Timestamp: 2025-05-06 16:12:00
+Timestamp: 2025-05-06 16:17:00
 Branch: main
-Configuration: Full build (dist folder)
+Configuration: Static build with correct Netlify adapter
