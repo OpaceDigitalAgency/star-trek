@@ -60,8 +60,8 @@ function generateSitemap(series, characters) {
     <priority>0.8</priority>
   </url>`).join('')}
   
-  <!-- Character pages -->
-  ${characters.map(c => `
+  <!-- Only include first 48 character pages in sitemap -->
+  ${characters.slice(0, 48).map(c => `
   <url>
     <loc>${baseUrl}/characters/${c.slug}/</loc>
     <lastmod>${c.lastmod || today}</lastmod>
