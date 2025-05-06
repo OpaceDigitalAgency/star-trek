@@ -2,12 +2,12 @@
 import Layout from '../../layouts/Layout.astro';
 import seriesData from '../../data/series.json';
 
-const PAGE_SIZE = 12;  // Number of series to display per page
-let totalPages = Math.ceil(seriesData.length / PAGE_SIZE);
+import { SERIES_PAGE_SIZE } from '../../data/constants.js';
+let totalPages = Math.ceil(seriesData.length / SERIES_PAGE_SIZE);
 let totalSeries = seriesData.length;
 
 export const prerender = true;
-export const staticSeries = seriesData.slice(0, PAGE_SIZE);
+export const staticSeries = seriesData.slice(0, SERIES_PAGE_SIZE);
 export let initialSeries = staticSeries;
 
 export const initialState = {

@@ -1,3 +1,5 @@
+import { CHARACTER_PAGE_SIZE } from './constants.js';
+
 export const staticCharacters = [
   {
     uid: "CHMA0000215045",
@@ -15,6 +17,5 @@ export const staticCharacters = [
   }
 ];
 
-export const PAGE_SIZE = 48;
 export const totalCharacters = 7571;
-export const totalPages = Math.ceil(totalCharacters / PAGE_SIZE);
+export const totalPages = Math.ceil(totalCharacters / CHARACTER_PAGE_SIZE);
