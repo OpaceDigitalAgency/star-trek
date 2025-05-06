@@ -145,7 +145,7 @@
   4. Added proxy support for static.stapi.co images
   5. Tested the system with various characters to ensure proper image URLs
   6. Committed the changes and pushed to the main branch
-  
+
      This solution reduces Netlify build time from 15+ minutes to under a minute by reading the cached JSON file instead of making 7,600+ API calls on every build.
 
 - Completed all fixes for the characters page issues:
@@ -412,7 +412,7 @@
       - Updated the hardcoded cast lists in `scripts/build-series-characters.mjs` with more complete cast information for all Star Trek series
       - Added missing characters based on Google Knowledge Graph and Memory Alpha data
       - Ensured proper display of cast members on series detail pages
-   
+
    2. **Added Episode Data Grouped by Season:**
       - Created a new script `scripts/build-series-episodes.mjs` that:
         - Fetches seasons for each series from STAPI
@@ -425,13 +425,13 @@
         - VOY: 168 episodes across 7 seasons
         - ENT: 97 episodes across 4 seasons
         - And more for other series
-   
+
    3. **Improved Series Detail Page:**
       - Enhanced the series/[slug].astro template to properly display:
         - Complete cast information with character names and performers
         - Episodes grouped by season with episode numbers, titles, air dates, and stardates
       - Improved the layout and styling for better readability
- 
+
  - **Outcome:** Series detail pages now provide a much better user experience with comprehensive information about each Star Trek series, properly organized and displayed in a visually appealing way.
 ## 2025-04-20
 
@@ -475,3 +475,30 @@ This ensures we have static content for the first page while maintaining dynamic
 [2025-04-21 10:57] Fixed state management by properly exporting initialState with staticCharacters and ensuring all necessary data (characters, totalCharacters, totalPages, pageSize) is available during prerendering.
 [2025-04-21 11:00] Simplified initial payload handling by using the initialState object directly in the client-side script tag, ensuring consistent data structure between server and client.
 [2025-04-21 11:08] Fixed code duplication by removing duplicate initialState export, ensuring a single source of truth for the initial state data structure.
+
+## 2025-04-21
+
+- **Completed Hybrid Character Data Delivery Implementation**
+  - **Issue:** Character detail pages needed a reliable way to fetch and display character data with images, even for characters not processed at build time.
+  - **Solution:**
+    1. ✅ Created `character-enrichment.cjs` Netlify function that:
+       - Accepts a character UID or name parameter
+       - Fetches character data from local cache or STAPI
+       - Enriches it with Memory Alpha image data
+       - Implements caching for performance
+       - Returns the complete character object
+    2. ✅ Implemented robust caching for enriched character data:
+       - Used file-based caching in /tmp for persistence
+       - Added in-memory caching for faster responses
+       - Implemented cache invalidation strategies
+    3. ✅ Updated `character-detail.cjs` to use the enrichment function as fallback:
+       - First checks local cache (characters-local.json)
+       - Falls back to characters.json if local cache is unavailable
+       - Uses character-enrichment function for characters not found locally
+       - Implements multiple fallback strategies for character lookup
+    4. ✅ Optimized Memory Alpha requests with:
+       - Rate limiting (1 request per second)
+       - Retry logic with exponential backoff
+       - Request queueing to prevent overwhelming the API
+       - Error handling with graceful degradation
+  - **Outcome:** All character detail pages now display correctly with proper images, regardless of whether they were processed at build time or not. The system efficiently balances performance and completeness within Netlify's constraints.
