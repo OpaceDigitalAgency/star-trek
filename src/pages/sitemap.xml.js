@@ -1,15 +1,14 @@
 import { getAllSeries, getAllCharacters } from '../services/sitemapService';
 
-export async function get() {
+export async function GET() {
   const series = await getAllSeries();
   const characters = await getAllCharacters();
   
-  return {
-    body: generateSitemap(series, characters),
+  return new Response(generateSitemap(series, characters), {
     headers: {
       'Content-Type': 'application/xml'
     }
-  };
+  });
 }
 
 function generateSitemap(series, characters) {
