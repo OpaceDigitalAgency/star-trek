@@ -44,11 +44,42 @@ const allSpecies = [
 
 console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}. Found ${allSpecies.length} species.`);
 
-// Extract ranks *only* from the initial page for the build
-let initialRanks = [...new Set(staticCharacters
-  .map(c => c.title?.trim())
-  .filter(Boolean) // Remove empty/null titles
-)].sort();
+// Initialize ranks - will be populated dynamically
+let initialRanks = [];
+
+// Function to update ranks dropdown
+async function updateRanksDropdown() {
+  try {
+    // Fetch all characters to get ranks list
+    const response = await fetch('/api/characters?pageSize=10000');
+    const data = await response.json();
+    const allCharacters = data.characters;
+
+    // Extract unique ranks/titles
+    const ranksSet = new Set();
+    allCharacters.forEach(char => {
+      if (char.title?.trim()) {
+        ranksSet.add(char.title.trim());
+      }
+    });
+
+    // Update ranks list
+    initialRanks = Array.from(ranksSet).sort();
+
+    // Update dropdown
+    if (rankFilter) {
+      rankFilter.innerHTML = '<option value="all">All Ranks</option>';
+      initialRanks.forEach(rank => {
+        const opt = document.createElement('option');
+        opt.value = rank;
+        opt.textContent = rank;
+        rankFilter.appendChild(opt);
+      });
+    }
+  } catch (error) {
+    console.error('Error updating ranks dropdown:', error);
+  }
+}
 
 
 // --- REMOVED Memory Alpha image fetching and complex species grouping from build ---
@@ -448,31 +479,32 @@ const charactersSchema = {
 
     // --- Species Dropdown Dynamic Update ---
     // Fetch all matching characters (with current filters except species) and update the species dropdown
-    function updateSpeciesDropdown() {
-      // Use the predefined species list
-      const sortedSpecies = [
-        'Human',
-        'Vulcan',
-        'Klingon',
-        'Romulan',
-        'Cardassian',
-        'Bajoran',
-        'Ferengi',
-        'Andorian',
-        'Betazoid',
-        'Trill',
-        'Borg',
-        'Changeling',
-        'El-Aurian',
-        'Tellarite',
-        'Unknown'
-      ].sort((a, b) => {
-        if (a === 'Human') return -1;
-        if (b === 'Human') return 1;
-        if (a === 'Unknown') return -1;
-        if (b === 'Unknown') return 1;
-        return a.localeCompare(b);
-      });
+    async function updateSpeciesDropdown() {
+      try {
+        // Fetch all characters to get species list
+        const response = await fetch('/api/characters?pageSize=10000');
+        const data = await response.json();
+        const allCharacters = data.characters;
+
+        // Extract unique species from characters
+        const speciesSet = new Set();
+        allCharacters.forEach(char => {
+          if (char.characterSpecies) {
+            char.characterSpecies.forEach(s => s.name && speciesSet.add(s.name));
+          }
+          if (char.species) {
+            char.species.forEach(s => s.name && speciesSet.add(s.name));
+          }
+        });
+
+        // Convert to sorted array
+        const sortedSpecies = Array.from(speciesSet).sort((a, b) => {
+          if (a === 'Human') return -1;
+          if (b === 'Human') return 1;
+          if (a === 'Unknown') return -1;
+          if (b === 'Unknown') return 1;
+          return a.localeCompare(b);
+        });
 
       // Save current selection
       const prevValue = speciesFilter.value;
@@ -532,7 +564,23 @@ const charactersSchema = {
     }
 
     // Initial load
-    fetchPageIfNeeded(1);
+    async function initialize() {
+      try {
+        // Update dropdowns first
+        await Promise.all([
+          updateSpeciesDropdown(),
+          updateRanksDropdown()
+        ]);
+        
+        // Then fetch first page of characters
+        await fetchPageIfNeeded(1);
+      } catch (error) {
+        console.error('Error during initialization:', error);
+      }
+    }
+
+    // Start initialization
+    initialize();
     // Function to get current filter values from UI elements
     function getCurrentFilters() {
         const filters = {};
