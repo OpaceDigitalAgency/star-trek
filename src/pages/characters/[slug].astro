@@ -3,9 +3,9 @@ import Layout from '../../layouts/Layout.astro';
 import { slugify } from '../../utils/slugify.js';
 import charactersData from '../../data/characters-local.json';
 
-export const prerender = true;
+// For hybrid rendering - prerender first 48, rest server-side
+export const prerender = false;
 
-// Generate static paths for initial characters only
 export async function getStaticPaths() {
   // Only generate the first 48 character pages statically
   const initialCharacters = charactersData.slice(0, 48);
@@ -19,7 +19,30 @@ export async function getStaticPaths() {
   });
 }
 
-// Get character from props
+// Server-side handling for non-static routes
+export async function get({ params }) {
+  const { slug } = params;
+  
+  // Find character in full dataset
+  const character = charactersData.find(c => {
+    const nameSlug = slugify(c.name);
+    return `${nameSlug}-${c.uid}` === slug;
+  });
+
+  if (!character) {
+    return new Response(null, {
+      status: 404,
+      statusText: 'Not found'
+    });
+  }
+
+  return {
+    body: JSON.stringify({ character }),
+    encoding: 'utf-8'
+  };
+}
+
+// Get character from props or params
 const { character } = Astro.props;
 
 // Handle case when character is not found
@@ -66,7 +89,6 @@ const characterSchema = {
                 alt={character.name}
                 onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
                 class="w-full h-full object-cover"
-                onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
               />
             </div>
             
@@ -141,8 +163,6 @@ const characterSchema = {
     </div>
   </div>
 </Layout>
-
-<!-- No longer needed since we're using standard img tag -->
 
 <style>
   .character-image {
