@@ -17,7 +17,7 @@ export async function GET({ request }) {
   }
 
   // Read characters from JSON file
-  const charactersPath = path.join(process.cwd(), 'src', 'data', 'characters.json');
+  const charactersPath = path.join(process.cwd(), 'src', 'data', 'characters-local.json');
   let allChars = [];
   
   try {
