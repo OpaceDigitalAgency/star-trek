@@ -1,12 +1,34 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import { stapiService } from '../../services/stapiService';
 import { slugify } from '../../utils/slugify.js';
+import charactersData from '../../data/characters-local.json';
 
+export const prerender = true;
 
-export const prerender = false;
+// Generate static paths for all characters
+export async function getStaticPaths() {
+  return charactersData.map(character => {
+    const nameSlug = slugify(character.name);
+    const slug = `${nameSlug}-${character.uid}`;
+    return {
+      params: { slug },
+      props: { character }
+    };
+  });
+}
 
-export async function get({ params, request }) {
+const { character } = Astro.props;
+
+// Create JSON-LD schema for character page
+const characterSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": character.name,
+  "description": `${character.name} is a character from Star Trek.`,
+  "url": `https://star-trek-timelines.netlify.app/characters/${slugify(character.name)}/`,
+  "jobTitle": character.title || "Officer",
+  "image": character.wikiImage || character.image || "/images/generic-character.jpg"
+};
   const slug = params.slug;
   console.log(`[slug].astro: Processing request for slug: "${slug}"`);
   

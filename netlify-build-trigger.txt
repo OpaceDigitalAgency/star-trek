@@ -1,4 +1,4 @@
 This file was created to trigger a new Netlify build.
-Timestamp: 2025-05-06 16:24:00
+Timestamp: 2025-05-06 16:47:00
 Branch: main
-Configuration: Fixed PAGE_SIZE and sitemap endpoint
+Configuration: Fixed series totals computation
