@@ -1,5 +1,7 @@
 import { getAllSeries, getAllCharacters } from '../services/sitemapService';
 
+export const prerender = false;
+
 export async function GET() {
   const series = await getAllSeries();
   const characters = await getAllCharacters();
