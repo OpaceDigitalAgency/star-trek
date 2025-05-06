@@ -12,8 +12,8 @@ export const initialSeries = staticSeries;
 
 export const initialState = {
   series: staticSeries,
-  totalSeries,
-  totalPages,
+  totalSeries: seriesData.length,
+  totalPages: Math.ceil(seriesData.length / SERIES_PAGE_SIZE),
   pageSize: SERIES_PAGE_SIZE
 };
 
