@@ -14,7 +14,7 @@ export const initialState = {
   series: staticSeries,
   totalSeries,
   totalPages,
-  pageSize: PAGE_SIZE
+  pageSize: SERIES_PAGE_SIZE
 };
 
 import { stapiService, extractYears, extractStardateYears } from '../../services/stapiService';
@@ -132,8 +132,8 @@ try {
     import.meta.env.SSR && console.log('Using local series data for initial build');
 
     // Get the first page of series
-    initialSeries = seriesLocalJson.slice(0, PAGE_SIZE);
-    totalPages = Math.ceil(seriesLocalJson.length / PAGE_SIZE);
+    initialSeries = seriesLocalJson.slice(0, SERIES_PAGE_SIZE);
+    totalPages = Math.ceil(seriesLocalJson.length / SERIES_PAGE_SIZE);
     totalSeries = seriesLocalJson.length;
   } else {
     // Fallback to STAPI API if local data is not available
@@ -279,8 +279,8 @@ try {
       return aYear - bYear;
     });
 
-    initialSeries = allSeries.slice(0, PAGE_SIZE);
-    totalPages = Math.ceil(allSeries.length / PAGE_SIZE);
+    initialSeries = allSeries.slice(0, SERIES_PAGE_SIZE);
+    totalPages = Math.ceil(allSeries.length / SERIES_PAGE_SIZE);
     totalSeries = allSeries.length;
   }
 
@@ -637,7 +637,7 @@ const seriesListSchema = {
     series: initialSeries,
     totalPages: totalPages,
     totalSeries: totalSeries,
-    pageSize: PAGE_SIZE,
+    pageSize: SERIES_PAGE_SIZE,
     productionCompanies: productionCompanies,
     networks: networks,
     decades: decades
@@ -736,7 +736,7 @@ const seriesListSchema = {
     }
 
     const payload = JSON.parse(document.getElementById('initial-payload').textContent);
-    const PAGE_SIZE = payload.pageSize;
+    const pageSize = payload.pageSize;
     let currentPage = 1;
     let totalPages = payload.totalPages;
     let totalSeries = payload.totalSeries;
@@ -1006,8 +1006,8 @@ const seriesListSchema = {
         .filter(card => card.style.display !== 'none');
 
       // Calculate pagination
-      const startIndex = (currentPage - 1) * PAGE_SIZE;
-      const endIndex = startIndex + PAGE_SIZE;
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = startIndex + pageSize;
 
       // Show/hide cards based on pagination
       visibleCards.forEach((card, index) => {
@@ -1019,7 +1019,7 @@ const seriesListSchema = {
       });
 
       // Update total pages based on visible cards
-      totalPages = Math.ceil(visibleCards.length / PAGE_SIZE);
+      totalPages = Math.ceil(visibleCards.length / pageSize);
       totalNum.textContent = totalPages;
 
       // Announce to screen readers
