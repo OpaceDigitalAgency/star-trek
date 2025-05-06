@@ -17,7 +17,13 @@ export async function getStaticPaths() {
   });
 }
 
+// Get character from props
 const { character } = Astro.props;
+
+// Handle case when character is not found
+if (!character) {
+  return Astro.redirect('/characters');
+}
 
 // Create JSON-LD schema for character page
 const characterSchema = {
