@@ -1,16 +1,18 @@
 ---
 import Layout from '../../layouts/Layout.astro';
-import initialSeries from '../../data/series.json';
+import seriesData from '../../data/series.json';
 
 const PAGE_SIZE = 12;  // Number of series to display per page
-const totalPages = Math.ceil(initialSeries.length / PAGE_SIZE);
+let totalPages = Math.ceil(seriesData.length / PAGE_SIZE);
+let totalSeries = seriesData.length;
 
 export const prerender = true;
-export const staticSeries = initialSeries.slice(0, PAGE_SIZE);
+export const staticSeries = seriesData.slice(0, PAGE_SIZE);
+export let initialSeries = staticSeries;
 
 export const initialState = {
   series: staticSeries,
-  totalSeries: initialSeries.length,
+  totalSeries,
   totalPages,
   pageSize: PAGE_SIZE
 };
@@ -32,11 +34,11 @@ const progressiveImageScript = `
         this._loading = true;
         this._error = false;
       }
-      
+
       static get observedAttributes() {
         return ['src', 'fallback', 'alt'];
       }
-      
+
       attributeChangedCallback(name, oldValue, newValue) {
         if (oldValue !== newValue) {
           this['_' + name] = newValue;
@@ -45,26 +47,26 @@ const progressiveImageScript = `
           }
         }
       }
-      
+
       connectedCallback() {
         this._src = this.getAttribute('src') || '';
         this._fallback = this.getAttribute('fallback') || '/images/stars-placeholder.jpg';
         this._alt = this.getAttribute('alt') || '';
         this.loadImage();
       }
-      
+
       loadImage() {
         this._loading = true;
         this._error = false;
         this.render();
-        
+
         if (!this._src) {
           this._error = true;
           this._loading = false;
           this.render();
           return;
         }
-        
+
         const img = new Image();
         img.src = this._src;
         img.onload = () => {
@@ -77,7 +79,7 @@ const progressiveImageScript = `
           this._loading = false;
           this._error = true;
           this.render();
-          
+
           // Try to load the fallback image
           if (this._fallback && this._fallback !== this._src) {
             const fallbackImg = new Image();
@@ -85,7 +87,7 @@ const progressiveImageScript = `
           }
         };
       }
-      
+
       render() {
         if (this._loading) {
           this.innerHTML = \`
@@ -102,7 +104,7 @@ const progressiveImageScript = `
         }
       }
     }
-    
+
     customElements.define('progressive-image', ProgressiveImage);
   }
 `;
@@ -128,7 +130,7 @@ try {
   // Use local series data directly for the initial build if available
   if (seriesLocalJson && seriesLocalJson.length > 0) {
     import.meta.env.SSR && console.log('Using local series data for initial build');
-    
+
     // Get the first page of series
     initialSeries = seriesLocalJson.slice(0, PAGE_SIZE);
     totalPages = Math.ceil(seriesLocalJson.length / PAGE_SIZE);
@@ -136,17 +138,17 @@ try {
   } else {
     // Fallback to STAPI API if local data is not available
     import.meta.env.SSR && console.log('Local series data not available, fetching from STAPI');
-    
+
     // Fetch all series from STAPI
     let allSeries = await stapiService.getSeries();
-    
+
     // Filter out irrelevant entries and ensure we have the main series
-    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine", 
-                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery", 
+    const mainSeries = ["Star Trek", "Star Trek: The Next Generation", "Star Trek: Deep Space Nine",
+                        "Star Trek: Voyager", "Star Trek: Enterprise", "Star Trek: Discovery",
                         "Star Trek: Picard", "Star Trek: The Animated Series"];
-    
+
     allSeries = allSeries.filter(series => mainSeries.includes(series.title));
-    
+
     // If STAPI fails or returns insufficient data, use fallback
     if (allSeries.length < 5) {
       allSeries = [
@@ -240,7 +242,7 @@ try {
         }
       ];
     }
-    
+
     // Map STAPI data to our format
     allSeries = allSeries.map(series => ({
       ...series,
@@ -249,14 +251,14 @@ try {
       image: stapiService.getImageUrl(series.title, 'series'),
       slug: slugify(series.title)
     }));
-    
+
     // Enhance with Memory Alpha data for each series
     for (let i = 0; i < allSeries.length; i++) {
       try {
         const series = allSeries[i];
         const wikiTitle = series.title.replace('Star Trek: ', '');
         const wikiData = await stapiService.getMemoryAlphaContent(wikiTitle);
-        
+
         if (wikiData.image) {
           series.wikiImage = wikiData.image;
         }
@@ -268,7 +270,7 @@ try {
         console.error(`Error fetching Memory Alpha data for series:`, error);
       }
     }
-    
+
     // Sort series by in-universe chronology (stardate or years)
     allSeries.sort((a, b) => {
       // Extract years from stardate or production years
@@ -276,15 +278,15 @@ try {
       const bYear = parseInt(b.stardate?.split('-')?.[0] || b.productionStartYear || 0);
       return aYear - bYear;
     });
-    
+
     initialSeries = allSeries.slice(0, PAGE_SIZE);
     totalPages = Math.ceil(allSeries.length / PAGE_SIZE);
     totalSeries = allSeries.length;
   }
-  
+
   console.log(`Initial build: Fetched ${initialSeries.length} series. Total series: ${totalSeries}, Total pages: ${totalPages}.`);
   console.log('[series/index.astro] Series slugs for cards:', initialSeries.map(s => s.slug || s.uid || s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')));
-  
+
 } catch (error) {
   console.error('Error fetching initial series data:', error);
   // Add fallback data if needed
@@ -355,7 +357,7 @@ const seriesListSchema = {
   schemaData={seriesListSchema}
 >
   <script is:inline set:html={progressiveImageScript}></script>
-  
+
   <!-- TEMP: ARIA live region for dynamic updates -->
   <div id="aria-live-region" aria-live="polite" class="sr-only" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
     Timeline updated.
@@ -370,21 +372,21 @@ const seriesListSchema = {
           <h1 class="text-3xl">Federation Database: Star Trek Series</h1>
         </div>
       </div>
-      
+
       <div class="lcars-panel mb-12">
         <div class="lcars-top-bar flex">
           <div class="w-32 h-8 bg-starfleet-gold rounded-tl-lg"></div>
           <div class="flex-1 h-8 bg-starfleet-blue"></div>
           <div class="w-16 h-8 bg-starfleet-red"></div>
         </div>
-        
+
         <div class="panel-content p-6 bg-space-black bg-opacity-90 border-x border-b border-starfleet-blue rounded-b-lg">
           <p class="text-gray-300 mb-6">
             Accessing Federation archives... Displaying all Star Trek television series spanning from the 1960s to today.
             Each series expands the rich tapestry of the Star Trek universe, introducing new characters,
             technologies, and interstellar civilizations.
           </p>
-        
+
         <div class="filters mb-8">
           <div class="flex flex-wrap gap-6">
             <!-- Production Company Filter -->
@@ -409,7 +411,7 @@ const seriesListSchema = {
                 </div>
               </div>
             )}
-            
+
             <!-- Network Filter -->
             {networks.length > 0 && (
               <div class="filter-group">
@@ -432,7 +434,7 @@ const seriesListSchema = {
                 </div>
               </div>
             )}
-            
+
             <!-- Decade Filter -->
             {decades.length > 0 && (
               <div class="filter-group">
@@ -455,7 +457,7 @@ const seriesListSchema = {
                 </div>
               </div>
             )}
-            
+
             <!-- View Toggle -->
             <div class="filter-group ml-4">
               <h3 class="text-white text-lg mb-3 filter-label">Timeline View</h3>
@@ -464,7 +466,7 @@ const seriesListSchema = {
                 <button id="view-release" class="trek-button">Release Order</button>
               </div>
             </div>
-            
+
             <!-- Search -->
             <div class="filter-group ml-auto">
               <h3 class="text-white text-lg mb-3 filter-label">Search</h3>
@@ -486,7 +488,7 @@ const seriesListSchema = {
         </div>
       </div>
     </div>
-    
+
     <!-- Series container with enhanced timeline style -->
     <div class="timeline-container" id="series-container" aria-label="Star Trek Series Timeline" role="list">
       <!-- Timeline legend -->
@@ -594,13 +596,13 @@ const seriesListSchema = {
         );
       })}
     </div>
-    
+
     <!-- Pagination controls -->
     <div class="flex justify-between items-center my-8">
       <div class="series-count px-4 py-2 bg-space-black rounded-full text-white text-sm border border-starfleet-blue shadow-glow" id="series-count">
         {totalSeries} series
       </div>
-      
+
       <div id="pagination-controls" class="flex justify-center items-center">
         <div class="lcars-pagination flex items-center bg-space-black border border-starfleet-blue rounded-lg overflow-hidden shadow-glow">
           <button id="prev-page" class="px-4 py-2 bg-starfleet-blue text-white hover:bg-starfleet-gold hover:text-space-black transition-colors">
@@ -616,7 +618,7 @@ const seriesListSchema = {
         </div>
       </div>
     </div>
-    
+
     <!-- No results message (hidden by default) -->
     <div id="no-results" class="hidden text-center py-8">
       <div class="lcars-panel p-6 inline-block">
@@ -628,6 +630,7 @@ const seriesListSchema = {
 </Layout>
 
 <script
+  is:inline
   id="initial-payload"
   type="application/json"
   set:html={JSON.stringify({
@@ -680,32 +683,32 @@ const seriesListSchema = {
   // Client-side STAPI client using the Netlify proxy
   const stapiClient = {
     PROXY_URL: '/api/series', // Use the proxy endpoint
-    
+
     async getSeries(page = 0, pageSize = 12, filters = {}) {
       try {
         const params = new URLSearchParams({
           pageNumber: page.toString(),
           pageSize: pageSize.toString(),
         });
-        
+
         // Add filter parameters
         for (const [key, value] of Object.entries(filters)) {
           if (value && value !== 'all') { // Only add active filters
             params.append(key, value);
           }
         }
-        
+
         const url = `${this.PROXY_URL}?${params.toString()}`;
         console.log(`Fetching via proxy: ${url}`); // Log URL
-        
+
         const response = await fetch(url); // Fetch from the proxy
-        
+
         if (!response.ok) {
            const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
            console.error(`Proxy fetch error! Status: ${response.status}`, errorData);
            throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.error || response.statusText}`);
         }
-        
+
         const data = await response.json();
         console.log(`Received page ${page} (filtered: ${JSON.stringify(filters)}):`, data); // Log received data
         return data; // Should contain { series: [], page: { totalPages, totalElements } }
@@ -716,7 +719,7 @@ const seriesListSchema = {
       }
     }
   };
-  
+
   document.addEventListener('DOMContentLoaded', () => {
     // Client-side slugify function to match server-side implementation
     function slugify(text) {
@@ -731,7 +734,7 @@ const seriesListSchema = {
         .replace(/^-+/, '')          // Trim - from start of text
         .replace(/-+$/, '');         // Trim - from end of text
     }
-    
+
     const payload = JSON.parse(document.getElementById('initial-payload').textContent);
     const PAGE_SIZE = payload.pageSize;
     let currentPage = 1;
@@ -741,7 +744,7 @@ const seriesListSchema = {
     let isLoading = false; // Prevent multiple simultaneous fetches
     let currentFilters = {}; // Initialize current filters
     let viewMode = 'chronology'; // Default view mode
-    
+
     // DOM Elements
     const companyFilter = document.getElementById('company-filter');
     const networkFilter = document.getElementById('network-filter');
@@ -756,7 +759,7 @@ const seriesListSchema = {
     const countBadge = document.getElementById('series-count');
     const container = document.getElementById('series-container');
     const noResults = document.getElementById('no-results');
-    
+
     const debounce = (fn, ms = 300) => {
       let t;
       return (...args) => {
@@ -764,39 +767,39 @@ const seriesListSchema = {
         t = setTimeout(() => fn(...args), ms);
       };
     };
-    
+
     // Simplified filter function that works directly with the DOM
     function applyFilters() {
       if (isLoading) return; // Don't apply if already loading
-      
+
       // Get current filter values
       const companyVal = companyFilter?.value;
       const networkVal = networkFilter?.value;
       const decadeVal = decadeFilter?.value;
       const searchTerm = searchInput.value.trim().toLowerCase();
-      
+
       // Get all series cards
       const seriesCards = document.querySelectorAll('.timeline-row');
       let visibleCount = 0;
-      
+
       // Loop through each card and check if it matches the filters
       seriesCards.forEach(card => {
         let shouldShow = true;
-        
+
         // Get the series data from the card
         const title = card.querySelector('.card-title')?.textContent?.toLowerCase() || '';
         const network = card.querySelector('.card-meta')?.textContent?.toLowerCase() || '';
         const company = card.querySelector('.card-description')?.textContent?.toLowerCase() || '';
         const yearText = card.querySelector('.card-date-badge')?.textContent || '';
         const decade = yearText ? Math.floor(parseInt(yearText) / 10) * 10 : null;
-        
+
         // Apply company filter
         if (companyVal && companyVal !== 'all') {
           // Get the company text from the card
           const companyText = card.querySelector('.card-company')?.textContent?.toLowerCase() || '';
           // Also check the description which might contain company info
           const descText = card.querySelector('.card-description')?.textContent?.toLowerCase() || '';
-          
+
           // Check if either contains the selected company
           if (!companyText.includes(companyVal.toLowerCase()) &&
               !descText.includes(companyVal.toLowerCase()) &&
@@ -804,14 +807,14 @@ const seriesListSchema = {
             shouldShow = false;
           }
         }
-        
+
         // Apply network filter
         if (networkVal && networkVal !== 'all') {
           // Get the network text from the card
           const networkText = card.querySelector('.card-network')?.textContent?.toLowerCase() || '';
           // Also check the meta which might contain network info
           const metaText = card.querySelector('.card-meta')?.textContent?.toLowerCase() || '';
-          
+
           // Check if either contains the selected network
           if (!networkText.includes(networkVal.toLowerCase()) &&
               !metaText.includes(networkVal.toLowerCase()) &&
@@ -819,19 +822,19 @@ const seriesListSchema = {
             shouldShow = false;
           }
         }
-        
+
         // Apply decade filter
         if (decadeVal && decadeVal !== 'all' && decade !== parseInt(decadeVal)) {
           shouldShow = false;
         }
-        
+
         // Apply search filter
         if (searchTerm && !title.includes(searchTerm) &&
             !company.includes(searchTerm) &&
             !network.includes(searchTerm)) {
           shouldShow = false;
         }
-        
+
         // Show or hide the card
         if (shouldShow) {
           card.style.display = '';
@@ -840,10 +843,10 @@ const seriesListSchema = {
           card.style.display = 'none';
         }
       });
-      
+
       // Update the count badge
       countBadge.textContent = `${visibleCount} series found`;
-      
+
       // Show/hide no results message
       if (visibleCount === 0) {
         noResults.classList.remove('hidden');
@@ -852,29 +855,29 @@ const seriesListSchema = {
         noResults.classList.add('hidden');
         container.classList.remove('hidden');
       }
-      
+
       // Announce to screen readers
       const ariaLive = document.getElementById('aria-live-region');
       if (ariaLive) {
         ariaLive.textContent = `Filtered to ${visibleCount} series.`;
       }
     }
-    
+
     // Function to sort the timeline cards based on view mode
     function sortTimelineCards() {
       const rows = Array.from(document.querySelectorAll('.timeline-row'));
-      
+
       // Sort the rows based on view mode
       rows.sort((a, b) => {
         const aCard = a.querySelector('.series-card');
         const bCard = b.querySelector('.series-card');
-        
+
         if (!aCard || !bCard) return 0;
-        
+
         // Extract years for sorting
         let aYear = 0;
         let bYear = 0;
-        
+
         if (viewMode === 'chronology') {
           // For chronology view, use the date badge (in-universe year)
           aYear = parseInt(aCard.querySelector('.card-date-badge')?.textContent || '0');
@@ -884,96 +887,96 @@ const seriesListSchema = {
           // First try from the meta text which contains production years
           const aMatch = aCard.querySelector('.card-meta')?.textContent?.match(/(\d{4})/);
           const bMatch = bCard.querySelector('.card-meta')?.textContent?.match(/(\d{4})/);
-          
+
           if (aMatch) aYear = parseInt(aMatch[1]);
           if (bMatch) bYear = parseInt(bMatch[1]);
-          
+
           // If not found, try from the date badge as fallback
           if (!aYear) aYear = parseInt(aCard.querySelector('.card-date-badge')?.textContent || '0');
           if (!bYear) bYear = parseInt(bCard.querySelector('.card-date-badge')?.textContent || '0');
         }
-          
+
         return aYear - bYear;
       });
-      
+
       // Remove all rows from container
       rows.forEach(row => row.remove());
-      
+
       // Re-add rows in sorted order
       rows.forEach((row, idx) => {
         // Update alignment based on new order
         row.classList.remove('left', 'right');
         row.classList.add(idx % 2 === 0 ? 'left' : 'right');
-        
+
         // Update connector position
         const connector = row.querySelector('.connector');
         if (connector) {
           connector.classList.remove('left-0', 'right-0');
           connector.classList.add(idx % 2 === 0 ? 'right-0' : 'left-0');
         }
-        
+
         container.appendChild(row);
       });
-      
+
       // Add a clearfix element
       const clearfix = document.createElement('div');
       clearfix.style.clear = 'both';
       container.appendChild(clearfix);
-      
+
       // Apply filters to the newly sorted cards
       applyFilters();
     }
-    
+
     // Debounced version of applying filters for search input
     const debouncedApplyFilters = debounce(applyFilters, 300);
-    
+
     // Event Listeners - Trigger filter application
     companyFilter?.addEventListener('change', applyFilters);
     networkFilter?.addEventListener('change', applyFilters);
     decadeFilter?.addEventListener('change', applyFilters);
     searchInput.addEventListener('input', debouncedApplyFilters); // Use debounced version for search
-    
+
     // View toggle
     chronologyBtn.addEventListener('click', () => {
       viewMode = 'chronology';
       chronologyBtn.classList.add('active');
       releaseBtn.classList.remove('active');
-      
+
       // Update the cards with chronology view styling
       document.querySelectorAll('.series-card').forEach(card => {
         // Update color scheme for chronology view
         const header = card.querySelector('.lcars-card-header div:nth-child(2)');
         if (header) header.className = header.className.replace(/bg-[^\\s]+/, 'bg-starfleet-blue');
-        
+
         // Update other elements as needed
         const cardBody = card.querySelector('.card-body');
         if (cardBody) cardBody.className = cardBody.className.replace(/border-[^\\s]+/, 'border-starfleet-blue');
       });
-      
+
       // Sort the cards based on chronological order
       sortTimelineCards();
     });
-    
+
     releaseBtn.addEventListener('click', () => {
       viewMode = 'release';
       releaseBtn.classList.add('active');
       chronologyBtn.classList.remove('active');
-      
+
       // Update the cards with release view styling
       document.querySelectorAll('.series-card').forEach(card => {
         // Update color scheme for release view
         const header = card.querySelector('.lcars-card-header div:nth-child(2)');
         if (header) header.className = header.className.replace(/bg-[^\\s]+/, 'bg-starfleet-red');
-        
+
         // Update other elements as needed
         const cardBody = card.querySelector('.card-body');
         if (cardBody) cardBody.className = cardBody.className.replace(/border-[^\\s]+/, 'border-starfleet-red');
       });
-      
+
       // Sort the cards based on release order
       sortTimelineCards();
     });
-    
+
     // Simplified pagination that works with the visible cards
     prevBtn.addEventListener('click', () => {
       if (currentPage > 1) {
@@ -981,31 +984,31 @@ const seriesListSchema = {
         updatePagination();
       }
     });
-    
+
     nextBtn.addEventListener('click', () => {
       if (currentPage < totalPages) {
         currentPage++;
         updatePagination();
       }
     });
-    
+
     // Function to update pagination display and visible cards
     function updatePagination() {
       // Update page number display
       pageNum.textContent = currentPage;
-      
+
       // Enable/disable pagination buttons
       prevBtn.disabled = currentPage <= 1;
       nextBtn.disabled = currentPage >= totalPages;
-      
+
       // Get all visible cards (those that match current filters)
       const visibleCards = Array.from(document.querySelectorAll('.timeline-row'))
         .filter(card => card.style.display !== 'none');
-      
+
       // Calculate pagination
       const startIndex = (currentPage - 1) * PAGE_SIZE;
       const endIndex = startIndex + PAGE_SIZE;
-      
+
       // Show/hide cards based on pagination
       visibleCards.forEach((card, index) => {
         if (index >= startIndex && index < endIndex) {
@@ -1014,18 +1017,18 @@ const seriesListSchema = {
           card.style.display = 'none';
         }
       });
-      
+
       // Update total pages based on visible cards
       totalPages = Math.ceil(visibleCards.length / PAGE_SIZE);
       totalNum.textContent = totalPages;
-      
+
       // Announce to screen readers
       const ariaLive = document.getElementById('aria-live-region');
       if (ariaLive) {
         ariaLive.textContent = `Page ${currentPage} of ${totalPages}.`;
       }
     }
-    
+
     // Initial setup
     sortTimelineCards(); // Sort cards based on initial view mode
     applyFilters(); // Apply any initial filters
@@ -1040,22 +1043,22 @@ const seriesListSchema = {
     margin: 0 auto;
     padding: 40px 0;
   }
-  
+
   .timeline-row {
     position: relative;
     margin-bottom: 40px;
   }
-  
+
   .timeline-row.left .series-card {
     float: left;
     margin-right: 60px;
   }
-  
+
   .timeline-row.right .series-card {
     float: right;
     margin-left: 60px;
   }
-  
+
   /* Only apply single-column layout on mobile */
   @media (max-width: 768px) {
     .timeline-container, .timeline-row, .series-card {
@@ -1077,13 +1080,13 @@ const seriesListSchema = {
     position: relative;
     overflow: hidden;
   }
-  
+
   .trek-button:hover {
     background-color: var(--starfleet-blue);
     color: white;
     transform: translateY(-2px);
   }
-  
+
   .trek-button.active {
     background-color: var(--console-blue);
     box-shadow: 0 0 15px var(--console-blue);
@@ -1106,7 +1109,7 @@ const seriesListSchema = {
     transform: scaleX(1);
     transform-origin: left;
   }
-  
+
   /* Enhanced Filter Styles */
   .filter-group {
     position: relative;
@@ -1143,7 +1146,7 @@ const seriesListSchema = {
     height: 2px;
     background: var(--starfleet-blue);
   }
-  
+
   /* Timeline container with enhanced styling */
   .timeline-container {
     position: relative;
@@ -1152,7 +1155,7 @@ const seriesListSchema = {
     padding: 60px 0;
     overflow: visible;
   }
-  
+
   /* Timeline legend */
   .timeline-legend {
     display: flex;
@@ -1166,35 +1169,35 @@ const seriesListSchema = {
     z-index: 5;
     position: relative;
   }
-  
+
   .legend-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
-  
+
   .legend-dot {
     width: 12px;
     height: 12px;
     border-radius: 50%;
     display: inline-block;
   }
-  
+
   .legend-dot.in-universe {
     background-color: var(--starfleet-blue);
     box-shadow: 0 0 8px var(--starfleet-blue);
   }
-  
+
   .legend-dot.release-order {
     background-color: var(--starfleet-red);
     box-shadow: 0 0 8px var(--starfleet-red);
   }
-  
+
   .legend-text {
     color: white;
     font-size: 0.875rem;
   }
-  
+
   /* Enhanced timeline vertical line */
   .timeline-container::before {
     content: '';
@@ -1226,7 +1229,7 @@ const seriesListSchema = {
     z-index: 2;
     white-space: nowrap;
   }
-  
+
   /* Improved series card styles */
   .series-card {
     position: relative;
@@ -1241,7 +1244,7 @@ const seriesListSchema = {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     z-index: 2; /* Ensure cards appear above timeline elements */
   }
-  
+
   /* Card date badge */
   .card-date-badge {
     position: absolute;
@@ -1259,7 +1262,7 @@ const seriesListSchema = {
     z-index: 10;
     letter-spacing: 0.5px;
   }
-  
+
   /* Card image container */
   .card-image-container {
     position: relative;
@@ -1269,7 +1272,7 @@ const seriesListSchema = {
     height: 200px;
     overflow: hidden;
   }
-  
+
   .card-image {
     transition: transform 0.5s ease;
     width: 100%;
@@ -1277,7 +1280,7 @@ const seriesListSchema = {
     object-fit: cover;
     object-position: center;
   }
-  
+
   /* Card title */
   .card-title {
     position: relative;
@@ -1292,7 +1295,7 @@ const seriesListSchema = {
     display: flex;
     align-items: center;
   }
-  
+
   .card-title::before {
     content: '•';
     color: var(--starfleet-gold);
@@ -1300,7 +1303,7 @@ const seriesListSchema = {
     font-size: 1.5rem;
     text-shadow: 0 0 10px var(--starfleet-gold);
   }
-  
+
   /* Card meta info */
   .card-meta {
     background: rgba(1, 10, 31, 0.7);
@@ -1313,7 +1316,7 @@ const seriesListSchema = {
     font-family: 'Courier New', monospace;
     color: var(--console-green);
   }
-  
+
   /* Card description */
   .card-description {
     line-height: 1.6;
@@ -1323,7 +1326,7 @@ const seriesListSchema = {
     border-top: 1px solid rgba(0, 178, 255, 0.2);
     margin-top: 0.5rem;
   }
-  
+
   /* Timeline rows */
   .timeline-row {
     position: relative;
@@ -1333,19 +1336,19 @@ const seriesListSchema = {
     display: flex;
     align-items: center;
   }
-  
+
   /* Left side timeline rows */
   .timeline-row.left {
     justify-content: flex-end;
     padding-right: calc(50% + 40px);
   }
-  
+
   /* Right side timeline rows */
   .timeline-row.right {
     justify-content: flex-start;
     padding-left: calc(50% + 40px);
   }
-  
+
   /* Series cards inside timeline rows */
   .timeline-row .series-card {
     width: 450px;
@@ -1359,19 +1362,19 @@ const seriesListSchema = {
     transition: all 0.3s ease;
     overflow: hidden;
   }
-  
+
   /* Make sure the cards don't get too small on mobile */
   @media (max-width: 768px) {
     .timeline-row .series-card {
       width: 90%;
     }
-    
+
     .timeline-row.left, .timeline-row.right {
       padding: 0;
       justify-content: center;
     }
   }
-  
+
   /* Timeline dots with pulsing animation */
   .timeline-row::after {
     content: '';
@@ -1386,12 +1389,12 @@ const seriesListSchema = {
     top: 50%;
     transform: translateY(-50%);
   }
-  
+
   /* Position dots for left/right rows */
   .timeline-row.left::after {
     right: calc(50% - 12px);
   }
-  
+
   .timeline-row.right::after {
     left: calc(50% - 12px);
   }
@@ -1408,7 +1411,7 @@ const seriesListSchema = {
     box-shadow: 0 0 10px var(--starfleet-gold);
     transform: translateY(-50%);
   }
-  
+
   /* Position connecting lines for left/right rows */
   .timeline-row.left::before {
     right: 50%;
@@ -1417,35 +1420,35 @@ const seriesListSchema = {
   .timeline-row.right::before {
     left: 50%;
   }
-  
+
   /* Enhanced hover effects */
   .series-card:hover {
     transform: translateY(-5px) scale(1.02);
     box-shadow: 0 15px 30px rgba(0, 178, 255, 0.6);
     border-color: var(--starfleet-gold);
   }
-  
+
   .series-card:hover img {
     transform: scale(1.1);
     transition: transform 0.5s ease;
   }
-  
+
   .series-card:hover .card-image-container {
     box-shadow: 0 0 25px rgba(0, 178, 255, 0.7);
     border-color: var(--starfleet-gold);
   }
-  
+
   .series-card:hover .card-date-badge {
     background-color: var(--starfleet-gold);
     color: var(--space-black);
     box-shadow: 0 0 15px rgba(255, 204, 0, 0.8);
   }
-  
+
   .series-card:hover .card-title {
     background: linear-gradient(90deg, rgba(255, 204, 0, 0.2), transparent);
     text-shadow: 0 0 15px rgba(255, 204, 0, 0.7);
   }
-  
+
   .series-card:hover .card-meta {
     border-color: var(--starfleet-gold);
     color: var(--starfleet-gold);
@@ -1463,7 +1466,7 @@ const seriesListSchema = {
       box-shadow: 0 0 0 0 rgba(255, 204, 0, 0);
     }
   }
-  
+
   /* Panel styling */
   .lcars-panel {
     background-color: rgba(3, 10, 23, 0.7);
@@ -1472,16 +1475,16 @@ const seriesListSchema = {
     overflow: hidden;
     padding: 0;
   }
-  
+
   .card-body {
     transition: all 0.3s ease;
     padding: 1rem;
   }
-  
+
   img {
     transition: transform 0.5s ease;
   }
-  
+
   /* Enhanced pagination styles */
   .lcars-pagination {
     position: relative;
@@ -1490,17 +1493,17 @@ const seriesListSchema = {
     border-radius: 8px;
     box-shadow: 0 0 15px rgba(0, 178, 255, 0.2);
   }
-  
+
   /* Shadow glow effect */
   .shadow-glow {
     box-shadow: 0 0 15px rgba(0, 178, 255, 0.3);
     transition: box-shadow 0.3s ease;
   }
-  
+
   .shadow-glow:hover {
     box-shadow: 0 0 20px rgba(0, 178, 255, 0.5);
   }
-  
+
   .lcars-pagination button {
     position: relative;
     z-index: 2;
@@ -1508,17 +1511,17 @@ const seriesListSchema = {
     font-weight: bold;
     min-width: 100px;
   }
-  
+
   .lcars-pagination button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   .lcars-pagination button:not(:disabled):hover {
     background-color: var(--starfleet-gold);
     color: var(--space-black);
   }
-  
+
   .lcars-pagination::before {
     content: '';
     position: absolute;
@@ -1530,19 +1533,19 @@ const seriesListSchema = {
     animation: sweep 2s infinite;
     z-index: 1;
   }
-  
+
   @keyframes sweep {
     0% { left: -100%; }
     100% { left: 100%; }
   }
-  
+
   /* Clear floats after timeline */
   .timeline-container::after {
     content: "";
     display: table;
     clear: both;
   }
-  
+
   /* Memory Alpha links and colored bars styling */
   a[href*="memory-alpha"], a[href*="Memory-Alpha"], .memory-alpha-link {
     display: inline-block;
@@ -1559,14 +1562,14 @@ const seriesListSchema = {
     width: auto;
     max-width: 100%;
   }
-  
+
   a[href*="memory-alpha"]:hover, a[href*="Memory-Alpha"]:hover, .memory-alpha-link:hover {
     background-color: rgba(3, 10, 23, 0.8);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border-left-color: var(--starfleet-gold);
   }
-  
+
   /* Add spacing between timeline entries */
   .timeline-row {
     margin-bottom: 70px;
@@ -1575,12 +1578,12 @@ const seriesListSchema = {
     padding: 25px 0;
     border-radius: 8px;
   }
-  
+
   /* Add visual separation between timeline sections */
   .timeline-row:nth-child(odd) {
     background-color: rgba(0, 0, 0, 0.2);
   }
-  
+
   /* Style all colored bars (targeting by their common structure) */
   [class*="bg-starfleet-"], [class*="bg-console-"] {
     border-radius: 4px;
@@ -1592,12 +1595,12 @@ const seriesListSchema = {
     width: auto;
     max-width: 100%;
   }
-  
+
   /* Add more spacing between horizontal bars */
   div > div > div[class*="bg-"] {
     margin-bottom: 30px;
   }
-  
+
   /* Fix for Memory Alpha links and colored bars to be properly positioned */
   .timeline-row > a[href*="memory-alpha"],
   .timeline-row > a[href*="Memory-Alpha"],
@@ -1610,7 +1613,7 @@ const seriesListSchema = {
     width: auto;
     max-width: 100%;
   }
-  
+
   /* Ensure Memory Alpha links are associated with their series */
   .timeline-row.left > a[href*="memory-alpha"],
   .timeline-row.left > a[href*="Memory-Alpha"],
@@ -1620,7 +1623,7 @@ const seriesListSchema = {
     margin-right: 60px;
     width: calc(50% - 60px);
   }
-  
+
   .timeline-row.right > a[href*="memory-alpha"],
   .timeline-row.right > a[href*="Memory-Alpha"],
   .timeline-row.right > .memory-alpha-link,
@@ -1629,7 +1632,7 @@ const seriesListSchema = {
     margin-left: 60px;
     width: calc(50% - 60px);
   }
-  
+
   /* Fix for Memory Alpha links inside cards */
   .memory-alpha-link-card {
     display: inline-flex !important;
@@ -1639,14 +1642,14 @@ const seriesListSchema = {
     position: relative !important;
     border-left: none !important;
   }
-  
+
   /* Fix for Memory Alpha links that are dynamically added */
   .timeline-row::after {
     content: "";
     display: table;
     clear: both;
   }
-  
+
   /* Ensure Memory Alpha links are contained within their timeline rows */
   .timeline-container > a[href*="memory-alpha"],
   .timeline-container > a[href*="Memory-Alpha"],
@@ -1654,7 +1657,7 @@ const seriesListSchema = {
   .timeline-container > div[class*="bg-"] {
     display: none !important; /* Hide any links that are direct children of the timeline container */
   }
-  
+
   /* Add dividers between timeline entries */
   .timeline-row:not(:last-child)::after {
     content: '';
@@ -1666,24 +1669,24 @@ const seriesListSchema = {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(0, 178, 255, 0.4), transparent);
   }
-  
+
   /* Improve spacing between elements */
   .timeline-container > div {
     margin-bottom: 50px;
   }
-  
+
   /* Add spacing between all elements */
   .timeline-container * + * {
     margin-top: 10px;
   }
-  
+
   /* Enhanced filter styles */
   .filter-label {
     position: relative;
     display: inline-block;
     margin-bottom: 0.75rem;
   }
-  
+
   .filter-label::after {
     content: '';
     position: absolute;
@@ -1693,84 +1696,84 @@ const seriesListSchema = {
     height: 2px;
     background: linear-gradient(90deg, var(--starfleet-blue), transparent);
   }
-  
+
   .filter-select-wrapper {
     position: relative;
     transition: all 0.3s ease;
   }
-  
+
   .filter-select {
     transition: all 0.3s ease;
   }
-  
+
   .filter-select:focus + .filter-chevron svg {
     fill: var(--console-blue);
     filter: drop-shadow(0 0 5px var(--console-blue));
   }
-  
+
   .view-toggle-container {
     display: flex;
     gap: 0.5rem;
   }
-  
+
   .search-container {
     position: relative;
   }
-  
+
   .search-container input:focus + div svg {
     color: var(--starfleet-gold);
   }
-  
+
   /* Enhanced responsive timeline */
   @media screen and (max-width: 992px) {
     .series-card {
       width: calc(50% - 40px);
       margin-bottom: 70px; /* Adjusted spacing for medium screens */
     }
-    
+
     .timeline-row {
       margin-bottom: 40px;
     }
-    
+
     .memory-alpha-link {
       margin: 25px 0;
     }
-    
+
     .series-card::after {
       width: 15px;
       height: 15px;
       right: -55px;
     }
-    
+
     .series-card:nth-child(even)::after {
       left: -55px;
     }
-    
+
     .series-card::before {
       width: 40px;
     }
-    
+
     .series-card:nth-child(odd)::before {
       right: -40px;
     }
-    
+
     .series-card:nth-child(even)::before {
       left: -40px;
     }
-    
+
     .timeline-legend {
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
     }
   }
-  
+
   @media screen and (max-width: 768px) {
     /* Place the timeline to the left */
     .timeline-container::before {
       left: 31px;
     }
-    
+
     /* Full-width cards */
     .series-card {
       width: calc(100% - 80px);
@@ -1778,17 +1781,17 @@ const seriesListSchema = {
       margin-left: 80px;
       margin-bottom: 50px; /* Adjusted spacing for mobile */
     }
-    
+
     .timeline-row {
       margin-bottom: 30px;
       padding: 10px 0;
     }
-    
+
     .memory-alpha-link {
       margin: 15px 0;
       padding: 8px;
     }
-    
+
     /* Adjust Memory Alpha links and colored bars for mobile */
     .timeline-row.left > a[href*="memory-alpha"],
     .timeline-row.left > a[href*="Memory-Alpha"],
@@ -1803,7 +1806,7 @@ const seriesListSchema = {
       margin-left: 80px;
       margin-right: 0;
     }
-    
+
     /* Ensure Memory Alpha links inside cards remain properly styled on mobile */
     .memory-alpha-link-card {
       display: inline-flex !important;
@@ -1811,7 +1814,7 @@ const seriesListSchema = {
       float: none !important;
       width: auto !important;
     }
-    
+
     /* Make all cards stack on top of each other */
     .series-card:nth-child(odd),
     .series-card:nth-child(even) {
@@ -1820,14 +1823,14 @@ const seriesListSchema = {
       float: right;
       clear: both;
     }
-    
+
     /* Make all dots align to the left */
     .series-card::after,
     .series-card:nth-child(even)::after {
       left: -45px;
       right: auto;
     }
-    
+
     /* Adjust connecting lines for mobile */
     .series-card::before,
     .series-card:nth-child(odd)::before,
@@ -1835,17 +1838,17 @@ const seriesListSchema = {
       left: -35px;
       width: 35px;
     }
-    
+
     /* Adjust filters for mobile */
     .filters .flex {
       flex-direction: column;
       gap: 1rem;
     }
-    
+
     .filter-group {
       width: 100%;
     }
-    
+
     /* Year markers positioning for mobile */
     .timeline-container .year-marker {
       left: 31px;
@@ -1853,7 +1856,7 @@ const seriesListSchema = {
       font-size: 0.7rem;
       padding: 4px 8px;
     }
-    
+
     .timeline-legend {
       flex-direction: column;
       align-items: flex-start;
@@ -1862,37 +1865,37 @@ const seriesListSchema = {
       margin-bottom: 1.5rem;
     }
   }
-  
+
   @media screen and (max-width: 480px) {
     .series-card {
       margin-left: 60px;
       width: calc(100% - 60px);
     }
-    
+
     .lcars-pagination button {
       min-width: 80px;
       padding: 0.5rem;
       font-size: 0.9rem;
     }
-    
+
     .card-date-badge {
       top: 8px;
       right: 8px;
       font-size: 0.7rem;
       padding: 3px 6px;
     }
-    
+
     .card-title {
       font-size: 1.1rem;
     }
-    
+
     .card-meta {
       flex-direction: column;
       gap: 0.5rem;
       align-items: flex-start;
     }
   }
-  
+
   .lcars-pagination button {
     position: relative;
     z-index: 2;
@@ -1900,17 +1903,17 @@ const seriesListSchema = {
     font-weight: bold;
     min-width: 100px;
   }
-  
+
   .lcars-pagination button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  
+
   .lcars-pagination button:not(:disabled):hover {
     background-color: var(--starfleet-gold);
     color: var(--space-black);
   }
-  
+
   .lcars-pagination::before {
     content: '';
     position: absolute;
@@ -1922,19 +1925,19 @@ const seriesListSchema = {
     animation: sweep 2s infinite;
     z-index: 1;
   }
-  
+
   @keyframes sweep {
     0% { left: -100%; }
     100% { left: 100%; }
   }
-  
+
   /* Clear floats after timeline */
   .timeline-container::after {
     content: "";
     display: table;
     clear: both;
   }
-  
+
   /* Memory Alpha links and colored bars styling */
   a[href*="memory-alpha"], a[href*="Memory-Alpha"], .memory-alpha-link {
     display: inline-block;
@@ -1951,14 +1954,14 @@ const seriesListSchema = {
     width: auto;
     max-width: 100%;
   }
-  
+
   a[href*="memory-alpha"]:hover, a[href*="Memory-Alpha"]:hover, .memory-alpha-link:hover {
     background-color: rgba(3, 10, 23, 0.8);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     border-left-color: var(--starfleet-gold);
   }
-  
+
   /* Add spacing between timeline entries */
   .timeline-row {
     margin-bottom: 70px;
@@ -1967,12 +1970,12 @@ const seriesListSchema = {
     padding: 25px 0;
     border-radius: 8px;
   }
-  
+
   /* Add visual separation between timeline sections */
   .timeline-row:nth-child(odd) {
     background-color: rgba(0, 0, 0, 0.2);
   }
-  
+
   /* Style all colored bars (targeting by their common structure) */
   [class*="bg-starfleet-"], [class*="bg-console-"] {
     border-radius: 4px;
@@ -1984,12 +1987,12 @@ const seriesListSchema = {
     width: auto;
     max-width: 100%;
   }
-  
+
   /* Add more spacing between horizontal bars */
   div > div > div[class*="bg-"] {
     margin-bottom: 30px;
   }
-  
+
   /* Fix for Memory Alpha links and colored bars to be properly positioned */
   .timeline-row > a[href*="memory-alpha"],
   .timeline-row > a[href*="Memory-Alpha"],
@@ -2002,7 +2005,7 @@ const seriesListSchema = {
     width: auto;
     max-width: 100%;
   }
-  
+
   /* Ensure Memory Alpha links are associated with their series */
   .timeline-row.left > a[href*="memory-alpha"],
   .timeline-row.left > a[href*="Memory-Alpha"],
@@ -2012,7 +2015,7 @@ const seriesListSchema = {
     margin-right: 60px;
     width: calc(50% - 60px);
   }
-  
+
   .timeline-row.right > a[href*="memory-alpha"],
   .timeline-row.right > a[href*="Memory-Alpha"],
   .timeline-row.right > .memory-alpha-link,
@@ -2021,7 +2024,7 @@ const seriesListSchema = {
     margin-left: 60px;
     width: calc(50% - 60px);
   }
-  
+
   /* Fix for Memory Alpha links inside cards */
   .memory-alpha-link-card {
     display: inline-flex !important;
@@ -2031,14 +2034,14 @@ const seriesListSchema = {
     position: relative !important;
     border-left: none !important;
   }
-  
+
   /* Fix for Memory Alpha links that are dynamically added */
   .timeline-row::after {
     content: "";
     display: table;
     clear: both;
   }
-  
+
   /* Ensure Memory Alpha links are contained within their timeline rows */
   .timeline-container > a[href*="memory-alpha"],
   .timeline-container > a[href*="Memory-Alpha"],
@@ -2046,7 +2049,7 @@ const seriesListSchema = {
   .timeline-container > div[class*="bg-"] {
     display: none !important; /* Hide any links that are direct children of the timeline container */
   }
-  
+
   /* Add dividers between timeline entries */
   .timeline-row:not(:last-child)::after {
     content: '';
@@ -2058,24 +2061,24 @@ const seriesListSchema = {
     height: 1px;
     background: linear-gradient(90deg, transparent, rgba(0, 178, 255, 0.4), transparent);
   }
-  
+
   /* Improve spacing between elements */
   .timeline-container > div {
     margin-bottom: 50px;
   }
-  
+
   /* Add spacing between all elements */
   .timeline-container * + * {
     margin-top: 10px;
   }
-  
+
   /* Enhanced filter styles */
   .filter-label {
     position: relative;
     display: inline-block;
     margin-bottom: 0.75rem;
   }
-  
+
   .filter-label::after {
     content: '';
     position: absolute;
@@ -2085,30 +2088,30 @@ const seriesListSchema = {
     height: 2px;
     background: linear-gradient(90deg, var(--starfleet-blue), transparent);
   }
-  
+
   .filter-select-wrapper {
     position: relative;
     transition: all 0.3s ease;
   }
-  
+
   .filter-select {
     transition: all 0.3s ease;
   }
-  
+
   .filter-select:focus + .filter-chevron svg {
     fill: var(--console-blue);
     filter: drop-shadow(0 0 5px var(--console-blue));
   }
-  
+
   .view-toggle-container {
     display: flex;
     gap: 0.5rem;
   }
-  
+
   .search-container {
     position: relative;
   }
-  
+
   .search-container input:focus + div svg {
     color: var(--starfleet-gold);
   }
@@ -2118,50 +2121,50 @@ const seriesListSchema = {
       width: calc(50% - 40px);
       margin-bottom: 70px; /* Adjusted spacing for medium screens */
     }
-    
+
     .timeline-row {
       margin-bottom: 40px;
     }
-    
+
     .memory-alpha-link {
       margin: 25px 0;
     }
-    
+
     .series-card::after {
       width: 15px;
       height: 15px;
       right: -55px;
     }
-    
+
     .series-card:nth-child(even)::after {
       left: -55px;
     }
-    
+
     .series-card::before {
       width: 40px;
     }
-    
+
     .series-card:nth-child(odd)::before {
       right: -40px;
     }
-    
+
     .series-card:nth-child(even)::before {
       left: -40px;
     }
-    
+
     .timeline-legend {
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
     }
   }
-  
+
   @media screen and (max-width: 768px) {
     /* Place the timeline to the left */
     .timeline-container::before {
       left: 31px;
     }
-    
+
     /* Full-width cards */
     .series-card {
       width: calc(100% - 80px);
@@ -2169,17 +2172,17 @@ const seriesListSchema = {
       margin-left: 80px;
       margin-bottom: 50px; /* Adjusted spacing for mobile */
     }
-    
+
     .timeline-row {
       margin-bottom: 30px;
       padding: 10px 0;
     }
-    
+
     .memory-alpha-link {
       margin: 15px 0;
       padding: 8px;
     }
-    
+
     /* Adjust Memory Alpha links and colored bars for mobile */
     .timeline-row.left > a[href*="memory-alpha"],
     .timeline-row.left > a[href*="Memory-Alpha"],
@@ -2194,7 +2197,7 @@ const seriesListSchema = {
       margin-left: 80px;
       margin-right: 0;
     }
-    
+
     /* Ensure Memory Alpha links inside cards remain properly styled on mobile */
     .memory-alpha-link-card {
       display: inline-flex !important;
@@ -2202,7 +2205,7 @@ const seriesListSchema = {
       float: none !important;
       width: auto !important;
     }
-    
+
     /* Make all cards stack on top of each other */
     .series-card:nth-child(odd),
     .series-card:nth-child(even) {
@@ -2211,14 +2214,14 @@ const seriesListSchema = {
       float: right;
       clear: both;
     }
-    
+
     /* Make all dots align to the left */
     .series-card::after,
     .series-card:nth-child(even)::after {
       left: -45px;
       right: auto;
     }
-    
+
     /* Adjust connecting lines for mobile */
     .series-card::before,
     .series-card:nth-child(odd)::before,
@@ -2226,17 +2229,17 @@ const seriesListSchema = {
       left: -35px;
       width: 35px;
     }
-    
+
     /* Adjust filters for mobile */
     .filters .flex {
       flex-direction: column;
       gap: 1rem;
     }
-    
+
     .filter-group {
       width: 100%;
     }
-    
+
     /* Year markers positioning for mobile */
     .timeline-container .year-marker {
       left: 31px;
@@ -2244,7 +2247,7 @@ const seriesListSchema = {
       font-size: 0.7rem;
       padding: 4px 8px;
     }
-    
+
     .timeline-legend {
       flex-direction: column;
       align-items: flex-start;
@@ -2253,30 +2256,30 @@ const seriesListSchema = {
       margin-bottom: 1.5rem;
     }
   }
-  
+
   @media screen and (max-width: 480px) {
     .series-card {
       margin-left: 60px;
       width: calc(100% - 60px);
     }
-    
+
     .lcars-pagination button {
       min-width: 80px;
       padding: 0.5rem;
       font-size: 0.9rem;
     }
-    
+
     .card-date-badge {
       top: 8px;
       right: 8px;
       font-size: 0.7rem;
       padding: 3px 6px;
     }
-    
+
     .card-title {
       font-size: 1.1rem;
     }
-    
+
     .card-meta {
       flex-direction: column;
       gap: 0.5rem;
