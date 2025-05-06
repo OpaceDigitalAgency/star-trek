@@ -1,16 +1,22 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { CHARACTER_PAGE_SIZE } from '../../data/constants.js';
-import { initialState, totalPages, staticCharacters, totalCharacters } from '../../data/staticData.js';
+import charactersData from '../../data/characters-local.json';
 
-// ---- prerender exports ---------------------------------------------------
+// Get initial data for first page
+const initialCharacters = charactersData.slice(0, CHARACTER_PAGE_SIZE);
+const totalCharacters = charactersData.length;
+const totalPages = Math.ceil(totalCharacters / CHARACTER_PAGE_SIZE);
+
+// Initial state for client-side
+const initialState = {
+  characters: initialCharacters,
+  totalCharacters,
+  totalPages,
+  pageSize: CHARACTER_PAGE_SIZE
+};
+
 export const prerender = true;
-
-// Make page size available during build
-export const PAGE_SIZE = CHARACTER_PAGE_SIZE;
-
-// Log build info
-console.log(`Initial build: Fetched ${staticCharacters.length} characters. Total characters: ${totalCharacters}, Total pages: ${totalPages}`);
 // Get unique species from initial characters
 const allSpecies = [
   'Human',
@@ -235,51 +241,79 @@ const charactersSchema = {
       .replace(/-+$/, '');         // Trim - from end of text
   }
 
-  // Client-side STAPI client using the Netlify proxy
-  const stapiClient = {
-    PROXY_URL: '/api/characters', // Use the proxy endpoint
-
-    async getCharacters(page = 1, pageSize = 48, filters = {}) {
-      // Adjust page number for API (0-based)
-      const apiPage = page - 1;
-      try {
-        // Create a new object without the pageSize property from filters
-        const { pageSize: filterPageSize, ...otherFilters } = filters;
-        
-        const params = new URLSearchParams({
-          pageNumber: apiPage.toString(),
-          pageSize: pageSize.toString(),
-        });
-
-        // Add filter parameters
-        for (const [key, value] of Object.entries(otherFilters)) {
-          if (value && value !== 'all') { // Only add active filters
-            params.append(key, value);
-          }
+  // Load characters from local JSON file
+  async function loadCharacters(page = 1, filters = {}) {
+    try {
+      const response = await fetch('/api/characters', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
         }
+      });
 
-        const url = `${this.PROXY_URL}?${params.toString()}`;
-        console.log(`Fetching via proxy: ${url}`); // Log URL
-
-        const response = await fetch(url); // Fetch from the proxy
-
-        if (!response.ok) {
-           const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response' }));
-           console.error(`Proxy fetch error! Status: ${response.status}`, errorData);
-           throw new Error(`HTTP error! status: ${response.status}, details: ${errorData.error || response.statusText}`);
-        }
-
-        const data = await response.json();
-        console.log(`Received page ${page} (filtered: ${JSON.stringify(filters)}):`, data); // Log received data
-        return data; // Should contain { characters: [], page: { totalPages, totalElements } }
-      } catch (error) {
-        console.error('Error fetching characters via proxy:', error);
-        // Return an empty structure on error to prevent crashes
-        return { characters: [], page: { totalPages: 1, totalElements: 0 } };
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const allCharacters = await response.json();
+      
+      // Apply filters
+      let filtered = allCharacters;
+      
+      if (filters.species && filters.species !== 'all') {
+        filtered = filtered.filter(char =>
+          char.characterSpecies?.some(s => s.name === filters.species) ||
+          char.species?.some(s => s.name === filters.species)
+        );
+      }
+      
+      if (filters.title && filters.title !== 'all') {
+        filtered = filtered.filter(char => char.title === filters.title);
+      }
+      
+      if (filters.important) {
+        filtered = filtered.filter(char => char.important || char.isImportant);
+      }
+      
+      if (filters.keep) {
+        filtered = filtered.filter(char => char.keep === true);
+      }
+      
+      if (filters.name) {
+        const searchTerm = filters.name.toLowerCase();
+        filtered = filtered.filter(char =>
+          char.name.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // Calculate pagination
+      const pageSize = 48;
+      const start = (page - 1) * pageSize;
+      const end = start + pageSize;
+      const pageData = filtered.slice(start, end);
+
+      return {
+        characters: pageData,
+        page: {
+          totalPages: Math.ceil(filtered.length / pageSize),
+          totalElements: filtered.length,
+          pageNumber: page - 1,
+          pageSize: pageSize
+        }
+      };
+    } catch (error) {
+      console.error('Error loading characters:', error);
+      return {
+        characters: [],
+        page: {
+          totalPages: 1,
+          totalElements: 0,
+          pageNumber: 0,
+          pageSize: 48
+        }
+      };
     }
-    // Removed getMemoryAlphaImage - image handling simplified
-  };
+  }
 
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -290,10 +324,40 @@ const charactersSchema = {
       let currentFilters = {}; // Initialize current filters
       
       // Initialize state
-      let allCharacters = [...payload.characters]; // Current page's characters
       let currentPage = 1;
-      let totalPages = payload.totalPages;
-      let totalCharacters = payload.totalCharacters;
+      let totalPages = initialState.totalPages;
+      let totalCharacters = initialState.totalCharacters;
+      let currentFilters = {};
+
+      // Function to render character cards
+      function renderCharacters(characters) {
+        container.innerHTML = characters.map(char => `
+          <div class="character-card group relative bg-space-black border border-starfleet-blue rounded-lg overflow-hidden hover:border-starfleet-gold transition-colors">
+            <a href="/characters/${char.uid}/" class="block">
+              <div class="aspect-square overflow-hidden">
+                <img
+                  src="${char.wikiImage || char.image || '/images/generic-character.jpg'}"
+                  alt="${char.name}"
+                  class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                  onerror="this.onerror=null; this.src='/images/generic-character.jpg';"
+                />
+              </div>
+              <div class="p-4">
+                <h3 class="text-lg font-semibold text-white mb-1">${char.name}</h3>
+                ${char.title ? `<p class="text-starfleet-gold text-sm">${char.title}</p>` : ''}
+                ${char.characterSpecies?.length ?
+                  `<p class="text-gray-400 text-sm">${char.characterSpecies.map(s => s.name).join(', ')}</p>` :
+                  (char.species?.length ?
+                    `<p class="text-gray-400 text-sm">${char.species.map(s => s.name).join(', ')}</p>` :
+                    '')}
+              </div>
+            </a>
+          </div>
+        `).join('');
+      }
+
+      // Initial render
+      renderCharacters(initialState.characters);
 
       // Style fixes for dropdowns
       const dropdowns = document.querySelectorAll('select');
@@ -434,6 +498,41 @@ const charactersSchema = {
       }
     }
 
+    // Add pagination event handlers
+    prevBtn.addEventListener('click', () => {
+      if (currentPage > 1) {
+        currentPage--;
+        fetchPageIfNeeded(currentPage);
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentPage < totalPages) {
+        currentPage++;
+        fetchPageIfNeeded(currentPage);
+      }
+    });
+
+    // Function to get current filter values
+    function getCurrentFilters() {
+      return {
+        species: speciesFilter?.value !== 'all' ? speciesFilter?.value : undefined,
+        title: rankFilter?.value !== 'all' ? rankFilter?.value : undefined,
+        important: importantBox?.checked,
+        keep: keepBox?.checked,
+        name: searchInput?.value?.trim() || undefined
+      };
+    }
+
+    // Function to apply filters and fetch results
+    async function applyFiltersAndFetch() {
+      currentPage = 1; // Reset to first page when filters change
+      currentFilters = getCurrentFilters();
+      await fetchPageIfNeeded(currentPage);
+    }
+
+    // Initial load
+    fetchPageIfNeeded(1);
     // Function to get current filter values from UI elements
     function getCurrentFilters() {
         const filters = {};
@@ -479,25 +578,39 @@ const charactersSchema = {
     }
 
     // Function to apply filters and get a specific page
-    async function fetchPageIfNeeded(pageNumber) { // pageNumber is 1-based for UI
-      console.log('fetchPageIfNeeded called with page:', pageNumber, 'type:', typeof pageNumber);
-      if (isLoading) {
-        console.log('Already loading, ignoring request');
-        return;
-      }
+    async function fetchPageIfNeeded(pageNumber) {
+      if (isLoading) return;
 
       try {
         isLoading = true;
         container.style.opacity = '0.5';
 
-        // Convert 1-based UI page number to 0-based API page number
-        const apiPageNumber = Number(pageNumber) - 1;
-        console.log('Converting UI page', pageNumber, 'to API page:', apiPageNumber);
+        // Get current filters
+        const filters = getCurrentFilters();
         
-        // Prepare API filters
-        const apiFilters = {
-          ...currentFilters,
-          page: apiPageNumber
+        // Load filtered characters
+        const result = await loadCharacters(pageNumber, filters);
+        
+        // Update state
+        currentPage = pageNumber;
+        totalPages = result.page.totalPages;
+        totalCharacters = result.page.totalElements;
+        
+        // Update UI
+        renderCharacters(result.characters);
+        updatePaginationUI();
+        
+        // Show/hide no results message
+        if (result.characters.length === 0) {
+          container.classList.add('hidden');
+          noResults.classList.remove('hidden');
+        } else {
+          container.classList.remove('hidden');
+          noResults.classList.add('hidden');
+        }
+
+        // Update character count
+        countBadge.textContent = `${result.page.totalElements} characters found`;
         };
         
         // Rename filter parameters to match API expectations
