@@ -5,9 +5,11 @@ import charactersData from '../../data/characters-local.json';
 
 export const prerender = true;
 
-// Generate static paths for all characters
+// Generate static paths for initial characters only
 export async function getStaticPaths() {
-  return charactersData.map(character => {
+  // Only generate the first 48 character pages statically
+  const initialCharacters = charactersData.slice(0, 48);
+  return initialCharacters.map(character => {
     const nameSlug = slugify(character.name);
     const slug = `${nameSlug}-${character.uid}`;
     return {
