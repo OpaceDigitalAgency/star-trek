@@ -6,66 +6,12 @@
   NODE_VERSION = "18"
   NETLIFY_ENV = "production"
 
-# Enable Netlify Asset Optimization
-[build.processing]
-  skip_processing = false
-[build.processing.css]
-  bundle = true
-  minify = true
-[build.processing.js]
-  bundle = true
-  minify = true
-[build.processing.html]
-  pretty_urls = true
-[build.processing.images]
-  compress = true
-
 # Enable functions directory
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
-  included_files = [
-    "netlify/functions/characters.json",
-    "src/data/initial-characters.json"
-  ]
 
-# API and function redirects - these need to be before the catch-all redirects
-[[redirects]]
-  from = "/api/series"
-  to = "/.netlify/functions/stapi-series-proxy"
-  status = 200
-
-[[redirects]]
-  from = "/api/memory-alpha/*"
-  to = "/.netlify/functions/memory-alpha-search"
-  status = 200
-
-[[redirects]]
-  from = "/characters/:slug"
-  to = "/.netlify/functions/character-detail"
-  status = 200
-
-# API endpoint for series detail data - using Netlify function as fallback
-[[redirects]]
-  from = "/api/series/:slug"
-  to = "/.netlify/functions/series-detail"
-  status = 200
-
-# Series detail pages should be handled by the Astro SSR page, not directly by the function
-# Removed circular redirects that might be causing issues
-
-# This is a more general redirect and should come after the specific ones
-[[redirects]]
-  from = "/series/*"
-  to = "/series/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/images/*"
-  to = "/images/:splat"
-  status = 200
-  force = true
-
+# Basic catch-all redirect for SPA
 [[redirects]]
   from = "/*"
   to = "/index.html"
