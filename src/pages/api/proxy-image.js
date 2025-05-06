@@ -3,6 +3,8 @@ import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 
+export const prerender = false;
+
 export async function get({ request }) {
   // Get the URL from the query parameters
   const url = new URL(request.url);

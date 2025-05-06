@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
+export const prerender = false;
+
 export async function GET({ request }) {
   const url = new URL(request.url);
   const pageNumber = parseInt(url.searchParams.get('pageNumber') || '0', 10);
