@@ -515,12 +515,12 @@ const charactersSchema = {
         }
         
         console.log('Sending API filters for page:', apiFilters);
-        const apiData = await stapiClient.getCharacters(apiPageNumber, PAGE_SIZE, apiFilters);
+        const apiData = await stapiClient.getCharacters(apiPageNumber, pageSize, apiFilters);
         
         // Update state with new data
         allCharacters = apiData.characters || [];
         currentPage = pageNumber; // Keep UI page number as 1-based
-        totalPages = apiData.page?.totalPages || Math.ceil(totalCharacters / PAGE_SIZE);
+        totalPages = apiData.page?.totalPages || Math.ceil(totalCharacters / pageSize);
         totalCharacters = apiData.page?.totalElements || totalCharacters;
         
         console.log('Updated page data:', {

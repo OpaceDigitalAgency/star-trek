@@ -3,12 +3,12 @@ import Layout from '../../layouts/Layout.astro';
 import seriesData from '../../data/series.json';
 
 import { SERIES_PAGE_SIZE } from '../../data/constants.js';
-let totalPages = Math.ceil(seriesData.length / SERIES_PAGE_SIZE);
-let totalSeries = seriesData.length;
+export const totalPages = Math.ceil(seriesData.length / SERIES_PAGE_SIZE);
+export const totalSeries = seriesData.length;
 
 export const prerender = true;
 export const staticSeries = seriesData.slice(0, SERIES_PAGE_SIZE);
-export let initialSeries = staticSeries;
+export const initialSeries = staticSeries;
 
 export const initialState = {
   series: staticSeries,
@@ -132,9 +132,12 @@ try {
     import.meta.env.SSR && console.log('Using local series data for initial build');
 
     // Get the first page of series
-    initialSeries = seriesLocalJson.slice(0, SERIES_PAGE_SIZE);
-    totalPages = Math.ceil(seriesLocalJson.length / SERIES_PAGE_SIZE);
-    totalSeries = seriesLocalJson.length;
+    const firstPageSeries = seriesLocalJson.slice(0, SERIES_PAGE_SIZE);
+    const computedTotalPages = Math.ceil(seriesLocalJson.length / SERIES_PAGE_SIZE);
+    const computedTotalSeries = seriesLocalJson.length;
+
+    // Update exports with computed values
+    initialSeries = firstPageSeries;
   } else {
     // Fallback to STAPI API if local data is not available
     import.meta.env.SSR && console.log('Local series data not available, fetching from STAPI');
@@ -279,9 +282,12 @@ try {
       return aYear - bYear;
     });
 
-    initialSeries = allSeries.slice(0, SERIES_PAGE_SIZE);
-    totalPages = Math.ceil(allSeries.length / SERIES_PAGE_SIZE);
-    totalSeries = allSeries.length;
+    const firstPageSeries = allSeries.slice(0, SERIES_PAGE_SIZE);
+    const computedTotalPages = Math.ceil(allSeries.length / SERIES_PAGE_SIZE);
+    const computedTotalSeries = allSeries.length;
+
+    // Update exports with computed values
+    initialSeries = firstPageSeries;
   }
 
   console.log(`Initial build: Fetched ${initialSeries.length} series. Total series: ${totalSeries}, Total pages: ${totalPages}.`);
@@ -290,9 +296,12 @@ try {
 } catch (error) {
   console.error('Error fetching initial series data:', error);
   // Add fallback data if needed
-  initialSeries = [ /* Add fallback series objects here if API fails */ ];
-  totalSeries = initialSeries.length;
-  totalPages = 1;
+  const fallbackSeries = [ /* Add fallback series objects here if API fails */ ];
+  const computedTotalSeries = fallbackSeries.length;
+  const computedTotalPages = 1;
+
+  // Update exports with computed values
+  initialSeries = fallbackSeries;
 }
 
 // Extract production companies and networks for filter dropdowns
