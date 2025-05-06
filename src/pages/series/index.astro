@@ -290,7 +290,7 @@ try {
     initialSeries = firstPageSeries;
   }
 
-  console.log(`Initial build: Fetched ${initialSeries.length} series. Total series: ${totalSeries}, Total pages: ${totalPages}.`);
+  console.log(`Initial build: Fetched ${initialSeries.length} series. Total series: ${computedTotalSeries}, Total pages: ${computedTotalPages}.`);
   console.log('[series/index.astro] Series slugs for cards:', initialSeries.map(s => s.slug || s.uid || s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')));
 
 } catch (error) {
@@ -747,9 +747,9 @@ const seriesListSchema = {
     const payload = JSON.parse(document.getElementById('initial-payload').textContent);
     const pageSize = payload.pageSize;
     let currentPage = 1;
-    let totalPages = payload.totalPages;
-    let totalSeries = payload.totalSeries;
-    let allSeries = [...payload.series]; // Always holds only the current page's series
+    const totalPages = payload.totalPages;
+    const totalSeries = payload.totalSeries;
+    const allSeries = [...payload.series]; // Always holds only the current page's series
     let isLoading = false; // Prevent multiple simultaneous fetches
     let currentFilters = {}; // Initialize current filters
     let viewMode = 'chronology'; // Default view mode
